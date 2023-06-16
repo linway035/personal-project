@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      hidden_tweets.belongsTo(models.users, { foreignKey: 'user_id' })
+      hidden_tweets.belongsTo(models.tweets, { foreignKey: 'tweet_id' })
     }
   }
   hidden_tweets.init(
