@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       reply_likes.belongsTo(models.users, { foreignKey: 'user_id' })
+      reply_likes.belongsTo(models.replies, { foreignKey: 'reply_id' })
     }
   }
   reply_likes.init(
