@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       tweets.hasMany(models.ratings, { foreignKey: 'tweet_id' })
       tweets.hasMany(models.retweets, { foreignKey: 'tweet_id' })
       tweets.hasMany(models.hidden_tweets, { foreignKey: 'tweet_id' })
+      tweets.hasMany(models.tweet_images, { foreignKey: 'tweet_id' })
     }
   }
   tweets.init(

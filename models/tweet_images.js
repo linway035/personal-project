@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      tweet_images.belongsTo(models.tweets, { foreignKey: 'tweet_id' })
     }
   }
   tweet_images.init(
