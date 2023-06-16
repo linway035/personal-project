@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'followers',
       })
       users.hasMany(models.tweets, { foreignKey: 'user_id' })
+      users.hasMany(models.replies, { foreignKey: 'user_id' })
     }
   }
   users.init(
