@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       replies.belongsTo(models.users, { foreignKey: 'user_id' })
       replies.hasMany(models.reply_likes, { foreignKey: 'reply_id' })
+      replies.belongsTo(models.tweets, { foreignKey: 'tweet_id' })
     }
   }
   replies.init(
