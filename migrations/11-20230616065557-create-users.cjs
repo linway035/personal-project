@@ -1,7 +1,4 @@
 'use strict'
-
-const { now } = require('sequelize/types/utils')
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
