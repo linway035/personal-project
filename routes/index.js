@@ -3,6 +3,9 @@ import users from './modules/users.js'
 const router = Router()
 
 router.use('/users', users)
-router.use('/', (req, res) => res.send('hi'))
+router.use('/home', (req, res) => res.send('hi'))
+router.get('/', (req, res) => {
+  res.redirect('/home')
+})
 
 export default router

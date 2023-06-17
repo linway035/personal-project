@@ -1,5 +1,6 @@
 import pool from '../middleware/databasePool.js'
 import bcrypt from 'bcryptjs'
+import { signJWT, verifyJWT } from '../middleware/JWT.js'
 const saltRounds = 10
 
 const userController = {
@@ -37,7 +38,17 @@ const userController = {
         'INSERT INTO users (provider, email, password, name, avatar, cover) VALUES (?, ?, ?, ?, ?, ?)',
         [provider, email, hash, name, avatar, cover]
       )
-      console.log(insert)
+      // console.log(insert)
+      // ResultSetHeader {
+      //   fieldCount: 0,
+      //   affectedRows: 1,
+      //   insertId: 1,
+      //   info: '',
+      //   serverStatus: 2,
+      //   warningStatus: 0
+      // }
+      const token = await signJWT(insert.insertId)
+      res.cookie('jwtToken', token).redirect('/')
     } catch (error) {
       next(error)
     }
