@@ -4,5 +4,7 @@ const router = Router()
 
 router.get('/signup', userController.getSignUpPage)
 router.post('/signup', userController.signUp)
+router.get('/signin', userController.getSignInPage)
+router.post('/signin', userController.signIn)
 
 export default router

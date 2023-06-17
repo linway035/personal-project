@@ -7,7 +7,7 @@ async function authenticate(req, res, next) {
     const token = tokenInHeaders?.replace('Bearer ', '') || req.cookies.jwtToken
     if (!token) {
       req.flash('error_messages', '請先登入')
-      return res.redirect('/signin')
+      return res.redirect('/users/signin')
     }
     const decoded = await verifyJWT(token)
     res.locals.userId = decoded.userId

@@ -53,6 +53,28 @@ const userController = {
       next(error)
     }
   },
+  getSignInPage: async (req, res, next) => {
+    res.render('signin')
+  },
+  signIn: async (req, res, next) => {
+    try {
+      const email = req.body.email.trim()
+      const password = req.body.password
+      if (!email || !password)
+        throw new Error('Email and Password are required')
+      const [user, fields] = await pool.execute(
+        'SELECT * FROM Users WHERE email = ?',
+        [email]
+      )
+      if (!user.length) throw new Error('User not exist')
+      const isPasswordCorrect = bcrypt.compareSync(password, user[0].password)
+      if (!isPasswordCorrect) throw new Error('Invalid password')
+      const token = await signJWT(user.id)
+      res.cookie('jwtToken', token).redirect('/')
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 
 export default userController

@@ -1,0 +1,23 @@
+<h2>登入</h2>
+
+<form action="/users/signin" method="POST">
+  <label for="email">Email:</label><br>
+  <input type="email" id="email" name="email"><br><br>
+
+  <label for="password">密碼:</label><br>
+  <input type="password" id="password" name="password"><br><br>
+
+  <input type="submit" value="登入">
+</form>
+
+<h3>或</h3>
+
+<button onclick="googleSignin()">使用 Google 登入</button>
+
+<script>
+  function googleSignin() {
+    // 在這裡實現使用 Google 登入的邏輯
+    // 可以使用 Google Sign-In API 或其他相關方法
+    alert("使用 Google 登入");
+  }
+</script>
