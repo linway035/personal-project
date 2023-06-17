@@ -10,6 +10,9 @@ const port = process.env.PORT || 3000
 
 app.engine('hbs', exphbs({ extname: '.hbs' }))
 app.set('view engine', 'hbs')
+// app.use(express.static('public'))
+// app.use(express.json())
+app.use(express.urlencoded({ extended: true })) //body-parser
 
 app.use(routes)
 
