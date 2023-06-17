@@ -12,10 +12,18 @@ module.exports = {
       follower_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       following_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       is_active: {
         allowNull: false,

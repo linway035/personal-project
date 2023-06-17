@@ -12,10 +12,18 @@ module.exports = {
       tweet_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'tweets',
+          key: 'id',
+        },
       },
       user_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       rating: {
         allowNull: false,

@@ -12,10 +12,18 @@ module.exports = {
       user_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
       reply_id: {
         allowNull: false,
         type: Sequelize.INTEGER,
+        references: {
+          model: 'replies',
+          key: 'id',
+        },
       },
       is_active: {
         allowNull: false,
