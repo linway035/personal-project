@@ -94,7 +94,7 @@ input::placeholder {
   margin-bottom: 22px;
   width: 356px;
   height: 46px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   border: none;
   color: #ffffff;
@@ -349,7 +349,7 @@ input::placeholder {
   margin-right: 10px;
   padding-bottom: 4px;
   width: 25px;
-  color: #ff6600;
+  color: #43bffd;
 }
 
 .admin-left-side .logout {
@@ -517,7 +517,7 @@ h4 {
   padding: 8px 16px;
   width: 96px;
   height: 40px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   flex: none;
   order: 0;
@@ -539,9 +539,9 @@ h4 {
   width: 64px;
   height: 40px;
   background: #ffffff;
-  border: 1px solid #ff6600;
+  border: 1px solid #43bffd;
   border-radius: 50px;
-  color: #ff6600;
+  color: #43bffd;
   padding: 0;
 }
 
@@ -600,7 +600,7 @@ h4 {
   margin-left: 528px;
   width: 88px;
   height: 46px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   border: none;
   color: #ffffff;
@@ -623,7 +623,7 @@ h4 {
   flex: none;
   order: 1;
   flex-grow: 0;
-  color: #ff6600;
+  color: #43bffd;
 }
 /* admin-tweets */
 
@@ -749,8 +749,8 @@ h4 {
 
 /* active時啟動 */
 .nav-tabs .nav-item .nav-link.active {
-  color: #ff6600;
-  border-color: #fff #fff #ff6600;
+  color: #43bffd;
+  border-color: #fff #fff #43bffd;
   border-width: 2px;
 }
 
@@ -816,7 +816,7 @@ h4 {
   padding: 8px 16px;
   width: 64.5px;
   height: 40px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   flex: none;
   order: 0;
@@ -945,7 +945,7 @@ h4 {
   padding: 8px 16px;
   width: 96px;
   height: 40px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   align-items: center;
   text-align: center;
@@ -966,12 +966,12 @@ h4 {
   width: 66px;
   height: 40px;
   background: #ffffff;
-  border: 1px solid #ff6600;
+  border: 1px solid #43bffd;
   border-radius: 50px;
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
-  color: #ff6600;
+  color: #43bffd;
   display: flex;
   align-items: center;
   text-align: center;
@@ -1044,7 +1044,7 @@ form.was-validated .input:invalid ~ .invalid-feedback {
   align-items: center;
   width: 64px;
   height: 40px;
-  background: #ff6600;
+  background: #43bffd;
   border-radius: 50px;
   border: none;
   color: #ffffff;

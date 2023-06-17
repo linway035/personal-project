@@ -6,11 +6,11 @@
         <a href="/tweets" class="nav-item-content">
           {{#ifNotCond route "home"}}
           <img src="/images/icons/outlined-home.png" class="base-icon">
-          <span class="word">首頁</span>
+          <span class="word">Home</span>
           {{/ifNotCond}}
           {{#ifCond route "home"}}
           <img src="/images/icons/filled-home.png" class="base-icon">
-          <span class="word" style="color: #FF6600;">首頁</span>
+          <span class="word" style="color: #43BFFD;">Home</span>
           {{/ifCond}}
         </a>
       </li>
@@ -22,7 +22,7 @@
           {{/ifNotCond}}
           {{#ifCond route "userProfile"}}
           <img src="/images/icons/filled-user.png" class="base-icon">
-          <span class="word" style="color: #FF6600;">個人資料</span>
+          <span class="word" style="color: #43BFFD;">個人資料</span>
           {{/ifCond}}
         </a>
       </li>
@@ -34,13 +34,13 @@
           {{/ifNotCond}}
           {{#ifCond route "settings"}}
           <img src="/images/icons/filled-cog.png" class="base-icon">
-          <span class="word" style="color: #FF6600;">設定</span>
+          <span class="word" style="color: #43BFFD;">設定</span>
           {{/ifCond}}
         </a>
       </li>
       <li class="nav-item d-flex justify-content-center" style="height: 46px;">
         <button type="button" class="btn btn-primary"
-          style="border-radius:50px; width:100%; background:#FF6600; border-color:#FF6600;font-size:20px;font-weight:400"
+          style="border-radius:50px; width:100%; background:#43BFFD; border-color:#43BFFD;font-size:20px;font-weight:400"
           data-bs-toggle="modal" data-bs-target="#post-modal">推文</button>
       </li>
     </ul>
