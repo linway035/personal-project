@@ -1,9 +1,9 @@
 <div style="height: 1200px;width:332px">
   <div id="left-section">
-    <a href="/tweets"><img id="logo" src="/images/icons/logo.png"></a>
+    <a href="/home"><img id="logo" src="/images/icons/logo.png"></a>
     <ul id="left-navs" class="nav flex-column">
       <li class="nav-item">
-        <a href="/tweets" class="nav-item-content">
+        <a href="/home" class="nav-item-content">
           {{#ifNotCond route "home"}}
           <img src="/images/icons/outlined-home.png" class="base-icon">
           <span class="word">Home</span>
@@ -29,7 +29,7 @@
       <li class="nav-item">
         <a href="/settings" class="nav-item-content">
           {{#ifNotCond route "settings"}}
-          <img src="/images/icons/outlined-cog.png" class="base-icon">
+          <img src="/images/icons/outlined-cog.png" class="base-icon">      
           <span class="word">設定</span>
           {{/ifNotCond}}
           {{#ifCond route "settings"}}
