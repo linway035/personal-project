@@ -7,16 +7,16 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate (models) {
       users.belongsToMany(models.users, {
         through: models.followships,
         foreignKey: 'follower_id',
-        as: 'followings',
+        as: 'followings'
       })
       users.belongsToMany(models.users, {
         through: models.followships,
         foreignKey: 'following_id',
-        as: 'followers',
+        as: 'followers'
       })
       users.hasMany(models.tweets, { foreignKey: 'user_id' })
       users.hasMany(models.replies, { foreignKey: 'user_id' })
@@ -35,13 +35,13 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       avatar: DataTypes.STRING,
       cover: DataTypes.STRING,
-      bio: DataTypes.STRING,
+      bio: DataTypes.STRING
     },
     {
       sequelize,
       modelName: 'users',
       tableName: 'users',
-      underscored: true,
+      underscored: true
     }
   )
   return users

@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate (models) {
       hidden_tweets.belongsTo(models.users, { foreignKey: 'user_id' })
       hidden_tweets.belongsTo(models.tweets, { foreignKey: 'tweet_id' })
     }
@@ -15,13 +15,13 @@ module.exports = (sequelize, DataTypes) => {
   hidden_tweets.init(
     {
       user_id: DataTypes.INTEGER,
-      tweet_id: DataTypes.INTEGER,
+      tweet_id: DataTypes.INTEGER
     },
     {
       sequelize,
       modelName: 'hidden_tweets',
       tableName: 'hidden_tweets',
-      underscored: true,
+      underscored: true
     }
   )
   return hidden_tweets
