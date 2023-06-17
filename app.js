@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser'
 import session from 'express-session'
 import flash from 'connect-flash'
 import routes from './routes/index.js'
+import handlebarsHelpers from './helpers/handlebars-helpers.js'
 
 dotenv.config()
 
@@ -12,9 +13,9 @@ const app = express()
 const port = process.env.PORT || 3000
 const SESSION_SECRET = process.env.SESSION_SECRET
 
-app.engine('hbs', exphbs({ extname: '.hbs' }))
+app.engine('hbs', exphbs({ extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
-// app.use(express.static('public'))
+app.use(express.static('public'))
 // app.use(express.json())
 app.use(express.urlencoded({ extended: true })) //body-parser
 app.use(cookieParser())
