@@ -11,12 +11,15 @@ const getUser = async (req, res, next) => {
 const tweetController = {
   getHome: async (req, res, next) => {
     const currentUserID = res.locals.userId
-    const [currentUser] = await pool.execute(`
-    SELECT id, name, avatar FROM users WHERE id =${currentUserID}`)
-    // console.log(currentUser[0])
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
     const currentUserData = currentUser[0]
 
-    const [data, fields] = await pool.execute(`
+    const [data, fields] = await pool.execute(
+      `
     SELECT tweets.*, users.name, users.avatar, 
     IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
     IF(tl.user_id IS NULL, 0, 1) AS is_liked
@@ -31,32 +34,37 @@ const tweetController = {
     LEFT JOIN (
       SELECT t.id AS tweet_id, COUNT(r.id) AS count
       FROM tweets AS t
-      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id = r.id
+      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
       WHERE r.is_active = 1
       GROUP BY t.id
     ) AS reply_counts ON tweets.id = reply_counts.tweet_id
     LEFT JOIN (
-      SELECT * FROM tweet_likes WHERE user_id = ${currentUserID} AND is_active = 1
+      SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
     ) AS tl ON tweets.id = tl.tweet_id
     WHERE tweets.is_active = 1
       AND tweets.id NOT IN (
-        SELECT tweet_id FROM hidden_tweets WHERE user_id = ${currentUserID}
+        SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
     )
     AND tweets.user_id IN (
-      SELECT following_id FROM followships WHERE follower_id = ${currentUserID}
+      SELECT following_id FROM followships WHERE follower_id = ?
     )
     ORDER BY tweets.updated_at DESC
     LIMIT 6;
-    `) //ORDER LIMIT pending
+    `,
+      [currentUserID, currentUserID, currentUserID]
+    ) //ORDER LIMIT pending
 
-    const [follows] = await pool.execute(`
+    const [follows] = await pool.execute(
+      `
     SELECT id, name, avatar FROM users WHERE id NOT IN
-    (SELECT following_id FROM followships WHERE follower_id=${currentUserID} 
+    (SELECT following_id FROM followships WHERE follower_id=? 
       AND followships.is_active=1)
-    AND id <> ${currentUserID}
+    AND id <> ?
     ORDER BY users.created_at DESC
     LIMIT 3;   
-    `) //order pending
+    `,
+      [currentUserID, currentUserID]
+    ) //order pending
 
     // console.log(follows) //array of objects
 
@@ -105,7 +113,6 @@ const tweetController = {
   postReply: async (req, res, next) => {
     try {
       const tweetId = req.params.id
-      console.log(tweetId)
       const currentUserID = res.locals.userId
       const content = req.body.comment
       if (!content) {
@@ -122,6 +129,61 @@ const tweetController = {
     } catch (error) {
       next(error)
     }
+  },
+  getTweetPage: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    const [data, fields] = await pool.execute(
+      `SELECT tweets.*, users.name, users.avatar, IFNULL(like_counts.count, 0) AS like_count, 
+      IFNULL(reply_counts.count, 0) AS reply_count, IF(tl.user_id IS NULL, 0, 1) AS is_liked
+      FROM tweets
+      JOIN users ON tweets.user_id = users.id
+      LEFT JOIN (
+        SELECT tweet_id, COUNT(*) AS count
+        FROM tweet_likes
+        WHERE is_active = 1
+        GROUP BY tweet_id
+      ) AS like_counts ON tweets.id = like_counts.tweet_id
+      LEFT JOIN (
+        SELECT t.id AS tweet_id, COUNT(r.id) AS count
+        FROM tweets AS t
+        LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
+        WHERE r.is_active = 1
+        GROUP BY t.id
+      ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+      LEFT JOIN (
+        SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
+      ) AS tl ON tweets.id = tl.tweet_id
+      WHERE tweets.id = ?`,
+      [currentUserID, tweetId]
+    )
+    if (data.length === 0) {
+      throw new Error('找不到該推文')
+    }
+    const tweet = data[0]
+    const [follows] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id NOT IN
+    (SELECT following_id FROM followships WHERE follower_id=? 
+      AND followships.is_active=1)
+    AND id <> ?
+    ORDER BY users.created_at DESC
+    LIMIT 3;   
+    `,
+      [currentUserID, currentUserID]
+    ) //order pending
+
+    const [replies] = await pool.execute(
+      `
+    SELECT replies.*, users.name, users.avatar 
+    FROM replies
+    JOIN users ON replies.user_id = users.id
+    WHERE tweet_id = ? AND is_active = 1;
+    `,
+      [tweetId]
+    )
+    // console.log(replies) //array of objects
+    res.render('tweet', { tweet, follows, replies })
   },
 }
 export default tweetController

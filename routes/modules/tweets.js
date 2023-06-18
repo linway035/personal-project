@@ -6,6 +6,6 @@ const router = Router()
 router.post('/:id/like', authenticate, tweetController.postLike)
 router.post('/:id/unlike', authenticate, tweetController.postUnlike)
 router.post('/:id/replies', authenticate, tweetController.postReply)
-// router.get('/:id/replies', authenticate, tweetController.getTweet)
+router.get('/:id/replies', authenticate, tweetController.getTweetPage)
 
 export default router

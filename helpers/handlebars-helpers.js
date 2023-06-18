@@ -13,6 +13,7 @@ const handlebarsHelpers = {
   },
   currentYear: () => dayjs().year(),
   relativeTimeFromNow: a => dayjs(a).fromNow(),
+  tweetDateTime: a => dayjs(a).format('A h:mm・YYYY年M月D日'),
 }
 
 export default handlebarsHelpers
