@@ -38,8 +38,9 @@ const tweetController = {
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ${currentUserID}
     )
-    ORDER BY tweets.updated_at DESC;
-    `)
+    ORDER BY tweets.updated_at DESC
+    LIMIT 6;
+    `) //ORDER LIMIT
 
     const [follows] = await pool.execute(`
     SELECT id, name, avatar FROM users WHERE id NOT IN
@@ -54,5 +55,36 @@ const tweetController = {
 
     res.render('tweets', { tweets: data, user: currentUserData, follows })
   },
+  postLike: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    try {
+      await pool.execute(
+        `INSERT INTO tweet_likes (user_id,tweet_id) VALUES (?,?)`,
+        [currentUserID, tweetId]
+      )
+      res.redirect('back')
+    } catch (error) {
+      next(error)
+    }
+  },
+  postUnlike: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    try {
+      await pool.execute(
+        `UPDATE tweet_likes
+        SET is_active = 0, updated_at = NOW()
+        WHERE id = 
+        (SELECT id FROM tweet_likes WHERE user_id = ? AND tweet_id = ?)
+        `,
+        [currentUserID, tweetId]
+      )
+      res.redirect('back')
+    } catch (error) {
+      next(error)
+    }
+  },
+  postReply: async (req, res, next) => {},
 }
 export default tweetController

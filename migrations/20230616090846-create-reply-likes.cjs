@@ -41,6 +41,11 @@ module.exports = {
         defaultValue: Sequelize.literal('NOW()'),
       },
     })
+    await queryInterface.addConstraint('reply_likes', {
+      fields: ['user_id', 'reply_id'],
+      type: 'unique',
+      name: 'unique_user_reply',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('reply_likes')

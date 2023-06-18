@@ -7,6 +7,7 @@ import authenticate from '../middleware/auth.js'
 const router = Router()
 
 router.use('/users', users)
+router.use('/tweets', tweets)
 router.use('/home', authenticate, tweetController.getHome) //, authenticate
 router.get('/', (req, res) => {
   res.redirect('/home')
