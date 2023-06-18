@@ -1,11 +1,11 @@
 <div style="height: 1200px;width:427px;">
   <div class="popular-container">
     <div class="popular-title">
-      <h4>推薦跟隨</h4>
+      <h4>Who to follow</h4>
     </div>
     <div class="tweets-mid" style="height: 656px;width:273px;">
       <ul class="popular-list-group" style="display:inline">
-        {{#each users}}
+        {{#each follows}}
         {{!-- 正在跟隨 --}}
         <li class="list-group-item d-flex justify-content-between align-items-start">
           <div class="user-icon">
@@ -18,23 +18,12 @@
               <div class="popular-name" style="text-overflow:ellipsis; overflow:hidden; width:4.5rem">
                 {{this.name}}
               </div>
-              <small class="small-account"
-                style="text-overflow:ellipsis; overflow:hidden; width:4.5rem">@{{this.account}}
-              </small>
             </a>
-          </div>
-          {{#if isCurrentUser }}
-          <div></div>
-          {{else if this.isFollowed }}
-          <form action="/followships/{{this.id}}?_method=DELETE" method="POST" style="display: contents;">
-            <button type="submit" class="following-btn">正在跟隨</button>
-          </form>
-          {{else}}
+          </div>          
           <form action="/followships" method="POST" style="display: contents;">
             <input type="text" name="id" value="{{this.id}}" style="display: none;">
             <button type="submit" class="follow-btn">跟隨</button>
           </form>
-          {{/if}}
         </li>
         {{/each}}
       </ul>

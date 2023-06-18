@@ -40,9 +40,19 @@ const tweetController = {
     )
     ORDER BY tweets.updated_at DESC;
     `)
-    console.log(data.length)
-    console.log(currentUserID)
-    res.render('tweets', { tweets: data, user: currentUserData })
+
+    const [follows] = await pool.execute(`
+    SELECT id, name, avatar FROM users WHERE id NOT IN
+    (SELECT following_id FROM followships WHERE follower_id=${currentUserID} 
+      AND followships.is_active=1)
+    AND id <> ${currentUserID}
+    ORDER BY users.created_at DESC
+    LIMIT 3;   
+    `) //order depending
+
+    console.log(follows) //array of objects
+
+    res.render('tweets', { tweets: data, user: currentUserData, follows })
   },
 }
 export default tweetController
