@@ -17,7 +17,7 @@
 <div class="index-tweets d-flex justify-content-center">
   {{#each tweets}}
   {{!-- 這是modal-reply --}}
-  {{>reply-modal user=this.User tweet=this User=../currentUser}}
+  {{>reply-modal user=../user tweet=this}}
   <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
     <div id="tweet-icon">
       <a href="/users/{{this.user_id}}/tweets">

@@ -42,9 +42,12 @@ const tweetController = {
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ${currentUserID}
     )
+    AND tweets.user_id IN (
+      SELECT following_id FROM followships WHERE follower_id = ${currentUserID}
+    )
     ORDER BY tweets.updated_at DESC
     LIMIT 6;
-    `) //ORDER LIMIT
+    `) //ORDER LIMIT pending
 
     const [follows] = await pool.execute(`
     SELECT id, name, avatar FROM users WHERE id NOT IN
@@ -53,7 +56,7 @@ const tweetController = {
     AND id <> ${currentUserID}
     ORDER BY users.created_at DESC
     LIMIT 3;   
-    `) //order depending
+    `) //order pending
 
     // console.log(follows) //array of objects
 
@@ -67,7 +70,7 @@ const tweetController = {
       await pool.execute(
         `INSERT INTO tweet_likes (user_id, tweet_id, is_active, updated_at)
         VALUES (?, ?, 1, NOW())
-        ON DUPLICATE KEY UPDATE is_active = 1`,
+        ON DUPLICATE KEY UPDATE is_active = 1, updated_at = NOW()`,
         [currentUserID, tweetId]
       )
       res.redirect('back')
@@ -99,6 +102,26 @@ const tweetController = {
       next(error)
     }
   },
-  postReply: async (req, res, next) => {},
+  postReply: async (req, res, next) => {
+    try {
+      const tweetId = req.params.id
+      console.log(tweetId)
+      const currentUserID = res.locals.userId
+      const content = req.body.comment
+      if (!content) {
+        req.flash('error_messages', '內容不可空白')
+        res.redirect('back')
+      }
+      await pool.execute(
+        `
+      INSERT INTO replies (tweet_id, user_id, content, parent_id, path)
+      VALUES (?,?,?,?,?)`,
+        [tweetId, currentUserID, content, null, tweetId]
+      ) //parent_id,path,PENDING
+      res.redirect('back')
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 export default tweetController
