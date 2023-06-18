@@ -7,7 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\" --fix",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "model": "npx sequelize db:migrate",
+    "seed": "npx sequelize db:seed:all"
   },
   "keywords": [],
   "author": "",

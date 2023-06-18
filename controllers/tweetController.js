@@ -8,6 +8,7 @@ const tweetController = {
     ORDER BY tweets.updated_at DESC;
     `)
     console.log(data)
+    console.log(res.locals.userId)
     res.render('tweets', { tweets: data })
   },
 }
