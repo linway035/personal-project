@@ -18,7 +18,8 @@ const tweetController = {
 
     const [data, fields] = await pool.execute(`
     SELECT tweets.*, users.name, users.avatar, 
-    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count
+    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
+    IF(tl.user_id IS NULL, 0, 1) AS is_liked
     FROM tweets
     JOIN users ON tweets.user_id = users.id
     LEFT JOIN (
@@ -34,6 +35,9 @@ const tweetController = {
       WHERE r.is_active = 1
       GROUP BY t.id
     ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+    LEFT JOIN (
+      SELECT * FROM tweet_likes WHERE user_id = ${currentUserID} AND is_active = 1
+    ) AS tl ON tweets.id = tl.tweet_id
     WHERE tweets.is_active = 1
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ${currentUserID}
@@ -59,8 +63,11 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
+      //若違反唯一性約束條件，則觸發重複鍵更新的邏輯
       await pool.execute(
-        `INSERT INTO tweet_likes (user_id,tweet_id) VALUES (?,?)`,
+        `INSERT INTO tweet_likes (user_id, tweet_id, is_active, updated_at)
+        VALUES (?, ?, 1, NOW())
+        ON DUPLICATE KEY UPDATE is_active = 1`,
         [currentUserID, tweetId]
       )
       res.redirect('back')
@@ -72,12 +79,19 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
+      //MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
       await pool.execute(
         `UPDATE tweet_likes
         SET is_active = 0, updated_at = NOW()
-        WHERE id = 
-        (SELECT id FROM tweet_likes WHERE user_id = ? AND tweet_id = ?)
-        `,
+        WHERE id IN (
+          SELECT id
+          FROM (
+            SELECT tl.id
+            FROM tweet_likes AS tl
+            WHERE tl.user_id = ? AND tl.tweet_id = ?
+            LIMIT 1
+          ) AS subquery
+        )`,
         [currentUserID, tweetId]
       )
       res.redirect('back')
