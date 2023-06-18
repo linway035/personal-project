@@ -20,22 +20,20 @@
   {{>reply-modal user=this.User tweet=this User=../currentUser}}
   <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
     <div id="tweet-icon">
-      <a href="/users/{{this.UserId}}/tweets">
-        <img src="{{this.User.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
+      <a href="/users/{{this.user_id}}/tweets">
+        <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
       </a>
     </div>
     <div id="tweet-right" style="width: 528px;">
       <div class="header" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
-        <a href="/users/{{this.UserId}}/tweets">
-          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.User.name}}</span>
-          <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D; margin-left:8px;"
-            class="text-muted"> @{{this.User.account}}</span>
+        <a href="/users/{{this.user_id}}/tweets">
+          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
         </a>
         <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
-          class="text-muted">．{{relativeTimeFromNow this.createdAt}}</span>
+          class="text-muted">．{{relativeTimeFromNow this.updated_at}}</span>
       </div>
       <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
-        {{this.description}}
+        {{this.content}}
       </div>
       <div class="actions d-flex justify-content-between">
         <div class="d-flex reply">
