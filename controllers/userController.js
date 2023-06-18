@@ -75,6 +75,9 @@ const userController = {
       next(error)
     }
   },
+  logout: async (req, res, next) => {
+    res.clearCookie('jwtToken').redirect('/users/signin')
+  },
 }
 
 export default userController
