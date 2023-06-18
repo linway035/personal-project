@@ -7,7 +7,7 @@ const tweetController = {
     JOIN users ON tweets.user_id = users.id
     ORDER BY tweets.updated_at DESC;
     `)
-    console.log(data)
+    // console.log(data)
     console.log(res.locals.userId)
     res.render('tweets', { tweets: data })
   },

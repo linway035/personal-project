@@ -69,7 +69,7 @@ const userController = {
       if (!user.length) throw new Error('User not exist')
       const isPasswordCorrect = bcrypt.compareSync(password, user[0].password)
       if (!isPasswordCorrect) throw new Error('Invalid password')
-      const token = await signJWT(user.id)
+      const token = await signJWT(user[0].id)
       res.cookie('jwtToken', token).redirect('/')
     } catch (error) {
       next(error)
