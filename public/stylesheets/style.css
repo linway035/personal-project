@@ -364,7 +364,7 @@ a {
 
 /* left  */
 #left-section {
-  position: relative;
+  position: fixed;
   width: 178px;
   height: 1200px;
   left: 134px;
@@ -402,11 +402,10 @@ a {
 }
 
 #logout {
-  position: absolute;
+  position: fixed;
   width: 178px;
   height: 58px;
-  left: 0px;
-  top: 1142px;
+  bottom: 0px;
 }
 
 #left-navs .nav-item .nav-item-content {

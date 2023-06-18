@@ -50,7 +50,7 @@ const tweetController = {
     LIMIT 3;   
     `) //order depending
 
-    console.log(follows) //array of objects
+    // console.log(follows) //array of objects
 
     res.render('tweets', { tweets: data, user: currentUserData, follows })
   },
