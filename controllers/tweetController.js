@@ -45,13 +45,13 @@ const tweetController = {
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
     )
-    AND tweets.user_id IN (
+    AND (tweets.user_id IN (
       SELECT following_id FROM followships WHERE follower_id = ?
-    )
+    ) OR tweets.user_id = ?)
     ORDER BY tweets.updated_at DESC
     LIMIT 6;
     `,
-      [currentUserID, currentUserID, currentUserID]
+      [currentUserID, currentUserID, currentUserID, currentUserID]
     ) //ORDER LIMIT pending
 
     const [follows] = await pool.execute(
@@ -184,6 +184,26 @@ const tweetController = {
     )
     // console.log(replies) //array of objects
     res.render('tweet', { tweet, follows, replies })
+  },
+  postTweet: async (req, res, next) => {
+    try {
+      const { description } = req.body
+      const currentUserID = res.locals.userId
+      if (description.length > 140) {
+        throw new Error('請以 140 字以內為限')
+      } else if (description.trim() === '') {
+        throw new Error('內容不可空白')
+      }
+      await pool.execute(
+        `INSERT INTO tweets (user_id, content)
+        VALUES (?, ?)
+        `,
+        [currentUserID, description]
+      )
+      res.redirect('back')
+    } catch (error) {
+      next(error)
+    }
   },
 }
 export default tweetController
