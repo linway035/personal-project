@@ -12,7 +12,8 @@ module.exports = {
         name: 'Bleacher Report NBA',
         avatar:
           'https://pbs.twimg.com/profile_images/1266053203616989186/ozSULDRt_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/36724576/1493213775/1080x360',
         bio: 'Top NBA news, columns, video and opinion from http://BleacherReport.com',
       },
       {
@@ -22,7 +23,8 @@ module.exports = {
         name: 'SHAQ',
         avatar:
           'https://pbs.twimg.com/profile_images/1579949436527988737/RDqn1udJ_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/17461978/1665524734/1080x360',
         bio: 'VERY QUOTATIOUS, I PERFORM RANDOM ACTS OF SHAQNESS',
       },
       {
@@ -32,7 +34,8 @@ module.exports = {
         name: 'Stephen Curry',
         avatar:
           'https://pbs.twimg.com/profile_images/1542667356949819392/IyRCxMgo_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/42562446/1678229624/1080x360',
         bio: 'Warriors guard. Davidson Wildcat. BAYC. Philippians 4:13 ',
       },
       {
@@ -42,7 +45,8 @@ module.exports = {
         name: 'LeBron James',
         avatar:
           'https://pbs.twimg.com/profile_images/1421530540063092736/xqtcu8HX_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/23083404/1529843462/1080x360',
         bio: 'EST. AKRON - ST.V/M Class of 03',
       },
       {
@@ -52,7 +56,8 @@ module.exports = {
         name: 'Trae Young',
         avatar:
           'https://pbs.twimg.com/profile_images/1225597479711858688/-G9orx5h_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/2842841126/1609304009/1080x360',
         bio: 'Trae Young 3’s OTW 👀! 👟',
       },
       {
@@ -62,7 +67,8 @@ module.exports = {
         name: 'Atlanta Hawks',
         avatar:
           'https://pbs.twimg.com/profile_images/1642782600618991616/TovAAzTb_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/17292143/1682650946/1080x360',
         bio: 'We are always #TrueToAtlanta',
       },
       {
@@ -72,7 +78,8 @@ module.exports = {
         name: 'NASA',
         avatar:
           'https://pbs.twimg.com/profile_images/1321163587679784960/0ZxKlEKB_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/11348282/1686258645/1080x360',
         bio: 'There is space for everybody. ✨',
       },
       {
@@ -82,7 +89,8 @@ module.exports = {
         name: 'Taylor Swift',
         avatar:
           'https://pbs.twimg.com/profile_images/1564101520043479043/eJpWqka2_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/17919972/1666325927/1080x360',
         bio: `I'm the problem, it's me`,
       },
       {
@@ -92,7 +100,8 @@ module.exports = {
         name: 'Rihanna',
         avatar:
           'https://pbs.twimg.com/profile_images/1585851311701970945/fC9dfWVm_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/79293791/1666801643/1080x360',
         bio: `rihanna.lnk.to/fentyskin`,
       },
       {
@@ -102,7 +111,8 @@ module.exports = {
         name: 'KATY PERRY',
         avatar:
           'https://pbs.twimg.com/profile_images/1392465354622791687/w_KwtKcE_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/21447363/1681492261/1080x360',
         bio: 'LOVE is the key that unlocks every door🗝️♥️',
       },
       {
@@ -112,7 +122,8 @@ module.exports = {
         name: 'President Biden',
         avatar:
           'https://pbs.twimg.com/profile_images/1380530524779859970/TfwVAbyX_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/1349149096909668363/1686583051/1080x360',
         bio: `46th President of the United States, husband to @FLOTUS, proud dad & pop.`,
       },
       {
@@ -122,7 +133,8 @@ module.exports = {
         name: 'Barack Obama',
         avatar:
           'https://pbs.twimg.com/profile_images/1329647526807543809/2SGvnHYV_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/813286/1633800288/1080x360',
         bio: 'Dad, husband, President, citizen.',
       },
       {
@@ -132,7 +144,8 @@ module.exports = {
         name: 'Mike Pence',
         avatar:
           'https://pbs.twimg.com/profile_images/1372291427833683972/sCIeF9RC_400x400.jpg',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/22203756/1686669903/1080x360',
         bio: `Husband, Father, Grandfather, Christian, Conservative, Republican- In That Order, 48th Vice President, & Candidate for President of the United States`,
       },
       {
@@ -142,7 +155,8 @@ module.exports = {
         name: 'GOP',
         avatar:
           'https://pbs.twimg.com/profile_images/1488637837499154441/T7lImQVl_400x400.png',
-        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        cover:
+          'https://pbs.twimg.com/profile_banners/11134252/1630094486/1080x360',
         bio: 'Text FREEDOM to 80810 to receive exclusive updates from the Republican National Committee!',
       },
       {
