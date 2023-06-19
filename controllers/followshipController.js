@@ -20,7 +20,7 @@ const followshipController = {
   unFollowships: async (req, res, next) => {
     try {
       const currentUserID = res.locals.userId
-      const followingId = Number(req.body.id)
+      const followingId = Number(req.params.id)
       await pool.execute(
         `UPDATE followships
         SET is_active = 0, updated_at = NOW()

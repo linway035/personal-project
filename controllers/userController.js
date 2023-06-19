@@ -78,6 +78,52 @@ const userController = {
   logout: async (req, res, next) => {
     res.clearCookie('jwtToken').redirect('/users/signin')
   },
+  getProfilePage: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
+    const currentUserData = currentUser[0]
+
+    const userId = req.params.id
+    const [user] = await pool.execute(
+      `
+    SELECT u.*, IF(f.following_id IS NULL, 0, 1) AS is_following,
+  (SELECT COUNT(*) FROM followships WHERE following_id = u.id AND is_active = 1) AS followers_count,
+    (SELECT COUNT(*) FROM followships WHERE follower_id = u.id AND is_active = 1) AS following_count
+    FROM users AS u
+    LEFT JOIN (
+      SELECT following_id
+      FROM followships
+      WHERE follower_id = ? AND is_active = 1
+    ) AS f ON u.id = f.following_id
+    WHERE u.id =?`,
+      [currentUserID, userId]
+    )
+    const userProfile = user[0]
+    const isCurrentUser = userProfile.id === currentUserID
+
+    const [follows] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id NOT IN
+    (SELECT following_id FROM followships WHERE follower_id=? 
+      AND followships.is_active=1)
+    AND id <> ?
+    ORDER BY users.created_at DESC
+    LIMIT 3;   
+    `,
+      [currentUserID, currentUserID]
+    ) //order pending
+
+    res.render('userprofile', {
+      userProfile,
+      isCurrentUser,
+      user: currentUserData,
+      follows,
+    })
+  },
 }
 
 export default userController

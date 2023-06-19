@@ -14,7 +14,7 @@ router.post(
   authenticate,
   followshipController.unFollowships
 )
-router.post('/followships/', authenticate, followshipController.postFollowships)
+router.post('/followships', authenticate, followshipController.postFollowships)
 router.use('/home', authenticate, tweetController.getHome) //, authenticate
 router.get('/', (req, res) => {
   res.redirect('/home')
