@@ -11,6 +11,7 @@ router.post('/:id/hidden', authenticate, tweetController.postHidden)
 router.delete('/:id/clearrating', authenticate, tweetController.deleteRating)
 router.post('/:id/rating', authenticate, tweetController.postRating)
 router.get('/:id/rating', authenticate, tweetController.getRating)
+router.get('/foryou', authenticate, tweetController.getForYouPage)
 router.post('/', authenticate, tweetController.postTweet)
 
 export default router

@@ -1,16 +1,9 @@
 const ratings = {
-  Alex: [4, 2, null, 5, 4, null],
-  Bob: [5, 3, 4, null, 3, null],
-  Tom: [3, null, 4, 4, 3, 1],
-  Alexx: [4, 2, null, 5, 4, null],
+  Alex: [4, 2, null, 5, 4],
+  Bob: [5, 3, 4, null, 3],
+  Tom: [3, null, 4, 4, 3],
 }
-
-const a = {
-  1: [5, null, null, null, 4, null, null, null, null, null],
-  2: [null, null, null, null, null, null, null, null, null, null],
-  3: [null, null, 5, 5, null, null, null, null, null, null],
-  4: [5, 5, null, null, 4, null, 4, null, null, null],
-}
+console.table(Object.values(ratings))
 
 // Step 1: Calculate similarity between Alex and all other users
 const calculateSimilarity = (user1, user2) => {
@@ -66,7 +59,7 @@ const predictRatings = (user, otherUsers) => {
   return predictedRatings
 }
 
-// Step 3: Select top-2 rated movies
+// Step 3: Select top rated movies
 const selectTopRatedMovies = (user, predictedRatings) => {
   const topRatedMovies = []
   const movieIndices = Object.keys(ratings[user])
@@ -81,19 +74,22 @@ const selectTopRatedMovies = (user, predictedRatings) => {
     topRatedMovies.push(movieRating)
   })
   topRatedMovies.sort((a, b) => b.rating - a.rating)
-  return topRatedMovies.slice(0, 2).map(movie => movie.movie)
+  console.log(
+    'hi',
+    topRatedMovies.map(movie => movie.movie)
+  )
+  return topRatedMovies.map(movie => movie.movie)
+  // return topRatedMovies.slice(0, 2).map(movie => movie.movie)
 }
 
 // Execute the steps for Alex
-// const similarityAlexBob = calculateSimilarity('Alex', 'Bob')
-// const similarityAlexTom = calculateSimilarity('Alex', 'Tom')
-const similarityAlexx = calculateSimilarity('Alex', 'Alexx')
+const similarityAlexBob = calculateSimilarity('Alex', 'Bob')
+const similarityAlexTom = calculateSimilarity('Alex', 'Tom')
 
-const predictedRatingsAlex = predictRatings('Alex', ['Bob', 'Tom', 'Alexx'])
+const predictedRatingsAlex = predictRatings('Alex', ['Bob', 'Tom'])
 const topRatedMoviesAlex = selectTopRatedMovies('Alex', predictedRatingsAlex)
 
-// console.log('Similarity between Alex and Bob:', similarityAlexBob)
-// console.log('Similarity between Alex and Tom:', similarityAlexTom)
-console.log('Similarity between Alex and Alexx:', similarityAlexx)
+console.log('Similarity between Alex and Bob:', similarityAlexBob)
+console.log('Similarity between Alex and Tom:', similarityAlexTom)
 console.log('Predicted ratings for Alex:', predictedRatingsAlex)
 console.log('Top rated movies for Alex:', topRatedMoviesAlex)

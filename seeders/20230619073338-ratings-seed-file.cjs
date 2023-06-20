@@ -31,6 +31,46 @@ module.exports = {
       { user_id: 18, tweet_id: 40, rating: 5 },
       { user_id: 18, tweet_id: 41, rating: 5 },
     ]
+
+    // nba hater (NASA, MUSIC)
+    for (let user_id = 1; user_id <= 6; user_id++) {
+      for (let tweet_id = 20; tweet_id <= 30; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 1 })
+      }
+    }
+    for (let user_id = 1; user_id <= 6; user_id++) {
+      for (let tweet_id = 1; tweet_id <= 19; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 5 })
+      }
+    }
+    // NASA NOBODY CARE
+    // MUSIC hater (NBA, POL, NASA)
+    for (let user_id = 8; user_id <= 10; user_id++) {
+      for (let tweet_id = 1; tweet_id <= 22; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 1 })
+      }
+      for (let tweet_id = 31; tweet_id <= 41; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 1 })
+      }
+    }
+    for (let user_id = 8; user_id <= 10; user_id++) {
+      for (let tweet_id = 23; tweet_id <= 30; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 5 })
+      }
+    }
+
+    // POL hater (NBA, MUSIC, NASA)
+    for (let user_id = 11; user_id <= 14; user_id++) {
+      for (let tweet_id = 1; tweet_id <= 30; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 1 })
+      }
+    }
+    for (let user_id = 11; user_id <= 14; user_id++) {
+      for (let tweet_id = 31; tweet_id <= 41; tweet_id++) {
+        ratings.push({ user_id, tweet_id, rating: 5 })
+      }
+    }
+
     await queryInterface.bulkInsert('ratings', ratings, {})
   },
 
