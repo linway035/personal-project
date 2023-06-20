@@ -224,7 +224,6 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     const rating = req.body.rating
-    console.log(rating)
     try {
       await pool.execute(
         `INSERT INTO ratings (user_id, tweet_id, rating)
@@ -248,7 +247,7 @@ const tweetController = {
         `,
         [tweetId, currentUserID]
       )
-      const rating = rows[0]?.rating || null
+      const rating = rows[0]?.rating || null //給前端判斷null情況
       // res.redirect('back')
       res.status(200).json({ rating })
     } catch (error) {

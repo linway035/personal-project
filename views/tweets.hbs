@@ -9,3 +9,72 @@
 
 {{!-- 這是推文modal --}}
 {{>post-modal}}
+
+<script>
+  const stars = document.querySelectorAll('.star')
+
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const rating = star.getAttribute('data-rating')
+      const ratingContainer = star.parentNode
+      const tweetId = ratingContainer.id.split('-')[1]
+      sendRatingToServer(rating, tweetId)
+    })
+  })
+
+  // 在頁面載入時獲取評分並顯示
+  getRatingsFromServer()
+
+  function getRatingsFromServer() {
+    const ratingContainers = document.querySelectorAll('.rating')
+    ratingContainers.forEach(ratingContainer => {
+      const tweetId = ratingContainer.id.split('-')[1]
+      const url = `/tweets/${tweetId}/rating`
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const rating = data.rating
+          highlightStars(tweetId, rating)
+        })
+        .catch(error => {
+          console.log('getRatingsFromServer error')
+        })
+    })
+  }
+
+  function highlightStars(tweetId, rating) {
+    const tweetRatingContainer = document.querySelector(`#rating-${tweetId}`)
+    const tweetStars = tweetRatingContainer.querySelectorAll('.star')
+    if (rating === null) {
+      tweetStars.forEach(star => {
+        star.innerHTML = '&#9734;' // 空心星星
+      })
+    } else {
+      tweetStars.forEach((star, index) => {
+        if (index < rating) {
+          star.innerHTML = '&#9733;' // 實心星星
+        } else {
+          star.innerHTML = '&#9734;' // 空心星星
+        }
+      })
+    }
+  }
+
+  function sendRatingToServer(rating, tweetId) {
+    const url = `/tweets/${tweetId}/rating`
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ rating: rating }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        getRatingsFromServer();
+      })
+      .catch(error => {
+        console.log('sendRatingToServer error')
+      });
+  }
+
+</script>
