@@ -5,6 +5,13 @@ const ratings = {
   Alexx: [4, 2, null, 5, 4, null],
 }
 
+const a = {
+  1: [5, null, null, null, 4, null, null, null, null, null],
+  2: [null, null, null, null, null, null, null, null, null, null],
+  3: [null, null, 5, 5, null, null, null, null, null, null],
+  4: [5, 5, null, null, 4, null, 4, null, null, null],
+}
+
 // Step 1: Calculate similarity between Alex and all other users
 const calculateSimilarity = (user1, user2) => {
   const commonIndices = Object.keys(ratings[user1]).filter(

@@ -8,6 +8,62 @@ const getUser = async (req, res, next) => {
   return currentUser[0]
 }
 
+async function transformData() {
+  const [data] = await pool.query(
+    `SELECT tweet_id, user_id, rating FROM ratings`
+  )
+  const [usersCount] = await pool.query(
+    `SELECT MAX(id) AS usersCount FROM users`
+  )
+  const [tweetsCount] = await pool.query(
+    `SELECT MAX(id) AS tweetsCount FROM tweets`
+  )
+  const usersLength = usersCount[0].usersCount
+  const tweetsLength = tweetsCount[0].tweetsCount
+
+  const transformedData = {}
+
+  // Initialize the transformed data object with empty arrays for each user
+  for (let user_id = 1; user_id <= usersLength; user_id++) {
+    transformedData[user_id] = Array(tweetsLength).fill(null)
+  }
+
+  // Populate the transformed data with ratings
+  data.forEach(({ tweet_id, user_id, rating }) => {
+    transformedData[user_id][tweet_id - 1] = rating
+  })
+
+  return transformedData
+}
+
+const matrix = await transformData()
+// console.log(matrix)
+
+const calculateSimilarity = (user1, user2, ratings) => {
+  const commonIndices = Object.keys(ratings[user1]).filter(
+    index => ratings[user1][index] !== null && ratings[user2][index] !== null
+  )
+  // console.log('commonIndices', commonIndices)
+
+  const numerator = commonIndices.reduce(
+    (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
+    0
+  )
+  const denominatorUser1 = Math.sqrt(
+    commonIndices.reduce(
+      (sum, index) => sum + Math.pow(ratings[user1][index], 2),
+      0
+    )
+  )
+  const denominatorUser2 = Math.sqrt(
+    commonIndices.reduce(
+      (sum, index) => sum + Math.pow(ratings[user2][index], 2),
+      0
+    )
+  )
+  return numerator / (denominatorUser1 * denominatorUser2)
+}
+
 const tweetController = {
   getHome: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -18,6 +74,7 @@ const tweetController = {
     )
     const currentUserData = currentUser[0]
 
+    // 取推文
     const [data, fields] = await pool.execute(
       `
     SELECT tweets.*, users.name, users.avatar, 
@@ -49,24 +106,51 @@ const tweetController = {
       SELECT following_id FROM followships WHERE follower_id = ?
     ) OR tweets.user_id = ?)
     ORDER BY tweets.updated_at DESC
-    LIMIT 6;
     `,
       [currentUserID, currentUserID, currentUserID, currentUserID]
     ) //ORDER LIMIT pending
 
+    // 取推薦
+    const userId = res.locals.userId
+    const similarityResults = {}
+    for (let user in matrix) {
+      if (user !== userId.toString()) {
+        similarityResults[user] = calculateSimilarity(
+          userId.toString(),
+          user,
+          matrix
+        )
+      }
+    }
+    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
+      // 非 NaN 的相似度值降序排列
+      if (!isNaN(b[1]) && !isNaN(a[1])) {
+        return b[1] - a[1]
+      }
+      // 如果其中一个相似度值为 NaN，则将 NaN 排在后面
+      if (isNaN(b[1]) || isNaN(a[1])) {
+        return isNaN(b[1]) ? -1 : 1
+      }
+      // 如果相似度值相等，根据 ID 从大到小排列
+      return parseInt(b[0]) - parseInt(a[0])
+    })
+    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    const userIdsStr = sortedUserIds.join(',')
+    console.log(userIdsStr)
+
     const [follows] = await pool.execute(
       `
-    SELECT id, name, avatar FROM users WHERE id NOT IN
-    (SELECT following_id FROM followships WHERE follower_id=? 
-      AND followships.is_active=1)
-    AND id <> ?
-    ORDER BY users.created_at DESC
-    LIMIT 3;   
-    `,
+      SELECT id, name, avatar FROM users WHERE id NOT IN
+      (SELECT following_id FROM followships WHERE follower_id=? 
+        AND followships.is_active=1)
+      AND id <> ?
+      ORDER BY FIELD(id,${userIdsStr})
+      LIMIT 5;   
+      `,
       [currentUserID, currentUserID]
-    ) //order pending
+    )
 
-    // console.log(follows) //array of objects
+    //console.log(follows) //array of objects
 
     res.render('tweets', { tweets: data, user: currentUserData, follows })
   },
