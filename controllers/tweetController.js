@@ -254,5 +254,20 @@ const tweetController = {
       next(error)
     }
   },
+  deleteRating: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    try {
+      await pool.execute(
+        `DELETE FROM ratings WHERE tweet_id=? and user_id=?;
+        `,
+        [tweetId, currentUserID]
+      )
+      // res.redirect('back')
+      res.sendStatus(200)
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 export default tweetController

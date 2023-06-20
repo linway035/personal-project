@@ -20,6 +20,13 @@
       const tweetId = ratingContainer.id.split('-')[1]
       sendRatingToServer(rating, tweetId)
     })
+
+    star.addEventListener('contextmenu', event => {
+      event.preventDefault(); // 阻止右鍵選單顯示
+      const ratingContainer = star.parentNode;
+      const tweetId = ratingContainer.id.split('-')[1];
+      clearRating(tweetId);
+    });
   })
 
   // 在頁面載入時獲取評分並顯示
@@ -77,4 +84,19 @@
       });
   }
 
+  function clearRating(tweetId) {
+    const url = `/tweets/${tweetId}/clearrating`;
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        getRatingsFromServer();
+      })
+      .catch(error => {
+        console.log('clearRating error');
+      });
+  }
 </script>
