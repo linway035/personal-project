@@ -245,17 +245,46 @@ const tweetController = {
       throw new Error('找不到該推文')
     }
     const tweet = data[0]
+
+    // 取推薦
+    const userId = res.locals.userId
+    const similarityResults = {}
+    for (let user in matrix) {
+      if (user !== userId.toString()) {
+        similarityResults[user] = calculateSimilarity(
+          userId.toString(),
+          user,
+          matrix
+        )
+      }
+    }
+    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
+      // 非 NaN 的相似度值降序排列
+      if (!isNaN(b[1]) && !isNaN(a[1])) {
+        return b[1] - a[1]
+      }
+      // 如果其中一个相似度值为 NaN，则将 NaN 排在后面
+      if (isNaN(b[1]) || isNaN(a[1])) {
+        return isNaN(b[1]) ? -1 : 1
+      }
+      // 如果相似度值相等，根据 ID 从大到小排列
+      return parseInt(b[0]) - parseInt(a[0])
+    })
+    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    const userIdsStr = sortedUserIds.join(',')
+    console.log(userIdsStr)
+
     const [follows] = await pool.execute(
       `
-    SELECT id, name, avatar FROM users WHERE id NOT IN
-    (SELECT following_id FROM followships WHERE follower_id=? 
-      AND followships.is_active=1)
-    AND id <> ?
-    ORDER BY users.created_at DESC
-    LIMIT 3;   
-    `,
+      SELECT id, name, avatar FROM users WHERE id NOT IN
+      (SELECT following_id FROM followships WHERE follower_id=? 
+        AND followships.is_active=1)
+      AND id <> ?
+      ORDER BY FIELD(id,${userIdsStr})
+      LIMIT 5;   
+      `,
       [currentUserID, currentUserID]
-    ) //order pending
+    )
 
     const [replies] = await pool.execute(
       `

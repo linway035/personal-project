@@ -77,7 +77,7 @@ for (let user in matrix) {
   }
 }
 
-console.log(similarityResults)
+// console.log(similarityResults)
 
 const sortedResults = Object.entries(similarityResults).sort((a, b) => {
   // 非 NaN 的相似度值降序排列
