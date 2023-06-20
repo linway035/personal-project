@@ -205,5 +205,20 @@ const tweetController = {
       next(error)
     }
   },
+  postHidden: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    try {
+      await pool.execute(
+        `INSERT INTO hidden_tweets (user_id, tweet_id)
+        VALUES (?, ?)
+        `,
+        [currentUserID, tweetId]
+      )
+      res.redirect('back')
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 export default tweetController

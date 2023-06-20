@@ -32,7 +32,8 @@
           <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
         </a>
         <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
-          class="text-muted">．{{relativeTimeFromNow this.updated_at}}</span>
+          class="text-muted">．{{relativeTimeFromNow this.updated_at}}
+        </span>
       </div>
       <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
         {{this.content}}
@@ -59,6 +60,13 @@
           </form>
           {{/if}}
           <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
+        </div>
+        <div class="d-flex hidden">
+          <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
+            <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
+              <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
+            </button>
+          </form>
         </div>
       </div>
     </div>
