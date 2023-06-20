@@ -677,7 +677,7 @@ h4 {
 }
 
 #tweet-right .actions {
-  width: 120px;
+  /* width: 120px; */
   height: 16px;
   margin-bottom: 8px;
 }
@@ -1152,4 +1152,8 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 
 .profile-intro:hover .tooltiptext {
   visibility: visible;
+}
+
+.star {
+  cursor: pointer;
 }

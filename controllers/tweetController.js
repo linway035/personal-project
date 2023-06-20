@@ -220,5 +220,40 @@ const tweetController = {
       next(error)
     }
   },
+  postRating: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    const rating = req.body.rating
+    console.log(rating)
+    try {
+      await pool.execute(
+        `INSERT INTO ratings (user_id, tweet_id, rating)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE rating = ? , updated_at = NOW();
+        `,
+        [currentUserID, tweetId, rating, rating]
+      )
+      // res.redirect('back')
+      res.sendStatus(200)
+    } catch (error) {
+      next(error)
+    }
+  },
+  getRating: async (req, res, next) => {
+    const tweetId = req.params.id
+    const currentUserID = res.locals.userId
+    try {
+      const [rows, fields] = await pool.execute(
+        `SELECT rating FROM ratings WHERE tweet_id=? AND user_id=?
+        `,
+        [tweetId, currentUserID]
+      )
+      const rating = rows[0]?.rating || null
+      // res.redirect('back')
+      res.status(200).json({ rating })
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 export default tweetController

@@ -1,0 +1,243 @@
+<style>
+  .star {
+    cursor: pointer;
+  }
+</style>
+<div id="rating">
+  <span class="star" data-rating="1">&#9734;</span>
+  <span class="star" data-rating="2">&#9734;</span>
+  <span class="star" data-rating="3">&#9734;</span>
+  <span class="star" data-rating="4">&#9734;</span>
+  <span class="star" data-rating="5">&#9734;</span>
+</div>
+
+<!-- <script>
+  const stars = document.querySelectorAll('.star')
+  const ratingContainer = document.getElementById('rating')
+
+  stars.forEach(star => {
+    star.addEventListener('mouseover', () => {
+      const hoverRating = star.getAttribute('data-rating')
+      highlightStars(hoverRating)
+    })
+
+    star.addEventListener('mouseout', () => {
+      resetStars()
+    })
+
+    star.addEventListener('click', () => {
+      const rating = star.getAttribute('data-rating')
+      sendRatingToServer(rating)
+    })
+  })
+
+  // 在頁面載入時獲取評分並顯示
+  getRatingFromServer()
+
+  function sendRatingToServer(rating) {
+    const tweetId = '{{this.id}}' // 替換為實際的 tweet ID
+    const url = `/tweets/${tweetId}/rating`
+
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ rating: rating }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        // 在此處理回應，例如顯示成功訊息或重新載入評分資料等
+        getRatingFromServer()
+      })
+      .catch(error => {
+        // 在此處理錯誤，例如顯示錯誤訊息給使用者
+      })
+  }
+
+  function getRatingFromServer() {
+    const tweetId = '{{this.id}}' // 替換為實際的 tweet ID
+    const url = `/tweets/${tweetId}/rating`
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const rating = data.rating
+        highlightStars(rating)
+      })
+      .catch(error => {
+        // 在此處理錯誤，例如顯示錯誤訊息給使用者
+      })
+  }
+
+  function highlightStars(rating) {
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.innerHTML = '&#9733;' // 實心星星
+      } else {
+        star.innerHTML = '&#9734;' // 空心星星
+      }
+    })
+  }
+
+  function resetStars() {
+    stars.forEach(star => {
+      star.innerHTML = '&#9734;' // 將所有星星設置為空心星星
+    })
+  }
+</script> -->
+
+<!-- <script>
+  const stars = document.querySelectorAll('.star')
+
+  stars.forEach(star => {
+    star.addEventListener('mouseover', () => {
+      const hoverRating = star.getAttribute('data-rating')
+      highlightStars(hoverRating)
+    })
+
+    star.addEventListener('mouseout', () => {
+      resetStars()
+    })
+
+    star.addEventListener('click', () => {
+      const rating = star.getAttribute('data-rating')
+      const ratingContainer = star.parentNode
+      const tweetId = ratingContainer.id.split('-')[1]
+      sendRatingToServer(rating, tweetId)
+    })
+  })
+
+  // 在頁面載入時獲取評分並顯示
+  getRatingsFromServer()
+
+  function sendRatingToServer(rating, tweetId) {
+    const url = `/tweets/${tweetId}/rating`
+
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ rating: rating }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        // 在此處理回應，例如顯示成功訊息或重新載入評分資料等
+        getRatingFromServer()
+      })
+      .catch(error => {
+        // 在此處理錯誤，例如顯示錯誤訊息給使用者
+      })
+  }
+
+  function getRatingsFromServer() {
+    const ratingContainers = document.querySelectorAll('.rating')
+    ratingContainers.forEach(ratingContainer => {
+      const tweetId = ratingContainer.id.split('-')[1]
+      const url = `/tweets/${tweetId}/rating`
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const rating = data.rating
+          highlightStars(rating, ratingContainer)
+        })
+        .catch(error => {
+          // 在此處理錯誤，例如顯示錯誤訊息給使用者
+        })
+    })
+  }
+
+  function highlightStars(rating, ratingContainer) {
+    const stars = ratingContainer.querySelectorAll('.star')
+
+    stars.forEach((star, index) => {
+      if (index < rating) {
+        star.innerHTML = '&#9733;' // 實心星星
+      } else {
+        star.innerHTML = '&#9734;' // 空心星星
+      }
+    })
+  }
+
+  function resetStars() {
+    stars.forEach(star => {
+      star.innerHTML = '&#9734;' // 將所有星星設置為空心星星
+    })
+  }
+</script> -->
+
+<script>
+  const stars = document.querySelectorAll('.star')
+
+  stars.forEach(star => {
+    star.addEventListener('mouseover', () => {
+      const hoverRating = star.getAttribute('data-rating')
+      highlightStars(hoverRating)
+    })
+
+    star.addEventListener('mouseout', () => {
+      resetStars()
+    })
+
+    star.addEventListener('click', () => {
+      const rating = star.getAttribute('data-rating')
+      const ratingContainer = star.parentNode
+      const tweetId = ratingContainer.id.split('-')[1]
+      sendRatingToServer(rating, tweetId)
+    })
+  })
+
+  // 在頁面載入時獲取評分並顯示
+  getRatingsFromServer()
+
+  function sendRatingToServer(rating, tweetId) {
+    const url = `/tweets/${tweetId}/rating`
+
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({ rating: rating }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        // 在此處理回應，例如顯示成功訊息或重新載入評分資料等
+        getRatingFromServer()
+      })
+      .catch(error => {
+        // 在此處理錯誤，例如顯示錯誤訊息給使用者
+      })
+  }
+
+  function getRatingsFromServer() {
+    const ratingContainers = document.querySelectorAll('.rating')
+    ratingContainers.forEach(ratingContainer => {
+      const tweetId = ratingContainer.id.split('-')[1]
+      const url = `/tweets/${tweetId}/rating`
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const rating = data.rating
+          highlightStars(rating, ratingContainer)
+        })
+        .catch(error => {
+          // 在此處理錯誤，例如顯示錯誤訊息給使用者
+        })
+    })
+  }
+
+  function highlightStars(hoverRating) {
+    stars.forEach((star, index) => {
+      if (index < hoverRating) {
+        star.innerHTML = '&#9733;' // 實心星星
+      } else {
+        star.innerHTML = '&#9734;' // 空心星星
+      }
+    })
+  }
+
+  function resetStars() {
+    stars.forEach(star => {
+      star.innerHTML = '&#9734;' // 將所有星星設置為空心星星
+    })
+  }
+</script>
