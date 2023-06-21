@@ -25,7 +25,7 @@ async function transformData() {
 
   // Initialize the transformed data object with empty arrays for each user
   for (let user_id = 1; user_id <= usersLength; user_id++) {
-    transformedData[user_id] = Array(tweetsLength).fill(null)
+    transformedData[user_id] = Array(tweetsLength).fill(0) //調參
   }
 
   // Populate the transformed data with ratings
@@ -118,6 +118,7 @@ const tweetController = {
     ) //ORDER LIMIT pending
 
     // 取推薦
+    const matrix = await transformData()
     const userId = res.locals.userId
     const similarityResults = {}
     for (let user in matrix) {
@@ -349,6 +350,7 @@ const tweetController = {
     const tweet = data[0]
 
     // 取推薦
+    const matrix = await transformData()
     const userId = res.locals.userId
     const similarityResults = {}
     for (let user in matrix) {
