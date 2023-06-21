@@ -36,20 +36,20 @@ async function transformData() {
   return transformedData
 }
 
-const matrix = await transformData()
-console.log(matrix)
+// const matrix = await transformData()
+// console.log(matrix)
 
 const calculateSimilarity = (user1, user2, ratings) => {
   const commonIndices = Object.keys(ratings[user1]).filter(
     index => ratings[user1][index] !== null && ratings[user2][index] !== null
   )
-  console.log('commonIndices', commonIndices)
+  // console.log('commonIndices', commonIndices)
 
   const numerator = commonIndices.reduce(
     (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
     0
   )
-  console.log('numerator', numerator)
+  // console.log('numerator', numerator)
   const denominatorUser1 = Math.sqrt(
     commonIndices.reduce(
       (sum, index) => sum + Math.pow(ratings[user1][index], 2),
@@ -62,12 +62,12 @@ const calculateSimilarity = (user1, user2, ratings) => {
       0
     )
   )
-  console.log(
-    'denominatorUser1',
-    denominatorUser1,
-    'denominatorUser2',
-    denominatorUser2
-  )
+  // console.log(
+  //   'denominatorUser1',
+  //   denominatorUser1,
+  //   'denominatorUser2',
+  //   denominatorUser2
+  // )
   return numerator / (denominatorUser1 * denominatorUser2)
 }
 
@@ -204,17 +204,13 @@ const tweetController = {
     ) //ORDER LIMIT pending
 
     // 取推薦
-    const ratings = {
-      Alex: [4, 2, null, 5, 4],
-      Bob: [5, 3, 4, null, 3],
-      Tom: [3, null, 4, 4, 3],
-    }
+    const matrix = await transformData() //若放在最外層則不會更新
     // console.log(matrix)
     // console.table(Object.values(matrix))
     const userId = res.locals.userId
     const similarityResults = {}
     // console.log(typeof userId.toString())
-    console.log('jj', calculateSimilarity(8, 15, matrix))
+    // console.log('jj', calculateSimilarity(8, 15, matrix))
     for (let user in matrix) {
       if (user !== userId.toString()) {
         // console.log('yy', user, typeof user)
@@ -226,7 +222,7 @@ const tweetController = {
       }
     }
     // const similarityResultsCopy = { ...similarityResults }
-    console.log(similarityResults)
+    console.log('similarityResults', similarityResults)
     // console.log(similarityResultsCopy)
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低

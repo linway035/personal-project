@@ -3,6 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min
+    }
+
+    const numTweets = 41
+    const minRatings = 1
+    const maxRatings = 30
+
     const ratings = [
       { user_id: 16, tweet_id: 1, rating: 5 },
       { user_id: 16, tweet_id: 2, rating: 5 },
@@ -32,42 +40,74 @@ module.exports = {
       { user_id: 18, tweet_id: 41, rating: 5 },
     ]
 
-    // nba hater (NASA, MUSIC)
+    // nba (1~19)
     for (let user_id = 1; user_id <= 6; user_id++) {
-      for (let tweet_id = 20; tweet_id <= 30; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 1 })
-      }
-    }
-    for (let user_id = 1; user_id <= 6; user_id++) {
-      for (let tweet_id = 1; tweet_id <= 19; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 5 })
+      const numRatings = getRandomInt(minRatings, maxRatings) // 評分次數
+
+      const tweetIndices = Array.from(
+        { length: numTweets },
+        (_, index) => index + 1
+      ) //做了個1~41的骰子，因為最後會移除評分過的
+
+      for (let i = 0; i < numRatings; i++) {
+        const randomIndex = getRandomInt(0, tweetIndices.length - 1)
+        const tweet_id = tweetIndices[randomIndex]
+
+        ratings.push({
+          user_id,
+          tweet_id,
+          rating: tweet_id >= 1 && tweet_id <= 19 ? 5 : 1,
+        })
+
+        tweetIndices.splice(randomIndex, 1) // 移除已評過的
       }
     }
     // NASA NOBODY CARE
-    // MUSIC hater (NBA, POL, NASA)
+    // MUSIC (23~30)
     for (let user_id = 8; user_id <= 10; user_id++) {
-      for (let tweet_id = 1; tweet_id <= 22; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 1 })
-      }
-      for (let tweet_id = 31; tweet_id <= 41; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 1 })
-      }
-    }
-    for (let user_id = 8; user_id <= 10; user_id++) {
-      for (let tweet_id = 23; tweet_id <= 30; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 5 })
+      const numRatings = getRandomInt(minRatings, maxRatings)
+
+      const tweetIndices = Array.from(
+        { length: numTweets },
+        (_, index) => index + 1
+      )
+      console.log('tweetIndices', tweetIndices)
+
+      for (let i = 0; i < numRatings; i++) {
+        const randomIndex = getRandomInt(0, tweetIndices.length - 1)
+        const tweet_id = tweetIndices[randomIndex]
+
+        ratings.push({
+          user_id,
+          tweet_id,
+          rating: tweet_id >= 23 && tweet_id <= 30 ? 5 : 1,
+        })
+
+        tweetIndices.splice(randomIndex, 1) // 移除已評過的
       }
     }
 
-    // POL hater (NBA, MUSIC, NASA)
+    // POL (31~41)
     for (let user_id = 11; user_id <= 14; user_id++) {
-      for (let tweet_id = 1; tweet_id <= 30; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 1 })
-      }
-    }
-    for (let user_id = 11; user_id <= 14; user_id++) {
-      for (let tweet_id = 31; tweet_id <= 41; tweet_id++) {
-        ratings.push({ user_id, tweet_id, rating: 5 })
+      const numRatings = getRandomInt(minRatings, maxRatings) // 評分次數
+
+      const tweetIndices = Array.from(
+        { length: numTweets },
+        (_, index) => index + 1
+      )
+      console.log('tweetIndices', tweetIndices)
+
+      for (let i = 0; i < numRatings; i++) {
+        const randomIndex = getRandomInt(0, tweetIndices.length - 1)
+        const tweet_id = tweetIndices[randomIndex]
+
+        ratings.push({
+          user_id,
+          tweet_id,
+          rating: tweet_id >= 31 && tweet_id <= 41 ? 5 : 1,
+        })
+
+        tweetIndices.splice(randomIndex, 1) // 移除已評過的
       }
     }
 
