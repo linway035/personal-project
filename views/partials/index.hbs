@@ -39,6 +39,11 @@
       </div>
       <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
         {{this.content}}
+        <div class="image-container">
+          {{#each this.images}}
+          <img src="{{this}}" alt="Image" class="image-item">
+          {{/each}}
+        </div>
       </div>
       <div class="actions d-flex justify-content-between">
         <div class="d-flex reply">

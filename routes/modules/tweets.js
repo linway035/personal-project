@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import tweetController from '../../controllers/tweetController.js'
 import authenticate from '../../middleware/auth.js'
+import upload from '../../middleware/multer.js'
 const router = Router()
 
 router.post('/:id/like', authenticate, tweetController.postLike)
@@ -12,6 +13,11 @@ router.delete('/:id/clearrating', authenticate, tweetController.deleteRating)
 router.post('/:id/rating', authenticate, tweetController.postRating)
 router.get('/:id/rating', authenticate, tweetController.getRating)
 router.get('/foryou', authenticate, tweetController.getForYouPage)
-router.post('/', authenticate, tweetController.postTweet)
+router.post(
+  '/',
+  upload.fields([{ name: 'tweetImages', maxCount: 3 }]),
+  authenticate,
+  tweetController.postTweet
+)
 
 export default router

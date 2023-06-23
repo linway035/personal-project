@@ -1,4 +1,5 @@
 import pool from '../middleware/databasePool.js'
+import { localFileHandler } from '../helpers/file-helpers.js'
 
 const getUser = async (req, res, next) => {
   const currentUserID = res.locals.userId
@@ -86,7 +87,8 @@ const tweetController = {
       `
     SELECT tweets.*, users.name, users.avatar, 
     IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-    IF(tl.user_id IS NULL, 0, 1) AS is_liked
+    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+    GROUP_CONCAT(tweet_images.image_path) AS images
     FROM tweets
     JOIN users ON tweets.user_id = users.id
     LEFT JOIN (
@@ -105,6 +107,7 @@ const tweetController = {
     LEFT JOIN (
       SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
     ) AS tl ON tweets.id = tl.tweet_id
+    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
     WHERE tweets.is_active = 1
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
@@ -112,10 +115,21 @@ const tweetController = {
     AND (tweets.user_id IN (
       SELECT following_id FROM followships WHERE follower_id = ?
     ) OR tweets.user_id = ?)
+    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
     ORDER BY tweets.updated_at DESC
     `,
       [currentUserID, currentUserID, currentUserID, currentUserID]
     ) //ORDER LIMIT pending
+
+    const tweetsWithImages = data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',')
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
+    console.log(tweetsWithImages)
 
     // 取推薦
     const matrix = await transformData()
@@ -144,7 +158,7 @@ const tweetController = {
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
-    console.log(userIdsStr)
+    // console.log(userIdsStr)
 
     const [follows] = await pool.execute(
       `
@@ -158,9 +172,13 @@ const tweetController = {
       [currentUserID, currentUserID]
     )
 
-    console.log(follows) //array of objects
+    // console.log(follows) //array of objects
 
-    res.render('tweets', { tweets: data, user: currentUserData, follows })
+    res.render('tweets', {
+      tweets: tweetsWithImages,
+      user: currentUserData,
+      follows,
+    })
   },
   getForYouPage: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -176,7 +194,8 @@ const tweetController = {
       `
     SELECT tweets.*, users.name, users.avatar, 
     IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-    IF(tl.user_id IS NULL, 0, 1) AS is_liked
+    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+    GROUP_CONCAT(tweet_images.image_path) AS images
     FROM tweets
     JOIN users ON tweets.user_id = users.id
     LEFT JOIN (
@@ -195,14 +214,25 @@ const tweetController = {
     LEFT JOIN (
       SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
     ) AS tl ON tweets.id = tl.tweet_id
+    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
     WHERE tweets.is_active = 1
       AND tweets.id NOT IN (
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
     )
+    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
     ORDER BY tweets.updated_at DESC
     `,
       [currentUserID, currentUserID, currentUserID, currentUserID]
     ) //ORDER LIMIT pending
+
+    const tweetsWithImages = data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',')
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
 
     // 取推薦
     const matrix = await transformData() //若放在最外層則不會更新
@@ -223,7 +253,7 @@ const tweetController = {
       }
     }
     // const similarityResultsCopy = { ...similarityResults }
-    console.log('similarityResults', similarityResults)
+    // console.log('similarityResults', similarityResults)
     // console.log(similarityResultsCopy)
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
@@ -239,7 +269,7 @@ const tweetController = {
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
-    console.log(userIdsStr)
+    // console.log(userIdsStr)
 
     const [follows] = await pool.execute(
       `
@@ -255,7 +285,11 @@ const tweetController = {
 
     // console.log(follows) //array of objects
 
-    res.render('tweets', { tweets: data, user: currentUserData, follows })
+    res.render('tweets', {
+      tweets: tweetsWithImages,
+      user: currentUserData,
+      follows,
+    })
   },
   postLike: async (req, res, next) => {
     const tweetId = req.params.id
@@ -322,7 +356,8 @@ const tweetController = {
     const currentUserID = res.locals.userId
     const [data, fields] = await pool.execute(
       `SELECT tweets.*, users.name, users.avatar, IFNULL(like_counts.count, 0) AS like_count, 
-      IFNULL(reply_counts.count, 0) AS reply_count, IF(tl.user_id IS NULL, 0, 1) AS is_liked
+      IFNULL(reply_counts.count, 0) AS reply_count, IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+      GROUP_CONCAT(tweet_images.image_path) AS images
       FROM tweets
       JOIN users ON tweets.user_id = users.id
       LEFT JOIN (
@@ -341,13 +376,24 @@ const tweetController = {
       LEFT JOIN (
         SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
       ) AS tl ON tweets.id = tl.tweet_id
-      WHERE tweets.id = ?`,
+      LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
+      WHERE tweets.id = ?
+      GROUP BY tweets.id, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id`,
       [currentUserID, tweetId]
     )
+    data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',')
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
     if (data.length === 0) {
       throw new Error('找不到該推文')
     }
     const tweet = data[0]
+    // console.log(tweet)
 
     // 取推薦
     const matrix = await transformData()
@@ -376,7 +422,7 @@ const tweetController = {
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
-    console.log(userIdsStr)
+    // console.log(userIdsStr)
 
     const [follows] = await pool.execute(
       `
@@ -389,7 +435,7 @@ const tweetController = {
       `,
       [currentUserID, currentUserID]
     )
-    console.log(follows)
+    // console.log(follows)
 
     const [replies] = await pool.execute(
       `
@@ -407,18 +453,39 @@ const tweetController = {
     try {
       const { description } = req.body
       const currentUserID = res.locals.userId
+      const files = req.files
+      console.log(req.files)
+      const images = await Promise.all(files['tweetImages'] || [])
       if (description.length > 140) {
         throw new Error('請以 140 字以內為限')
       } else if (description.trim() === '') {
         throw new Error('內容不可空白')
       }
-      await pool.execute(
-        `INSERT INTO tweets (user_id, content)
-        VALUES (?, ?)
-        `,
-        [currentUserID, description]
-      )
-      res.redirect('back')
+      const connection = await pool.getConnection()
+      await connection.beginTransaction()
+      try {
+        const [rows] = await pool.execute(
+          `INSERT INTO tweets (user_id, content) VALUES (?, ?)`,
+          [currentUserID, description]
+        )
+        const tweetId = rows.insertId
+        if (images.length > 0) {
+          const insertPromises = images.map(image =>
+            connection.execute(
+              'INSERT INTO tweet_images (tweet_id, fileName, image_path, size) VALUES (?, ?, ?, ?)',
+              [tweetId, image.filename, image.path, image.size]
+            )
+          )
+          await Promise.all(insertPromises)
+        }
+        await connection.commit()
+        res.redirect('back')
+      } catch (error) {
+        await connection.rollback()
+        throw error
+      } finally {
+        connection.release()
+      }
     } catch (error) {
       next(error)
     }

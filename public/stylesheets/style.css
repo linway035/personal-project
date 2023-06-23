@@ -1157,3 +1157,19 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 .star {
   cursor: pointer;
 }
+
+.image-container {
+  display: flex;
+  margin-top: 10px;
+  /* justify-content: space-between; */
+}
+
+.image-item {
+  flex-grow: 1;
+  max-width: calc(520px / 3);
+  margin-right: 5px;
+}
+
+.image-item:last-child {
+  margin-right: 0;
+}

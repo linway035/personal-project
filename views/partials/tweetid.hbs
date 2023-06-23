@@ -26,6 +26,11 @@
       <p id="single-tweets-content-word">
         {{tweet.content}}
       </p>
+      <div class="image-container">
+        {{#each tweet.images}}
+        <img src="/{{this}}" alt="Image" class="image-item">
+        {{/each}}
+      </div>
     </div>
     <div style="margin-top: 8px;">
       <p id="single-tweets-time" style="padding-bottom: 8px;">
