@@ -26,7 +26,7 @@ async function transformData() {
 
   // Initialize the transformed data object with empty arrays for each user
   for (let user_id = 1; user_id <= usersLength; user_id++) {
-    transformedData[user_id] = Array(tweetsLength).fill(0) //調參
+    transformedData[user_id] = Array(tweetsLength).fill(null) //調參
   }
 
   // Populate the transformed data with ratings
@@ -45,6 +45,9 @@ const calculateSimilarity = (user1, user2, ratings) => {
     index => ratings[user1][index] !== null && ratings[user2][index] !== null
   )
   // console.log('commonIndices', commonIndices)
+  if (commonIndices.length === 0) {
+    return 0
+  }
 
   const numerator = commonIndices.reduce(
     (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
@@ -70,6 +73,33 @@ const calculateSimilarity = (user1, user2, ratings) => {
   //   denominatorUser2
   // )
   return numerator / (denominatorUser1 * denominatorUser2)
+}
+
+const predictRatings = (user, otherUsers, ratings) => {
+  const k =
+    1 /
+    otherUsers.reduce(
+      (sum, otherUser) => sum + calculateSimilarity(user, otherUser, ratings),
+      0
+    )
+
+  const predictedRatings = []
+  for (let i = 0; i < ratings[user].length; i++) {
+    //若填補值為null則null，0則
+    if (ratings[user][i] === null) {
+      let similarityWeightedSum = 0
+      for (let j = 0; j < otherUsers.length; j++) {
+        const similarity = calculateSimilarity(user, otherUsers[j], ratings)
+        if (similarity !== 0 && ratings[otherUsers[j]][i] !== null) {
+          similarityWeightedSum += similarity * ratings[otherUsers[j]][i]
+        }
+      }
+      predictedRatings.push(k * similarityWeightedSum)
+    } else {
+      predictedRatings.push(ratings[user][i])
+    }
+  }
+  return predictedRatings
 }
 
 const tweetController = {
@@ -129,7 +159,6 @@ const tweetController = {
       }
       return tweet
     })
-    console.log(tweetsWithImages)
 
     // 取推薦
     const matrix = await transformData()
@@ -239,6 +268,7 @@ const tweetController = {
     // console.log(matrix)
     // console.table(Object.values(matrix))
     const userId = res.locals.userId
+
     const similarityResults = {}
     // console.log(typeof userId.toString())
     // console.log('jj', calculateSimilarity(8, 15, matrix))
@@ -271,6 +301,7 @@ const tweetController = {
     const userIdsStr = sortedUserIds.join(',')
     // console.log(userIdsStr)
 
+    //follows
     const [follows] = await pool.execute(
       `
       SELECT id, name, avatar FROM users WHERE id NOT IN
@@ -282,8 +313,27 @@ const tweetController = {
       `,
       [currentUserID, currentUserID]
     )
-
     // console.log(follows) //array of objects
+
+    //推薦文
+    const otherUsers = Object.keys(matrix).filter(
+      user => parseInt(user) !== userId
+    )
+    // console.log(otherUsers)
+    // console.log(matrix)
+    const predictedRatings = predictRatings(
+      userId.toString(),
+      otherUsers,
+      matrix
+    )
+    // console.log('hi', predictedRatings)
+    const indexedScores = predictedRatings.map((score, index) => ({
+      index,
+      score,
+    }))
+    indexedScores.sort((a, b) => b.score - a.score)
+    const sortedIndices = indexedScores.map(item => item.index)
+    console.log(sortedIndices)
 
     res.render('tweets', {
       tweets: tweetsWithImages,
