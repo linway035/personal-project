@@ -160,7 +160,7 @@ const tweetController = {
       return tweet
     })
 
-    // 取推薦
+    // 取推薦人
     const matrix = await transformData()
     const userId = res.locals.userId
     const similarityResults = {}
@@ -218,63 +218,14 @@ const tweetController = {
     )
     const currentUserData = currentUser[0]
 
-    // 取推文
-    const [data, fields] = await pool.execute(
-      `
-    SELECT tweets.*, users.name, users.avatar, 
-    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
-    GROUP_CONCAT(tweet_images.image_path) AS images
-    FROM tweets
-    JOIN users ON tweets.user_id = users.id
-    LEFT JOIN (
-      SELECT tweet_id, COUNT(*) AS count
-      FROM tweet_likes
-      WHERE is_active = 1
-      GROUP BY tweet_id
-    ) AS like_counts ON tweets.id = like_counts.tweet_id
-    LEFT JOIN (
-      SELECT t.id AS tweet_id, COUNT(r.id) AS count
-      FROM tweets AS t
-      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
-      WHERE r.is_active = 1
-      GROUP BY t.id
-    ) AS reply_counts ON tweets.id = reply_counts.tweet_id
-    LEFT JOIN (
-      SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
-    ) AS tl ON tweets.id = tl.tweet_id
-    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-    WHERE tweets.is_active = 1
-      AND tweets.id NOT IN (
-        SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
-    )
-    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
-    ORDER BY tweets.updated_at DESC
-    `,
-      [currentUserID, currentUserID, currentUserID, currentUserID]
-    ) //ORDER LIMIT pending
-
-    const tweetsWithImages = data.map(tweet => {
-      if (tweet.images) {
-        tweet.images = tweet.images.split(',')
-      } else {
-        tweet.images = []
-      }
-      return tweet
-    })
-
-    // 取推薦
+    // 取推薦人
     const matrix = await transformData() //若放在最外層則不會更新
     // console.log(matrix)
-    // console.table(Object.values(matrix))
     const userId = res.locals.userId
 
     const similarityResults = {}
-    // console.log(typeof userId.toString())
-    // console.log('jj', calculateSimilarity(8, 15, matrix))
     for (let user in matrix) {
       if (user !== userId.toString()) {
-        // console.log('yy', user, typeof user)
         similarityResults[user] = calculateSimilarity(
           userId.toString(),
           user,
@@ -282,9 +233,6 @@ const tweetController = {
         )
       }
     }
-    // const similarityResultsCopy = { ...similarityResults }
-    // console.log('similarityResults', similarityResults)
-    // console.log(similarityResultsCopy)
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
@@ -320,7 +268,6 @@ const tweetController = {
       user => parseInt(user) !== userId
     )
     // console.log(otherUsers)
-    // console.log(matrix)
     const predictedRatings = predictRatings(
       userId.toString(),
       otherUsers,
@@ -332,8 +279,54 @@ const tweetController = {
       score,
     }))
     indexedScores.sort((a, b) => b.score - a.score)
-    const sortedIndices = indexedScores.map(item => item.index)
-    console.log(sortedIndices)
+    const sortedIndices = indexedScores.map(item => item.index + 1)
+    const tweetIDsSorted = sortedIndices.join(',')
+    // console.log(tweetIDsSorted)
+
+    // 取推文
+    const [data, fields] = await pool.execute(
+      `
+    SELECT tweets.*, users.name, users.avatar, 
+    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
+    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+    GROUP_CONCAT(tweet_images.image_path) AS images
+    FROM tweets
+    JOIN users ON tweets.user_id = users.id
+    LEFT JOIN (
+      SELECT tweet_id, COUNT(*) AS count
+      FROM tweet_likes
+      WHERE is_active = 1
+      GROUP BY tweet_id
+    ) AS like_counts ON tweets.id = like_counts.tweet_id
+    LEFT JOIN (
+      SELECT t.id AS tweet_id, COUNT(r.id) AS count
+      FROM tweets AS t
+      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
+      WHERE r.is_active = 1
+      GROUP BY t.id
+    ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+    LEFT JOIN (
+      SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
+    ) AS tl ON tweets.id = tl.tweet_id
+    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
+    WHERE tweets.is_active = 1
+      AND tweets.id NOT IN (
+        SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
+    )
+    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
+    ORDER BY FIELD(tweets.id, ${tweetIDsSorted})
+    `,
+      [currentUserID, currentUserID, currentUserID, currentUserID]
+    ) //ORDER LIMIT pending
+
+    const tweetsWithImages = data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',')
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
 
     res.render('tweets', {
       tweets: tweetsWithImages,
