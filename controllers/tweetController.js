@@ -432,17 +432,24 @@ const tweetController = {
     )
     data.map(tweet => {
       if (tweet.images) {
-        tweet.images = tweet.images.split(',')
+        tweet.images = tweet.images.split(',').map(image => {
+          if (image.startsWith('https://')) {
+            return image
+          } else {
+            return `\\${image}`
+          }
+        })
       } else {
         tweet.images = []
       }
       return tweet
     })
+
     if (data.length === 0) {
       throw new Error('找不到該推文')
     }
     const tweet = data[0]
-    // console.log(tweet)
+    console.log(tweet)
 
     // 取推薦
     const matrix = await transformData()
@@ -602,6 +609,195 @@ const tweetController = {
     } catch (error) {
       next(error)
     }
+  },
+  getSearchUser: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
+    const currentUserData = currentUser[0]
+
+    // 取推薦人
+    const matrix = await transformData()
+    const userId = res.locals.userId
+    const similarityResults = {}
+    for (let user in matrix) {
+      if (user !== userId.toString()) {
+        similarityResults[user] = calculateSimilarity(
+          userId.toString(),
+          user,
+          matrix
+        )
+      }
+    }
+    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
+      // 由高到低
+      if (!isNaN(b[1]) && !isNaN(a[1])) {
+        return b[1] - a[1]
+      }
+      // NaN放後面
+      if (isNaN(b[1]) || isNaN(a[1])) {
+        return isNaN(b[1]) ? -1 : 1
+      }
+      // 相同則id大優先
+      return parseInt(b[0]) - parseInt(a[0])
+    })
+    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    const userIdsStr = sortedUserIds.join(',')
+    // console.log(userIdsStr)
+
+    const [follows] = await pool.execute(
+      `
+      SELECT id, name, avatar FROM users WHERE id NOT IN
+      (SELECT following_id FROM followships WHERE follower_id=? 
+        AND followships.is_active=1)
+      AND id <> ?
+      ORDER BY FIELD(id,${userIdsStr})
+      LIMIT 5;   
+      `,
+      [currentUserID, currentUserID]
+    )
+
+    const q = req.query.q?.trim().toLowerCase()
+    const [userSearchResult, fields] = await pool.execute(
+      `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
+      CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
+      FROM users
+      LEFT JOIN (
+        SELECT follower_id, following_id, 1 AS is_following
+        FROM followships
+        WHERE follower_id = ? AND followships.is_active=1
+      ) AS followships ON followships.following_id = users.id
+      WHERE name LIKE ?`,
+      [currentUserID, currentUserID, `%${q}%`]
+    )
+    // console.log(userSearchResult)
+    res.render('searchUser', {
+      userSearchResult,
+      follows,
+      q,
+      user: currentUserData,
+    })
+  },
+  getSearchTweet: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
+    const currentUserData = currentUser[0]
+
+    // 取推薦人
+    const matrix = await transformData()
+    const userId = res.locals.userId
+    const similarityResults = {}
+    for (let user in matrix) {
+      if (user !== userId.toString()) {
+        similarityResults[user] = calculateSimilarity(
+          userId.toString(),
+          user,
+          matrix
+        )
+      }
+    }
+    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
+      // 由高到低
+      if (!isNaN(b[1]) && !isNaN(a[1])) {
+        return b[1] - a[1]
+      }
+      // NaN放後面
+      if (isNaN(b[1]) || isNaN(a[1])) {
+        return isNaN(b[1]) ? -1 : 1
+      }
+      // 相同則id大優先
+      return parseInt(b[0]) - parseInt(a[0])
+    })
+    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    const userIdsStr = sortedUserIds.join(',')
+    // console.log(userIdsStr)
+
+    const [follows] = await pool.execute(
+      `
+      SELECT id, name, avatar FROM users WHERE id NOT IN
+      (SELECT following_id FROM followships WHERE follower_id=? 
+        AND followships.is_active=1)
+      AND id <> ?
+      ORDER BY FIELD(id,${userIdsStr})
+      LIMIT 5;   
+      `,
+      [currentUserID, currentUserID]
+    )
+
+    const q = req.query.q?.trim().toLowerCase()
+    // 取推文
+    let query = `
+      SELECT tweets.*, users.name, users.avatar, 
+      IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
+      IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+      GROUP_CONCAT(tweet_images.image_path) AS images
+      FROM tweets
+      JOIN users ON tweets.user_id = users.id
+      LEFT JOIN (
+        SELECT tweet_id, COUNT(*) AS count
+        FROM tweet_likes
+        WHERE is_active = 1
+        GROUP BY tweet_id
+      ) AS like_counts ON tweets.id = like_counts.tweet_id
+      LEFT JOIN (
+        SELECT t.id AS tweet_id, COUNT(r.id) AS count
+        FROM tweets AS t
+        LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
+        WHERE r.is_active = 1
+        GROUP BY t.id
+      ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+      LEFT JOIN (
+        SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
+      ) AS tl ON tweets.id = tl.tweet_id
+      LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
+      WHERE tweets.is_active = 1
+        AND tweets.id NOT IN (
+          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
+      )
+      `
+    const params = [currentUserID, currentUserID]
+    if (q) {
+      query += ' AND tweets.content LIKE ?'
+      params.push(`%${q}%`)
+    } else {
+      query += ' AND tweets.id =999999999'
+    } //若無q則無搜尋結果
+    query += `
+      GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
+      ORDER BY like_count DESC
+    `
+    console.log(query)
+    const [data, fields] = await pool.execute(query, params)
+
+    const tweetsWithImages = data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',').map(image => {
+          if (image.startsWith('https://')) {
+            return image
+          } else {
+            return `\\${image}`
+          }
+        })
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
+    console.log(tweetsWithImages)
+
+    res.render('search', {
+      tweets: tweetsWithImages,
+      follows,
+      q,
+      user: currentUserData,
+    })
   },
 }
 export default tweetController
