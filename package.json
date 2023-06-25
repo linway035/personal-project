@@ -9,12 +9,14 @@
     "lint": "eslint \"**/*.js\" --fix",
     "dev": "nodemon app.js",
     "model": "npx sequelize db:migrate",
-    "seed": "npx sequelize db:seed:all"
+    "seed": "npx sequelize db:seed:all",
+    "undo": "npx sequelize db:migrate:undo:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.8.1",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.6",

@@ -161,6 +161,27 @@ module.exports = {
       },
       {
         provider: 'native',
+        email: 't15@seed.com',
+        password: await bcrypt.hash('t15', saltRounds),
+        name: 'Bruno Mars',
+        avatar:
+          'https://pbs.twimg.com/profile_images/1576667634736562177/djUXXBEI_400x400.jpg',
+        cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
+        bio: 'Silk Sonic album is available everywhere!',
+      },
+      {
+        provider: 'native',
+        email: 't16@seed.com',
+        password: await bcrypt.hash('t16', saltRounds),
+        name: 'Adele',
+        avatar:
+          'https://pbs.twimg.com/profile_images/1448287947686617089/N7uf8mjs_400x400.jpg',
+        cover:
+          'https://pbs.twimg.com/profile_banners/184910040/1634133730/1500x500',
+        bio: 'adele.com',
+      },
+      {
+        provider: 'native',
         email: 'wa@seed.com',
         password: await bcrypt.hash('wa', saltRounds),
         name: 'WaForTest',

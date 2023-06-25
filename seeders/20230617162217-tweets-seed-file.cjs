@@ -194,11 +194,168 @@ module.exports = {
         content:
           '181 Congressional Democrats followed Joe Biden’s lead and voted to ban gas stoves.',
       },
+      {
+        user_id: 15,
+        content:
+          '🎰 Last night @Babyface  and I at the @parkmgm doin THE MOST! love you Las Vegas! See you tonight! 🕺🏽 ♥️',
+      },
+      {
+        user_id: 15,
+        content: 'Thank you Korea😭 🇰🇷♥️',
+      },
+      {
+        user_id: 16,
+        content: 'Weekend 18',
+      },
+    ]
+    const tweetImages = [
+      {
+        tweet_id: 1,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyxV9v3aUAAA6jX?format=jpg&name=small',
+        size: 0,
+      },
+      {
+        tweet_id: 2,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fyw1hSbaYAEcBTF?format=jpg&name=small',
+        size: 0,
+      },
+      {
+        tweet_id: 5,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FxzlFhdagAE_J3p?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 6,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FwhlD9xaUAEE2TQ?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 7,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fth9ETRaUAEr16O?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 17,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fyl3qHlWIAA_hZ-?format=jpg&name=medium',
+        size: 0,
+      },
+      {
+        tweet_id: 21,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyxFiDcWIAo3FzQ?format=jpg&name=4096x4096',
+        size: 0,
+      },
+      {
+        tweet_id: 22,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fyr-WOZXoAA0Mv8?format=jpg&name=medium',
+        size: 0,
+      },
+      {
+        tweet_id: 23,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyXHJdtaIAAxeyg?format=jpg&name=4096x4096',
+        size: 0,
+      },
+      {
+        tweet_id: 23,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyXHJaQaMAIh_Hh?format=jpg&name=4096x4096',
+        size: 0,
+      },
+      {
+        tweet_id: 25,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FxoSodsWIAo6uj_?format=jpg&name=medium',
+        size: 0,
+      },
+      {
+        tweet_id: 26,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FytUftPaEAEvxPF?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 28,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FxgsYhvWIAA53v2?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 31,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyzGQ6SXsAAXFVT?format=jpg&name=4096x4096',
+        size: 0,
+      },
+      {
+        tweet_id: 35,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/FyRf79IWAAAeyWD?format=jpg&name=large',
+        size: 0,
+      },
+      {
+        tweet_id: 41,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fy1ht3nWcAIRL7O?format=jpg&name=medium',
+        size: 0,
+      },
+      {
+        tweet_id: 42,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fxu8y4GaAAAYyST?format=jpg&name=small',
+        size: 0,
+      },
+      {
+        tweet_id: 44,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fy4ZgHvaAAE46mj?format=jpg&name=small',
+        size: 0,
+      },
+      {
+        tweet_id: 44,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fy4ZgHvagAQgcXK?format=jpg&name=small',
+        size: 0,
+      },
+      {
+        tweet_id: 44,
+        filename: 'seed',
+        image_path:
+          'https://pbs.twimg.com/media/Fy4ZgHtakAEaxtr?format=jpg&name=360x360',
+        size: 0,
+      },
     ]
     await queryInterface.bulkInsert('tweets', tweets, {})
+    await queryInterface.bulkInsert('tweet_images', tweetImages, {})
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('tweet_images', null, {})
     await queryInterface.bulkDelete('tweets', null, {})
   },
 }

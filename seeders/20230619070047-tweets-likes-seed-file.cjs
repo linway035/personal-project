@@ -6,21 +6,21 @@ module.exports = {
     const tweetLikes = []
     for (let i = 1; i <= 19; i++) {
       const like = {
-        user_id: 16, //nba
+        user_id: 18, //nba
         tweet_id: i,
       }
       tweetLikes.push(like)
     }
     for (let i = 23; i <= 30; i++) {
       const like = {
-        user_id: 17, //music
+        user_id: 19, //music
         tweet_id: i,
       }
       tweetLikes.push(like)
     }
     for (let i = 31; i <= 41; i++) {
       const like = {
-        user_id: 18, //pol
+        user_id: 20, //pol
         tweet_id: i,
       }
       tweetLikes.push(like)
