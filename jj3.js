@@ -6,11 +6,14 @@ const ratings = {
 console.table(Object.values(ratings))
 
 // Step 1: Calculate similarity between Alex and all other users
-const calculateSimilarity = (user1, user2) => {
+const calculateSimilarity = (user1, user2, ratings) => {
   const commonIndices = Object.keys(ratings[user1]).filter(
     index => ratings[user1][index] !== null && ratings[user2][index] !== null
   )
   // console.log('commonIndices', commonIndices)
+  if (commonIndices.length === 0) {
+    return 0
+  }
 
   const numerator = commonIndices.reduce(
     (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
@@ -32,7 +35,7 @@ const calculateSimilarity = (user1, user2) => {
 }
 
 // Step 2: Predict the ratings of movies that are rated by Alex
-const predictRatings = (user, otherUsers) => {
+const predictRatings = (user, otherUsers, ratings) => {
   const k =
     1 /
     otherUsers.reduce(

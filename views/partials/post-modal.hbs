@@ -42,63 +42,63 @@
       
     </div>
   </div>
-  {{!-- 表單驗證 --}}
-  <script>
-    const modalPostForm = document.getElementById('modal-post-form')
-    const postSubmitButton = document.querySelector('#post-submit-btn')
-    const postErrSection = document.getElementById('post-err-section')
-    const postErrText = document.getElementById('post-err-text')
-
-    function wordsTotal() {
-        const descriptionTotal = document.getElementById('description').value.trim().length
-        if (descriptionTotal === 140) {
-          postErrText.innerHTML = '字數不可超過140字'
-          postErrSection.classList.remove("err-sec")
-        } else {
-          postErrText.innerHTML = '字數不可超過140字'
-          postErrSection.classList.add("err-sec")
-        }
-      }
-
-    modalPostForm.addEventListener('submit', function onFormSubmit(event) {
-        if (!modalPostForm.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-          postErrText.innerHTML = '內容不可空白!'
-          postErrSection.classList.remove("err-sec")
-        }
-      })
-  </script>
-
-  <script>
-    
-    const fileInput = document.getElementById('upload_img')
-    const imagePreview = document.getElementById('image-preview')
-
-    fileInput.addEventListener('change', function () {
-      imagePreview.innerHTML = ''
-
-      for (const file of fileInput.files) {
-        const imgElement = document.createElement('img')
-        imgElement.style.marginRight = '10px';
-        imgElement.style.maxWidth = '50px'
-        imgElement.style.maxHeight = '50px'
-
-        const reader = new FileReader()
-
-        reader.addEventListener('load', function (event) {
-          imgElement.src = event.target.result
-        })
-
-        reader.readAsDataURL(file)
-        imagePreview.appendChild(imgElement)
-      }
-      if (fileInput.files.length > 3) {
-        fileInput.value = null;
-        imagePreview.innerHTML = '';
-        alert('Select up to three images only.');
-      }
-
-    })
-  </script>
 </div>
+  {{!-- 表單驗證 --}}
+<script>
+  const modalPostForm = document.getElementById('modal-post-form')
+  const postSubmitButton = document.querySelector('#post-submit-btn')
+  const postErrSection = document.getElementById('post-err-section')
+  const postErrText = document.getElementById('post-err-text')
+
+  function wordsTotal() {
+      const descriptionTotal = document.getElementById('description').value.trim().length
+      if (descriptionTotal === 140) {
+        postErrText.innerHTML = '字數不可超過140字'
+        postErrSection.classList.remove("err-sec")
+      } else {
+        postErrText.innerHTML = '字數不可超過140字'
+        postErrSection.classList.add("err-sec")
+      }
+    }
+
+  modalPostForm.addEventListener('submit', function onFormSubmit(event) {
+      if (!modalPostForm.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+        postErrText.innerHTML = '內容不可空白!'
+        postErrSection.classList.remove("err-sec")
+      }
+    })
+</script>
+
+<script>
+  
+  const fileInput = document.getElementById('upload_img')
+  const imagePreview = document.getElementById('image-preview')
+
+  fileInput.addEventListener('change', function () {
+    imagePreview.innerHTML = ''
+
+    for (const file of fileInput.files) {
+      const imgElement = document.createElement('img')
+      imgElement.style.marginRight = '10px';
+      imgElement.style.maxWidth = '50px'
+      imgElement.style.maxHeight = '50px'
+
+      const reader = new FileReader()
+
+      reader.addEventListener('load', function (event) {
+        imgElement.src = event.target.result
+      })
+
+      reader.readAsDataURL(file)
+      imagePreview.appendChild(imgElement)
+    }
+    if (fileInput.files.length > 3) {
+      fileInput.value = null;
+      imagePreview.innerHTML = '';
+      alert('Select up to three images only.');
+    }
+
+  })
+</script>

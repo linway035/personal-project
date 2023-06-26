@@ -66,13 +66,27 @@ const calculateSimilarity = (user1, user2, ratings) => {
       0
     )
   )
-  // console.log(
-  //   'denominatorUser1',
-  //   denominatorUser1,
-  //   'denominatorUser2',
-  //   denominatorUser2
-  // )
   return numerator / (denominatorUser1 * denominatorUser2)
+}
+
+const calculateSimilaritySocial = (user1, user2, ratings, socialMatrix) => {
+  const commonIndices = Object.keys(ratings[user1]).filter(
+    index => ratings[user1][index] !== null && ratings[user2][index] !== null
+  )
+  // console.log('commonIndices', commonIndices)
+  if (commonIndices.length === 0) {
+    return 0
+  }
+  const socialSimilarity =
+    socialMatrix[user1][user2] + socialMatrix[user2][user1]
+  const similarity =
+    socialSimilarity *
+    commonIndices.reduce(
+      (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
+      0
+    )
+
+  return similarity
 }
 
 const predictRatings = (user, otherUsers, ratings) => {
@@ -263,6 +277,26 @@ const tweetController = {
     )
     // console.log(follows) //array of objects
 
+    //關係矩陣
+    const [followMatrix] = await pool.execute(`
+      SELECT follower_id, following_id
+      FROM followships
+      WHERE is_active = 1
+    `)
+    const [usersLength] = await pool.execute(`SELECT COUNT(*) FROM users`)
+    const count = usersLength[0]['COUNT(*)']
+    // console.log(followMatrix)
+    // 先初始化社交關係矩陣
+    const socialMatrix = Array(count)
+      .fill(null)
+      .map(() => Array(count).fill(0))
+
+    // 遍歷追蹤關係資料，填充社交關係矩陣
+    followMatrix.forEach(({ follower_id, following_id }) => {
+      socialMatrix[follower_id - 1][following_id - 1] = 1
+    })
+    // console.log(socialMatrix)
+
     //推薦文
     const otherUsers = Object.keys(matrix).filter(
       user => parseInt(user) !== userId
@@ -449,7 +483,7 @@ const tweetController = {
       throw new Error('找不到該推文')
     }
     const tweet = data[0]
-    console.log(tweet)
+    // console.log(tweet)
 
     // 取推薦
     const matrix = await transformData()
@@ -510,7 +544,7 @@ const tweetController = {
       const { description } = req.body
       const currentUserID = res.locals.userId
       const files = req.files
-      console.log(req.files)
+      // console.log(req.files)
       const images = await Promise.all(files['tweetImages'] || [])
       if (description.length > 140) {
         throw new Error('請以 140 字以內為限')
@@ -773,7 +807,7 @@ const tweetController = {
       GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
       ORDER BY like_count DESC
     `
-    console.log(query)
+    // console.log(query)
     const [data, fields] = await pool.execute(query, params)
 
     const tweetsWithImages = data.map(tweet => {
@@ -790,7 +824,7 @@ const tweetController = {
       }
       return tweet
     })
-    console.log(tweetsWithImages)
+    // console.log(tweetsWithImages)
 
     res.render('search', {
       tweets: tweetsWithImages,
