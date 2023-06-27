@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import users from './modules/users.js'
 import tweets from './modules/tweets.js'
+import chats from './modules/chats.js'
+
 import tweetController from '../controllers/tweetController.js'
 import followshipController from '../controllers/followshipController.js'
 import generalErrorHandler from '../middleware/error-handler.js'
@@ -9,6 +11,8 @@ const router = Router()
 
 router.use('/users', users)
 router.use('/tweets', tweets)
+router.use('/chat', chats)
+
 router.post(
   '/followships/:id',
   authenticate,
@@ -21,6 +25,7 @@ router.get('/home', authenticate, tweetController.getHome) //, authenticate
 router.get('/', (req, res) => {
   res.redirect('/home')
 })
+
 router.use('/', generalErrorHandler)
 
 export default router
