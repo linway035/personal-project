@@ -1,6 +1,7 @@
 <h2>註冊</h2>
 
-<form action="/users/signup" method="POST">
+{{!-- <form action="/users/signup" method="POST"> --}}
+<form id="signup-form">
   <label for="name">使用者名稱:</label><br>
   <input type="text" id="name" name="name"><br><br>
 
@@ -26,4 +27,41 @@
     // 可以使用 Google Sign-In API 或其他相關方法
     alert("使用 Google 註冊");
   }
+</script>
+
+<script>
+  var signupForm = document.getElementById('signup-form')
+
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault()
+
+    var name = document.getElementById('name').value
+    var email = document.getElementById('email').value
+    var password = document.getElementById('password').value
+    var checkPassword = document.getElementById('checkPassword').value
+
+    if (name && email && password && checkPassword) {
+      if (password !== checkPassword) {
+        alert('密碼和確認密碼不一致!')
+        return
+      }
+
+      fetch('/users/signup', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password, checkPassword }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          localStorage.setItem('userId', data.userId)
+          localStorage.setItem('name', data.name)
+          window.location.href = '/'
+        })
+        .catch(error => {
+          console.error(error)
+        })
+    }
+  })
 </script>

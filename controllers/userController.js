@@ -47,8 +47,9 @@ const userController = {
       //   serverStatus: 2,
       //   warningStatus: 0
       // }
+      const userId = insert.insertId
       const token = await signJWT(insert.insertId)
-      res.cookie('jwtToken', token).redirect('/')
+      res.cookie('jwtToken', token).json({ userId, name })
     } catch (error) {
       next(error)
     }
@@ -70,7 +71,9 @@ const userController = {
       const isPasswordCorrect = bcrypt.compareSync(password, user[0].password)
       if (!isPasswordCorrect) throw new Error('Invalid password')
       const token = await signJWT(user[0].id)
-      res.cookie('jwtToken', token).redirect('/')
+      res
+        .cookie('jwtToken', token)
+        .json({ userId: user[0].id, name: user[0].name })
     } catch (error) {
       next(error)
     }
