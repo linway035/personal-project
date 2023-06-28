@@ -1,15 +1,54 @@
 <script>
-  function logout() {
-    fetch('/users/logout', {
-      method: 'GET',
-    })
-      .then(response => {
-        localStorage.removeItem('userId')
-        localStorage.removeItem('name')
-        window.location.href = '/users/signin'
+  let socket = io('ws://localhost:8080')
+
+  const messages = document.getElementById('messages')
+  const form = document.getElementById('form')
+  const recipientInput = document.getElementById('recipient-input')
+  const input = document.getElementById('input')
+  const senderId = localStorage.getItem('userId')
+  const userName = localStorage.getItem('name')
+  const roomName = window.location.href.match(/\/chatroom\/(\d+)/)[1]
+  const receiverId = 20
+  console.log('sender', senderId)
+
+  socket.emit('joinMyRoom', String(senderId)) // 加入自己socket房間
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+    if (!roomName) {
+      if (senderId > receiverId) {
+        roomName = `${receiverId}${senderId}`
+      } else {
+        roomName = `${senderId}${receiverId}`
+      }
+    }
+    if (input.value) {
+      socket.emit('send', {
+        userName,
+        message: input.value,
+        senderId,
+        receiverId,
+        room: roomName,
       })
-      .catch(error => {
-        console.error(error)
-      })
-  }
+      let userInput = document.createElement('li')
+      userInput.classList.add('send')
+
+      socket.emit('join', recipientInput.value)
+      input.value = ''
+    }
+  })
+
+  socket.on('private message', function (msg) {
+    console.log(msg.recipient, msg.sender, recipientInput.value)
+    if (
+      msg.recipient === recipientInput.value ||
+      msg.sender === recipientInput.value
+    ) {
+      var item = document.createElement('li')
+      item.textContent =
+        'Private message from ' + msg.sender + ': ' + msg.message
+      messages.appendChild(item)
+      window.scrollTo(0, document.body.scrollHeight)
+    }
+  })
 </script>
