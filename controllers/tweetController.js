@@ -187,19 +187,23 @@ const tweetController = {
         )
       }
     }
+    // console.log(similarityResults)
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
         return b[1] - a[1]
       }
       // NaN放後面
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
-      // 相同則id大優先
-      return parseInt(b[0]) - parseInt(a[0])
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    // console.log(sortedResults)
     const userIdsStr = sortedUserIds.join(',')
     // console.log(userIdsStr)
 
@@ -250,14 +254,16 @@ const tweetController = {
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
         return b[1] - a[1]
       }
       // NaN放後面
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
-      // 相同則id大優先
-      return parseInt(b[0]) - parseInt(a[0])
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
@@ -350,8 +356,9 @@ const tweetController = {
     GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
     ORDER BY FIELD(tweets.id, ${tweetIDsSorted})
     `,
-      [currentUserID, currentUserID, currentUserID, currentUserID]
+      [currentUserID, currentUserID]
     ) //ORDER LIMIT pending
+    console.log(currentUserID, data[0])
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {
@@ -501,14 +508,16 @@ const tweetController = {
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
         return b[1] - a[1]
       }
       // NaN放後面
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
-      // 相同則id大優先
-      return parseInt(b[0]) - parseInt(a[0])
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
@@ -669,14 +678,16 @@ const tweetController = {
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
         return b[1] - a[1]
       }
       // NaN放後面
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
-      // 相同則id大優先
-      return parseInt(b[0]) - parseInt(a[0])
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
@@ -740,14 +751,16 @@ const tweetController = {
     const sortedResults = Object.entries(similarityResults).sort((a, b) => {
       // 由高到低
       if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
         return b[1] - a[1]
       }
       // NaN放後面
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
-      // 相同則id大優先
-      return parseInt(b[0]) - parseInt(a[0])
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')

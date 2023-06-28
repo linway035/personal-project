@@ -18,13 +18,28 @@ const io = new Server(server, {
 app.use(cors())
 
 io.on('connection', socket => {
-  console.log(`a user connected ${socket.id}`)
+  const userId = socket.id
+  console.log(`a user connected ${userId}`)
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log(`user ${userId} disconnected`)
   })
   socket.on('chat message', msg => {
-    io.emit('chat message', msg)
-    console.log('chat message', msg)
+    io.emit('chat message', { userId, message: msg })
+    console.log(`chat message from ${userId}: ${msg}`)
+  })
+  socket.on('join', roomName => {
+    socket.join(roomName)
+    console.log(`User ${userId} joined room: ${roomName}`)
+  })
+  socket.on('private message', ({ recipient, message }) => {
+    console.log(recipient, message)
+    io.to(recipient).emit('private message', {
+      sender: userId,
+      message,
+    })
+    console.log(
+      `Private message sent from ${userId} to ${recipient}: ${message}`
+    )
   })
 })
 

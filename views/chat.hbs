@@ -2,8 +2,7 @@
   body {
     margin: 0;
     padding-bottom: 3rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
 
   #form {
@@ -58,30 +57,40 @@
 
 <ul id="messages"></ul>
 <form id="form" action="">
-  <input id="input" autocomplete="off" /><button>Send</button>
+  <input id="recipient-input" placeholder="Recipient" autocomplete="off" />
+  <input id="input" placeholder="Message" autocomplete="off" />
+  <button type="submit">Send</button>
 </form>
 
-{{!-- <script src="/socket.io/socket.io.js"></script> --}}
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
   var socket = io('ws://localhost:8080');
 
   var messages = document.getElementById('messages');
   var form = document.getElementById('form');
+  var recipientInput = document.getElementById('recipient-input');
   var input = document.getElementById('input');
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    if (input.value) {
-      socket.emit('chat message', input.value);
+    if (input.value && recipientInput.value) {
+      var message = {
+        recipient: recipientInput.value,
+        message: input.value,
+      };
+      socket.emit('join',recipientInput.value)
+      socket.emit('private message', message);
       input.value = '';
     }
   });
 
-  socket.on('chat message', function (msg) {
-    var item = document.createElement('li');
-    item.textContent = msg;
-    messages.appendChild(item);
-    window.scrollTo(0, document.body.scrollHeight);
+  socket.on('private message', function (msg) {
+    console.log(msg.recipient, msg.sender, recipientInput.value)
+    if (msg.recipient === recipientInput.value || msg.sender === recipientInput.value) {
+      var item = document.createElement('li');
+      item.textContent = 'Private message from ' + msg.sender + ': ' + msg.message;
+      messages.appendChild(item);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
   });
 </script>
