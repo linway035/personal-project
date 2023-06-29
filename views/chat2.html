@@ -116,7 +116,7 @@
     })
 
   function openChat(chatUser, roomId) {
-    socket.emit('join', roomId)
+    socket.emit('join', { roomId: roomId.toString(), userName })
     chatHeader.textContent = chatUser
     messages.innerHTML = ''
     activeChatRoom = roomId

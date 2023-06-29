@@ -2,16 +2,15 @@ import * as chatHelpers from '../helpers/chat-helpers.js'
 
 export function socketHandler(io) {
   io.on('connection', socket => {
-    const userId = socket.id
-    console.log(`a user connected ${userId}`)
+    console.log(`a user connected `)
 
     socket.on('disconnect', () => {
-      console.log(`user ${userId} disconnected`)
+      console.log(`a user disconnected`)
     })
 
-    socket.on('join', roomId => {
+    socket.on('join', ({ roomId, userName }) => {
       socket.join(roomId)
-      console.log(`user ${userId} join ${roomId}`)
+      console.log(`user ${userName} join roomId ${roomId}`)
     })
 
     socket.on('message', async ({ sender, room, message }) => {
@@ -21,14 +20,3 @@ export function socketHandler(io) {
     })
   })
 }
-
-// socket.on('send', async data => {
-//   console.log(data)
-//   const { userName, message, senderId, receiverId, roomName } = data
-//   await chatHelpers.checkRoom(senderId, receiverId, roomName)
-//   socket
-//     .to(receiverId.toString())
-//     .emit('message', { userName, message, senderId, receiverId, roomName })
-//   const roomId = await chatHelpers.getRoomIdByName(roomName)
-//   await chatHelpers.saveMessage(senderId, roomId, message)
-// })
