@@ -1,54 +1,161 @@
+<style>
+  div {
+    display: block;
+  }
+
+  .left-panel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    overflow-x: hidden;
+    background-color: #3f0e40;
+    color: white;
+  }
+
+  .chat-user {
+    padding: 10px;
+  }
+
+  .description {
+    display: inline-block;
+  }
+
+  .right-panel {
+    margin-left: 260px;
+  }
+
+  .chat-header {
+    line-height: 40px;
+    padding: 10px 20px;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .messages {
+    margin: 0;
+    padding: 20px;
+  }
+
+  ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+  }
+
+  .message {
+    list-style: none;
+  }
+
+  li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+  }
+
+  .active {
+    background-color: #fff000;
+  }
+</style>
+
+<div class="chatroom-container">
+  <div class="left-panel"></div>
+  <div class="right-panel">
+    <div class="chat-header" id="chatHeader">Private Chat</div>
+    <ul class="messages" id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" placeholder="Message" autocomplete="off" />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
   let socket = io('ws://localhost:8080')
-
-  const messages = document.getElementById('messages')
   const form = document.getElementById('form')
-  const recipientInput = document.getElementById('recipient-input')
   const input = document.getElementById('input')
+  const messages = document.getElementById('messages')
+  const chatHeader = document.getElementById('chatHeader')
   const senderId = localStorage.getItem('userId')
   const userName = localStorage.getItem('name')
-  const roomName = window.location.href.match(/\/chatroom\/(\d+)/)[1]
-  const receiverId = 20
-  console.log('sender', senderId)
+  const leftPanel = document.querySelector('.left-panel')
+  console.log('sender', senderId, 'userName', userName) //sender 17 userName WaForTest
+  let activeChatUser = null
 
-  socket.emit('joinMyRoom', String(senderId)) // 加入自己socket房間
+  // 左側列表
+  fetch('./chats/rooms')
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(user => {
+        const chatUserElement = document.createElement('div')
+        chatUserElement.classList.add('chat-user')
+        chatUserElement.setAttribute('onclick', `openChat('${user.name}')`)
+        chatUserElement.setAttribute('data-chat-user', user.name)
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault()
-    if (!roomName) {
-      if (senderId > receiverId) {
-        roomName = `${receiverId}${senderId}`
-      } else {
-        roomName = `${senderId}${receiverId}`
-      }
-    }
-    if (input.value) {
-      socket.emit('send', {
-        userName,
-        message: input.value,
-        senderId,
-        receiverId,
-        room: roomName,
+        const descriptionElement = document.createElement('div')
+        descriptionElement.classList.add('description')
+
+        const chatNameElement = document.createElement('div')
+        chatNameElement.classList.add('chat-name')
+        chatNameElement.textContent = user.name
+
+        descriptionElement.appendChild(chatNameElement)
+        chatUserElement.appendChild(descriptionElement)
+        leftPanel.appendChild(chatUserElement)
       })
-      let userInput = document.createElement('li')
-      userInput.classList.add('send')
+    })
+    .catch(error => {
+      console.log('Error fetching chat user list:', error)
+    })
 
-      socket.emit('join', recipientInput.value)
-      input.value = ''
+  function openChat(chatUser, roomId) {
+    activeChatUser = chatUser
+    chatHeader.textContent = chatUser
+    messages.innerHTML = ''
+
+    fetch(`http://localhost:3000/chats/messages/${roomId}`)
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(chat => {
+          const li = document.createElement('li')
+          li.classList.add('message')
+          li.textContent = chat.message
+          messages.appendChild(li)
+        })
+      })
+      .catch(error => {
+        console.log(`Error fetching chat messages for ${chatUser}:`, error)
+      })
+  }
+
+  socket.on('message', function (data) {
+    const { sender, message } = data
+    if (sender !== senderId) {
+      const li = document.createElement('li')
+      li.classList.add('message')
+      li.textContent = message
+      messages.appendChild(li)
     }
   })
 
-  socket.on('private message', function (msg) {
-    console.log(msg.recipient, msg.sender, recipientInput.value)
-    if (
-      msg.recipient === recipientInput.value ||
-      msg.sender === recipientInput.value
-    ) {
-      var item = document.createElement('li')
-      item.textContent =
-        'Private message from ' + msg.sender + ': ' + msg.message
-      messages.appendChild(item)
-      window.scrollTo(0, document.body.scrollHeight)
+  form.addEventListener('submit', function (e) {
+    e.preventDefault()
+    const message = input.value.trim()
+    if (message !== '') {
+      const li = document.createElement('li')
+      li.classList.add('message')
+      li.textContent = message
+      messages.appendChild(li)
+      // 發送訊息到伺服器
+      socket.emit('message', {
+        sender: senderId,
+        message: message,
+      })
+      input.value = ''
     }
   })
 </script>

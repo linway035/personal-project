@@ -11,7 +11,7 @@ const router = Router()
 
 router.use('/users', users)
 router.use('/tweets', tweets)
-router.use('/chat', chats)
+router.use('/chats', chats)
 
 router.post(
   '/followships/:id',
