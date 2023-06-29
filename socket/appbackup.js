@@ -26,10 +26,20 @@ io.on('connection', socket => {
     console.log(`user ${userId} disconnected`)
   })
 
-  socket.on('message', ({ sender, room, message }) => {
-    console.log(`Received message from ${sender} to ${room}: ${message}`)
-    // chatHelpers.saveMessage(sender, room, message)
-    // socket.to(room.toString()).emit('message')
+  socket.on('message', ({ sender, message }) => {
+    // 假設使用者之間的私訊儲存在 chatHelpers 中的 chatRecords 物件中
+    chatHelpers.addChatRecord(sender, activeChatUser, message)
+
+    // 廣播訊息給目標使用者
+    const targetSocket = Object.values(io.sockets.sockets).find(
+      socket => socket.id === chatHelpers.getUserIdByName(activeChatUser)
+    )
+    if (targetSocket) {
+      targetSocket.emit('message', {
+        sender: sender,
+        message: message,
+      })
+    }
   })
 
   socket.on('join', roomName => {

@@ -5,117 +5,68 @@ const chatController = {
     res.render('chat')
   },
   getRoomList: async (req, res, next) => {
-    const chatUserLists = [
-      {
-        user_id: 17,
-        room_id: 1,
-        roomName: 'user0-1',
-        receiver: 1,
-        name: 'USER1',
-        avatar: 'USER1',
-      },
-      {
-        user_id: 17,
-        room_id: 2,
-        roomName: 'user0-2',
-        receiver: 2,
-        name: 'USER2',
-        avatar: 'USER2',
-      },
-      {
-        user_id: 17,
-        room_id: 3,
-        roomName: 'user0-3',
-        receiver: 3,
-        name: 'USER3',
-        avatar: 'USER3',
-      },
-      {
-        user_id: 17,
-        room_id: 4,
-        roomName: 'user0-4',
-        receiver: 4,
-        name: 'USER4',
-        avatar: 'USER4',
-      },
-      {
-        user_id: 17,
-        room_id: 5,
-        roomName: 'user0-5',
-        receiver: 5,
-        name: 'USER5',
-        avatar: 'USER5',
-      },
-    ]
+    const currentUserId = 17
+    const [chatUserLists] = await pool.execute(
+      `
+      SELECT 
+        CASE
+          WHEN r.user1_id =? THEN r.user2_id
+          ELSE r.user1_id
+        END AS receiver_id,
+        u.name AS receiver_name,
+        u.avatar AS receiver_avatar,
+        r.name AS roomName,
+        m.room_id,
+        m.message
+      FROM
+        messages AS m
+      INNER JOIN(
+        SELECT room_id, MAX(created_at) AS max_created_at
+        FROM messages
+        GROUP BY room_id
+      ) AS sub ON m.room_id = sub.room_id AND m.created_at = sub.max_created_at
+      INNER JOIN rooms AS r ON m.room_id = r.id
+      INNER JOIN users AS u ON (
+        CASE 
+          WHEN r.user1_id = ? THEN r.user2_id
+          ELSE r.user1_id
+        END) = u.id
+      WHERE
+        r.user1_id = ? OR r.user2_id = ?
+      ORDER BY m.created_at DESC
+      `,
+      [currentUserId, currentUserId, currentUserId, currentUserId]
+    )
+    //   console.log(chatUserLists)
+    //   [{
+    //   receiver_id: 2,
+    //   receiver_name: 'SHAQ',
+    //   receiver_avatar: 'https://pbs.twimg.com/profile_images/1579949436527988737/RDqn1udJ_400x400.jpg',
+    //   roomName: '2-17',
+    //   room_id: 2,
+    //   message: 'hi im17 too'
+    // },...]
+
     res.json(chatUserLists)
   },
   getRoomMessages: async (req, res, next) => {
     const roomId = req.params.roomId
-    const roomMessageall = [
-      {
-        id: 1,
-        room_id: 1,
-        user_id: 17,
-        message: 'hi im17',
-      },
-      {
-        id: 2,
-        room_id: 1,
-        user_id: 1,
-        message: 'user1 to 17',
-      },
-      {
-        id: 3,
-        room_id: 2,
-        user_id: 17,
-        message: 'hi im17',
-      },
-      {
-        id: 4,
-        room_id: 2,
-        user_id: 2,
-        message: 'user2 to 17',
-      },
-      {
-        id: 5,
-        room_id: 2,
-        user_id: 17,
-        message: 'hi im17 too',
-      },
-      {
-        id: 6,
-        room_id: 3,
-        user_id: 3,
-        message: 'user3 user3',
-      },
-    ]
-
-    const roomMessage = [
-      {
-        id: 3,
-        room_id: 2,
-        user_id: 17,
-        message: 'hi im17',
-      },
-      {
-        id: 4,
-        room_id: 2,
-        user_id: 2,
-        message: 'user2 to 17',
-      },
-      {
-        id: 5,
-        room_id: 2,
-        user_id: 17,
-        message: 'hi im17 too',
-      },
-    ]
-
-    const filteredMessages = roomMessageall.filter(
-      message => message.room_id === Number(roomId)
+    const [roomMessage] = await pool.execute(
+      `
+    SELECT * FROM messages WHERE room_id =? ORDER BY created_at DESC
+    `,
+      [roomId]
     )
+    //   console.log(roomMessage)
+    //   [{
+    //   id: 3,
+    //   user_id: 17,
+    //   room_id: 2,
+    //   message: 'hi im17',
+    //   created_at: 2023-06-29T07:04:43.000Z
+    // },...]
 
-    res.json(filteredMessages)
+    res.json(roomMessage)
   },
 }
 

@@ -84,7 +84,7 @@
   const userName = localStorage.getItem('name')
   const leftPanel = document.querySelector('.left-panel')
   console.log('sender', senderId, 'userName', userName) //sender 17 userName WaForTest
-  let activeChatUser = null
+  let activeChatRoom = null
 
   // 左側列表
   fetch('./chats/rooms')
@@ -93,15 +93,15 @@
       data.forEach(user => {
         const chatUserElement = document.createElement('div')
         chatUserElement.classList.add('chat-user')
-        chatUserElement.setAttribute('onclick', `openChat('${user.name}', ${user.room_id})`)
-        chatUserElement.setAttribute('data-chat-user', user.name)
+        chatUserElement.setAttribute('onclick', `openChat('${user.receiver_name}', ${user.room_id})`)
+        chatUserElement.setAttribute('data-chat-user', user.receiver_name)
 
         const descriptionElement = document.createElement('div')
         descriptionElement.classList.add('description')
 
         const chatNameElement = document.createElement('div')
         chatNameElement.classList.add('chat-name')
-        chatNameElement.textContent = user.name
+        chatNameElement.textContent = user.receiver_name
 
         descriptionElement.appendChild(chatNameElement)
         chatUserElement.appendChild(descriptionElement)
@@ -113,10 +113,9 @@
     })
 
   function openChat(chatUser, roomId) {
-    activeChatUser = chatUser
     chatHeader.textContent = chatUser
     messages.innerHTML = ''
-
+    activeChatRoom = roomId
     fetch(`./chats/messages/${roomId}`)
       .then(response => response.json())
       .then(data => {
@@ -132,16 +131,6 @@
       })
   }
 
-  socket.on('message', function (data) {
-    const { sender, message } = data
-    if (sender !== senderId) {
-      const li = document.createElement('li')
-      li.classList.add('message')
-      li.textContent = message
-      messages.appendChild(li)
-    }
-  })
-
   form.addEventListener('submit', function (e) {
     e.preventDefault()
     const message = input.value.trim()
@@ -151,8 +140,10 @@
       li.textContent = message
       messages.appendChild(li)
       // 發送訊息到伺服器
+      console.log(activeChatRoom)
       socket.emit('message', {
         sender: senderId,
+        room: activeChatRoom,
         message: message,
       })
       input.value = ''
