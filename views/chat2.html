@@ -75,7 +75,7 @@
 
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-  let socket = io('ws://localhost:8080')
+  let socket = io()
   const form = document.getElementById('form')
   const input = document.getElementById('input')
   const messages = document.getElementById('messages')
@@ -84,7 +84,7 @@
   const userName = localStorage.getItem('name')
   const leftPanel = document.querySelector('.left-panel')
   console.log('sender', senderId, 'userName', userName) //sender 17 userName WaForTest
-  let activeChatUser = null
+  let activeChatRoom = null
 
   // 左側列表
   fetch('./chats/rooms')
@@ -93,15 +93,18 @@
       data.forEach(user => {
         const chatUserElement = document.createElement('div')
         chatUserElement.classList.add('chat-user')
-        chatUserElement.setAttribute('onclick', `openChat('${user.name}')`)
-        chatUserElement.setAttribute('data-chat-user', user.name)
+        chatUserElement.setAttribute(
+          'onclick',
+          `openChat('${user.receiver_name}', ${user.room_id})`
+        )
+        chatUserElement.setAttribute('data-chat-user', user.receiver_name)
 
         const descriptionElement = document.createElement('div')
         descriptionElement.classList.add('description')
 
         const chatNameElement = document.createElement('div')
         chatNameElement.classList.add('chat-name')
-        chatNameElement.textContent = user.name
+        chatNameElement.textContent = user.receiver_name
 
         descriptionElement.appendChild(chatNameElement)
         chatUserElement.appendChild(descriptionElement)
@@ -113,11 +116,11 @@
     })
 
   function openChat(chatUser, roomId) {
-    activeChatUser = chatUser
+    socket.emit('join', roomId)
     chatHeader.textContent = chatUser
     messages.innerHTML = ''
-
-    fetch(`http://localhost:3000/chats/messages/${roomId}`)
+    activeChatRoom = roomId
+    fetch(`./chats/messages/${roomId}`)
       .then(response => response.json())
       .then(data => {
         data.forEach(chat => {
@@ -131,15 +134,11 @@
         console.log(`Error fetching chat messages for ${chatUser}:`, error)
       })
   }
-
-  socket.on('message', function (data) {
-    const { sender, message } = data
-    if (sender !== senderId) {
-      const li = document.createElement('li')
-      li.classList.add('message')
-      li.textContent = message
-      messages.appendChild(li)
-    }
+  socket.on('message', ({ sender, room, message }) => {
+    const li = document.createElement('li')
+    li.classList.add('message')
+    li.textContent = message
+    messages.appendChild(li)
   })
 
   form.addEventListener('submit', function (e) {
@@ -151,8 +150,10 @@
       li.textContent = message
       messages.appendChild(li)
       // 發送訊息到伺服器
+      console.log(activeChatRoom)
       socket.emit('message', {
         sender: senderId,
+        room: activeChatRoom,
         message: message,
       })
       input.value = ''

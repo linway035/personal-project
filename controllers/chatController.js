@@ -5,7 +5,7 @@ const chatController = {
     res.render('chat')
   },
   getRoomList: async (req, res, next) => {
-    const currentUserId = 17
+    const currentUserID = res.locals.userId
     const [chatUserLists] = await pool.execute(
       `
       SELECT 
@@ -35,7 +35,7 @@ const chatController = {
         r.user1_id = ? OR r.user2_id = ?
       ORDER BY m.created_at DESC
       `,
-      [currentUserId, currentUserId, currentUserId, currentUserId]
+      [currentUserID, currentUserID, currentUserID, currentUserID]
     )
     //   console.log(chatUserLists)
     //   [{
@@ -53,7 +53,7 @@ const chatController = {
     const roomId = req.params.roomId
     const [roomMessage] = await pool.execute(
       `
-    SELECT * FROM messages WHERE room_id =? ORDER BY created_at DESC
+    SELECT * FROM messages WHERE room_id =? ORDER BY created_at ASC
     `,
       [roomId]
     )
