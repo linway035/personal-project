@@ -5,6 +5,6 @@ const router = Router()
 
 router.get('/rooms', authenticate, chatController.getRoomList)
 router.get('/messages/:roomId', authenticate, chatController.getRoomMessages)
-router.get('/', authenticate, chatController.getApi)
+router.get('/', authenticate, chatController.getChatroom)
 
 export default router

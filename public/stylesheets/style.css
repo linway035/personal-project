@@ -1173,3 +1173,53 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 .image-item:last-child {
   margin-right: 0;
 }
+
+/* chatroom */
+.chatroom-container div {
+  display: block;
+}
+
+.chatroom-container .left-panel {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  overflow-x: hidden;
+  background-color: #3f0e40;
+  color: white;
+}
+
+.chatroom-container .chat-user {
+  padding: 10px;
+}
+.chatroom-container .description {
+  display: inline-block;
+}
+.chatroom-container .right-panel {
+  margin-left: 260px;
+}
+.chatroom-container .chat-header {
+  line-height: 40px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #dddddd;
+}
+.chatroom-container .messages {
+  margin: 0;
+  padding: 20px;
+}
+.chatroom-container ul {
+  display: block;
+  list-style-type: disc;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  padding-inline-start: 40px;
+}
+.chatroom-container .message {
+  list-style: none;
+}
+.chatroom-container li {
+  display: list-item;
+  text-align: -webkit-match-parent;
+}

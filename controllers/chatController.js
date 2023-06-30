@@ -1,7 +1,7 @@
 import pool from '../middleware/databasePool.js'
 
 const chatController = {
-  getApi: async (req, res, next) => {
+  getChatroom: async (req, res, next) => {
     res.render('chat')
   },
   getRoomList: async (req, res, next) => {
