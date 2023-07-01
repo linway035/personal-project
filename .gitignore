@@ -4,3 +4,4 @@ uploads/*
 temp/*
 .DS_Store
 config/config.json
+viewsdis

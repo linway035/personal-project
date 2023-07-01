@@ -1,27 +1,105 @@
-<h2>登入</h2>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+</head>
 
-{{!-- <form action="/users/signin" method="POST"> --}}
-<form id="signin-form">
-  <label for="email">Email:</label><br>
-  <input type="email" id="email" name="email"><br><br>
+<section class="vh-100 bg-image">
+  <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+    <div class="container h-90">
+      <div class="row d-flex justify-content-center align-items-center h-90">
+        <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+          <div class="card" style="border-radius: 15px">
+            <div class="card-body p-5">
+              <h2 class="text-uppercase text-center mb-5">Login</h2>
 
-  <label for="password">密碼:</label><br>
-  <input type="password" id="password" name="password"><br><br>
+              <form id="signin-form">
+                <div class="form-outline mb-4">
+                  <input type="email" class="form-control form-control-lg" id="email" name="email"
+                    placeholder="Your Email" />
+                </div>
 
-  <input type="submit" value="登入">
-</form>
+                <div class="form-outline mb-4">
+                  <input type="password" class="form-control form-control-lg" id="password" name="password"
+                    placeholder="Password" />
+                </div>
 
-<h3>或</h3>
+                <div class="d-flex justify-content-center">
+                  <button type="submit" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">
+                    Login
+                  </button>
+                </div>
 
-<button onclick="googleSignin()">使用 Google 登入</button>
+                <p class="text-center text-muted mt-5 mb-0">
+                  Don't have an account? Create an account!
+                  <a href="/users/signup" class="fw-bold text-body"><u>Register here</u></a>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<script>
-  function googleSignin() {
-    // 在這裡實現使用 Google 登入的邏輯
-    // 可以使用 Google Sign-In API 或其他相關方法
-    alert("使用 Google 登入");
+<style>
+  section {
+    font-family: montserrat;
   }
-</script>
+
+  h2 {
+    line-height: 1.66;
+    margin: 0;
+    padding: 0;
+    font-weight: 900;
+    color: #222;
+    font-size: 24px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .form-control-lg {
+    min-height: calc(1.5em + (1rem + 2px));
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    border-radius: 0.3rem;
+  }
+
+  .gradient-custom-3 {
+    /* fallback for old browsers */
+    background: #84fab0;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right,
+        rgba(132, 250, 176, 0.5),
+        rgba(143, 211, 244, 0.5));
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right,
+        rgba(132, 250, 176, 0.5),
+        rgba(143, 211, 244, 0.5));
+  }
+
+  .gradient-custom-4 {
+    /* fallback for old browsers */
+    background: #84fab0;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right,
+        rgba(132, 250, 176, 1),
+        rgba(143, 211, 244, 1));
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right,
+        rgba(132, 250, 176, 1),
+        rgba(143, 211, 244, 1));
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+  integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
 <script>
   var signinForm = document.getElementById('signin-form')
 
@@ -44,7 +122,7 @@
           localStorage.setItem('userId', data.userId)
           localStorage.setItem('name', data.name)
           localStorage.setItem('avatar', data.avatar)
-          window.location.href = '/' 
+          window.location.href = '/'
         })
         .catch(error => {
           console.error(error)
