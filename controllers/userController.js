@@ -117,7 +117,7 @@ const userController = {
       AND followships.is_active=1)
     AND id <> ?
     ORDER BY users.created_at DESC
-    LIMIT 3;   
+    LIMIT 5;   
     `,
       [currentUserID, currentUserID]
     ) //order pending
