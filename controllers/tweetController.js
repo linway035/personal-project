@@ -846,5 +846,51 @@ const tweetController = {
       user: currentUserData,
     })
   },
+  getRecommendUsersAPI: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+    // 取推薦人
+    const matrix = await transformData()
+    const userId = res.locals.userId
+    const similarityResults = {}
+    for (let user in matrix) {
+      if (user !== userId.toString()) {
+        similarityResults[user] = calculateSimilarity(
+          userId.toString(),
+          user,
+          matrix
+        )
+      }
+    }
+    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
+      // 由高到低
+      if (!isNaN(b[1]) && !isNaN(a[1])) {
+        if (b[1] === a[1]) {
+          // 若評分相同則按照 ID 大小排序
+          return parseInt(b[0]) - parseInt(a[0])
+        }
+        return b[1] - a[1]
+      }
+      // NaN放後面
+      if (isNaN(b[1]) || isNaN(a[1])) {
+        return isNaN(b[1]) ? -1 : 1
+      }
+    })
+    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
+    const userIdsStr = sortedUserIds.join(',')
+    // console.log(userIdsStr)
+
+    const [follows] = await pool.execute(
+      `
+      SELECT id, name, avatar FROM users WHERE id NOT IN
+      (SELECT following_id FROM followships WHERE follower_id=? 
+        AND followships.is_active=1)
+      AND id <> ?
+      ORDER BY FIELD(id,${userIdsStr})
+      LIMIT 5;   
+      `,
+      [currentUserID, currentUserID]
+    )
+    res.status(200).json(follows)
+  },
 }
 export default tweetController

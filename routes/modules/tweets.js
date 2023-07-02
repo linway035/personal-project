@@ -13,6 +13,7 @@ router.delete('/:id/clearrating', authenticate, tweetController.deleteRating)
 router.post('/:id/rating', authenticate, tweetController.postRating)
 router.get('/:id/rating', authenticate, tweetController.getRating)
 router.get('/foryou', authenticate, tweetController.getForYouPage)
+router.get('/follows', authenticate, tweetController.getRecommendUsersAPI)
 router.post(
   '/',
   upload.fields([{ name: 'tweetImages', maxCount: 3 }]),
