@@ -188,43 +188,10 @@ const tweetController = {
       }
     }
     // console.log(similarityResults)
-    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
-      // 由高到低
-      if (!isNaN(b[1]) && !isNaN(a[1])) {
-        if (b[1] === a[1]) {
-          // 若評分相同則按照 ID 大小排序
-          return parseInt(b[0]) - parseInt(a[0])
-        }
-        return b[1] - a[1]
-      }
-      // NaN放後面
-      if (isNaN(b[1]) || isNaN(a[1])) {
-        return isNaN(b[1]) ? -1 : 1
-      }
-    })
-    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
-    // console.log(sortedResults)
-    const userIdsStr = sortedUserIds.join(',')
-    // console.log(userIdsStr)
-
-    const [follows] = await pool.execute(
-      `
-      SELECT id, name, avatar FROM users WHERE id NOT IN
-      (SELECT following_id FROM followships WHERE follower_id=? 
-        AND followships.is_active=1)
-      AND id <> ?
-      ORDER BY FIELD(id,${userIdsStr})
-      LIMIT 5;   
-      `,
-      [currentUserID, currentUserID]
-    )
-
-    // console.log(follows) //array of objects
 
     res.render('tweets', {
       tweets: tweetsWithImages,
       user: currentUserData,
-      follows,
     })
   },
   getForYouPage: async (req, res, next) => {
@@ -251,37 +218,8 @@ const tweetController = {
         )
       }
     }
-    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
-      // 由高到低
-      if (!isNaN(b[1]) && !isNaN(a[1])) {
-        if (b[1] === a[1]) {
-          // 若評分相同則按照 ID 大小排序
-          return parseInt(b[0]) - parseInt(a[0])
-        }
-        return b[1] - a[1]
-      }
-      // NaN放後面
-      if (isNaN(b[1]) || isNaN(a[1])) {
-        return isNaN(b[1]) ? -1 : 1
-      }
-    })
-    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
-    const userIdsStr = sortedUserIds.join(',')
-    // console.log(userIdsStr)
 
-    //follows
-    const [follows] = await pool.execute(
-      `
-      SELECT id, name, avatar FROM users WHERE id NOT IN
-      (SELECT following_id FROM followships WHERE follower_id=? 
-        AND followships.is_active=1)
-      AND id <> ?
-      ORDER BY FIELD(id,${userIdsStr})
-      LIMIT 5;   
-      `,
-      [currentUserID, currentUserID]
-    )
-    // console.log(follows) //array of objects
+    // console.log(userIdsStr)
 
     //關係矩陣
     const [followMatrix] = await pool.execute(`
@@ -358,7 +296,7 @@ const tweetController = {
     `,
       [currentUserID, currentUserID]
     ) //ORDER LIMIT pending
-    console.log(currentUserID, data[0])
+    // console.log(currentUserID, data[0])
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {
@@ -378,7 +316,6 @@ const tweetController = {
     res.render('tweets', {
       tweets: tweetsWithImages,
       user: currentUserData,
-      follows,
     })
   },
   postLike: async (req, res, next) => {
@@ -492,50 +429,6 @@ const tweetController = {
     const tweet = data[0]
     // console.log(tweet)
 
-    // 取推薦
-    const matrix = await transformData()
-    const userId = res.locals.userId
-    const similarityResults = {}
-    for (let user in matrix) {
-      if (user !== userId.toString()) {
-        similarityResults[user] = calculateSimilarity(
-          userId.toString(),
-          user,
-          matrix
-        )
-      }
-    }
-    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
-      // 由高到低
-      if (!isNaN(b[1]) && !isNaN(a[1])) {
-        if (b[1] === a[1]) {
-          // 若評分相同則按照 ID 大小排序
-          return parseInt(b[0]) - parseInt(a[0])
-        }
-        return b[1] - a[1]
-      }
-      // NaN放後面
-      if (isNaN(b[1]) || isNaN(a[1])) {
-        return isNaN(b[1]) ? -1 : 1
-      }
-    })
-    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
-    const userIdsStr = sortedUserIds.join(',')
-    // console.log(userIdsStr)
-
-    const [follows] = await pool.execute(
-      `
-      SELECT id, name, avatar FROM users WHERE id NOT IN
-      (SELECT following_id FROM followships WHERE follower_id=? 
-        AND followships.is_active=1)
-      AND id <> ?
-      ORDER BY FIELD(id,${userIdsStr})
-      LIMIT 5;   
-      `,
-      [currentUserID, currentUserID]
-    )
-    // console.log(follows)
-
     const [replies] = await pool.execute(
       `
     SELECT replies.*, users.name, users.avatar 
@@ -546,7 +439,7 @@ const tweetController = {
       [tweetId]
     )
     // console.log(replies) //array of objects
-    res.render('tweet', { tweet, follows, replies })
+    res.render('tweet', { tweet, replies })
   },
   postTweet: async (req, res, next) => {
     try {
@@ -662,49 +555,6 @@ const tweetController = {
     )
     const currentUserData = currentUser[0]
 
-    // 取推薦人
-    const matrix = await transformData()
-    const userId = res.locals.userId
-    const similarityResults = {}
-    for (let user in matrix) {
-      if (user !== userId.toString()) {
-        similarityResults[user] = calculateSimilarity(
-          userId.toString(),
-          user,
-          matrix
-        )
-      }
-    }
-    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
-      // 由高到低
-      if (!isNaN(b[1]) && !isNaN(a[1])) {
-        if (b[1] === a[1]) {
-          // 若評分相同則按照 ID 大小排序
-          return parseInt(b[0]) - parseInt(a[0])
-        }
-        return b[1] - a[1]
-      }
-      // NaN放後面
-      if (isNaN(b[1]) || isNaN(a[1])) {
-        return isNaN(b[1]) ? -1 : 1
-      }
-    })
-    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
-    const userIdsStr = sortedUserIds.join(',')
-    // console.log(userIdsStr)
-
-    const [follows] = await pool.execute(
-      `
-      SELECT id, name, avatar FROM users WHERE id NOT IN
-      (SELECT following_id FROM followships WHERE follower_id=? 
-        AND followships.is_active=1)
-      AND id <> ?
-      ORDER BY FIELD(id,${userIdsStr})
-      LIMIT 5;   
-      `,
-      [currentUserID, currentUserID]
-    )
-
     const q = req.query.q?.trim().toLowerCase()
     const [userSearchResult, fields] = await pool.execute(
       `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
@@ -721,7 +571,6 @@ const tweetController = {
     // console.log(userSearchResult)
     res.render('searchUser', {
       userSearchResult,
-      follows,
       q,
       user: currentUserData,
     })
@@ -734,49 +583,6 @@ const tweetController = {
       [currentUserID]
     )
     const currentUserData = currentUser[0]
-
-    // 取推薦人
-    const matrix = await transformData()
-    const userId = res.locals.userId
-    const similarityResults = {}
-    for (let user in matrix) {
-      if (user !== userId.toString()) {
-        similarityResults[user] = calculateSimilarity(
-          userId.toString(),
-          user,
-          matrix
-        )
-      }
-    }
-    const sortedResults = Object.entries(similarityResults).sort((a, b) => {
-      // 由高到低
-      if (!isNaN(b[1]) && !isNaN(a[1])) {
-        if (b[1] === a[1]) {
-          // 若評分相同則按照 ID 大小排序
-          return parseInt(b[0]) - parseInt(a[0])
-        }
-        return b[1] - a[1]
-      }
-      // NaN放後面
-      if (isNaN(b[1]) || isNaN(a[1])) {
-        return isNaN(b[1]) ? -1 : 1
-      }
-    })
-    const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
-    const userIdsStr = sortedUserIds.join(',')
-    // console.log(userIdsStr)
-
-    const [follows] = await pool.execute(
-      `
-      SELECT id, name, avatar FROM users WHERE id NOT IN
-      (SELECT following_id FROM followships WHERE follower_id=? 
-        AND followships.is_active=1)
-      AND id <> ?
-      ORDER BY FIELD(id,${userIdsStr})
-      LIMIT 5;   
-      `,
-      [currentUserID, currentUserID]
-    )
 
     const q = req.query.q?.trim().toLowerCase()
     // 取推文
@@ -841,7 +647,6 @@ const tweetController = {
 
     res.render('search', {
       tweets: tweetsWithImages,
-      follows,
       q,
       user: currentUserData,
     })
