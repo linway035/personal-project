@@ -174,25 +174,70 @@ const tweetController = {
       return tweet
     })
 
-    // 取推薦人
-    const matrix = await transformData()
-    const userId = res.locals.userId
-    const similarityResults = {}
-    for (let user in matrix) {
-      if (user !== userId.toString()) {
-        similarityResults[user] = calculateSimilarity(
-          userId.toString(),
-          user,
-          matrix
-        )
-      }
-    }
-    // console.log(similarityResults)
-
     res.render('tweets', {
       tweets: tweetsWithImages,
       user: currentUserData,
     })
+  },
+  getHomeAPI: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+
+      // 取推文
+      const [data, fields] = await pool.execute(
+        `
+    SELECT tweets.*, users.name, users.avatar, 
+    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
+    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
+    GROUP_CONCAT(tweet_images.image_path) AS images
+    FROM tweets
+    JOIN users ON tweets.user_id = users.id
+    LEFT JOIN (
+      SELECT tweet_id, COUNT(*) AS count
+      FROM tweet_likes
+      WHERE is_active = 1
+      GROUP BY tweet_id
+    ) AS like_counts ON tweets.id = like_counts.tweet_id
+    LEFT JOIN (
+      SELECT t.id AS tweet_id, COUNT(r.id) AS count
+      FROM tweets AS t
+      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
+      WHERE r.is_active = 1
+      GROUP BY t.id
+    ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+    LEFT JOIN (
+      SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
+    ) AS tl ON tweets.id = tl.tweet_id
+    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
+    WHERE tweets.is_active = 1
+      AND tweets.id NOT IN (
+        SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
+    )
+    AND (tweets.user_id IN (
+      SELECT following_id FROM followships WHERE follower_id = ?
+    ) OR tweets.user_id = ?)
+    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
+    ORDER BY tweets.updated_at DESC
+    `,
+        [currentUserID, currentUserID, currentUserID, currentUserID]
+      ) //ORDER LIMIT pending
+
+      const tweetsWithImages = data.map(tweet => {
+        if (tweet.images) {
+          tweet.images = tweet.images.split(',')
+        } else {
+          tweet.images = []
+        }
+        return tweet
+      })
+
+      const tweets = tweetsWithImages
+
+      res.status(200).json(tweets)
+    } catch (error) {
+      console.error('Error retrieving home data:', error)
+      res.status(500).json({ message: 'Failed to retrieve home data' })
+    }
   },
   getForYouPage: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -329,7 +374,7 @@ const tweetController = {
         ON DUPLICATE KEY UPDATE is_active = 1, updated_at = NOW()`,
         [currentUserID, tweetId]
       )
-      res.redirect('back')
+      res.status(200).json({ message: 'Tweet liked successfully' })
     } catch (error) {
       next(error)
     }
@@ -353,7 +398,7 @@ const tweetController = {
         )`,
         [currentUserID, tweetId]
       )
-      res.redirect('back')
+      res.status(200).json({ message: 'Tweet unliked successfully' })
     } catch (error) {
       next(error)
     }

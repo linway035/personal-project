@@ -2,6 +2,7 @@
 
 body {
   font-family: 'Noto Sans TC', sans-serif;
+  /* background-color: #69c9d0; */
 }
 
 .ac-icon {
@@ -365,19 +366,21 @@ a {
 /* left  */
 #left-section {
   position: fixed;
+  /* margin: 90px auto 0; */
   width: 178px;
   height: 1200px;
-  left: 134px;
-  top: 0px;
+  left: 90px;
+  /* top: 80px; */
   background: #ffffff;
+  /* margin: 0 auto; */
 }
 
 #logo {
   position: absolute;
   width: 70px;
   height: 70px;
-  left: 8px;
-  top: 8px;
+  /* left: 8px; */
+  /* top: 8px; */
 }
 
 #left-navs {
@@ -389,8 +392,8 @@ a {
   position: absolute;
   width: 178px;
   /* height: 244px; */
-  left: 0px;
-  top: 66px;
+  /* left: 0px; */
+  /* top: 66px; */
 }
 
 #left-navs .nav-item {
@@ -454,11 +457,12 @@ h4 {
 }
 
 .popular-container {
-  position: absolute;
-  width: 273px;
-  height: 731px;
+  position: fixed;
+  width: 350px;
+  /* height: 731px; */
   margin-left: 24px;
-  top: 16px;
+  right: 24px;
+  /* top: 16px; */
   background: #fafafb;
   border-radius: 16px;
 }
@@ -485,7 +489,7 @@ h4 {
 
 .list-group-item {
   margin: 0px 16px 30px 16px;
-  width: 241px;
+  /* width: 241px; */
   height: 50px;
 }
 

@@ -1,17 +1,22 @@
-<div class="d-flex align-items-center justify-content-between bg-light py-3 border-bottom">
-  <h1 id="pageTitle" class="fw-bold fs-4 text-dark ms-3">Home</h1>
-  <nav class="d-flex">
-    <div class="mx-2">
-      <a class="text-decoration-none" href="/tweets/foryou" style="color: #000080;"
-        onclick="changePageTitle('Recommend')">For You</a>
-    </div>
-    <div class="mx-2">
-      <a class="text-decoration-none" href="/home" style="color: #000080;"
-        onclick="changePageTitle('Latest')">Following</a>
+<div style="margin-top: 24px; height: 51px; border-bottom: 1px solid #e6ecf0;">
+  <span style="font-weight: 700; font-size: 24px; line-height: 26px; color: #171725; margin-left: 24px;">Home</span>
+  <nav style="display: flex; align-items: center; justify-content: space-around;">
+    <div style="margin: 0 12px; font-size: 16px; color: #6C757D; cursor: pointer;">
+      <a href="/tweets/foryou">For You</a>
+      </div>
+    <div style="margin: 0 12px; font-size: 16px; color: #6C757D; cursor: pointer;"> 
+      <a href="/home">Following</a>
     </div>
   </nav>
 </div>
-
+<div class="index-post">
+  <div class="posting">
+    <img src="{{user.avatar}}" style="height:50px; width:50px; border-radius:50%">
+    <span style="font-weight: 700;font-size: 18px;line-height: 26px;color: #6C757D;">What is happening?</span>
+  </div>
+  <button type="submit" class="index-post-btn" data-bs-toggle="modal" data-bs-target="#post-modal">Tweet</button>
+  <div class="index-divider"></div>
+</div>
 
 <div class="index-tweets d-flex justify-content-center">
   {{#each tweets}}
@@ -81,9 +86,6 @@
 
 
 <script>
-  function changePageTitle(title) {
-      document.getElementById('pageTitle').textContent = title;
-    }
   function likeTweet(event, tweetId) {
     event.preventDefault()
     fetch(`/tweets/${tweetId}/like`, {
