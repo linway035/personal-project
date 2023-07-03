@@ -9,6 +9,13 @@ router.post('/signup', userController.signUp)
 router.get('/signin', userController.getSignInPage)
 router.post('/signin', userController.signIn)
 router.get('/logout', authenticate, userController.logout)
+router.get('/:id/followings', authenticate, userController.getUserFollowings)
+router.get(
+  '/:id/followings/api',
+  authenticate,
+  userController.getUserFollowingsAPI
+)
+router.get('/:id/followers', authenticate, userController.getUserFollowers)
 router.get('/edit/:id', authenticate, userController.getUserInfo)
 router.post(
   '/edit/:id',

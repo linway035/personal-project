@@ -159,6 +159,73 @@ const userController = {
       next(err)
     }
   },
+  getUserFollowings: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const userId = req.params.id
+      const [pageUser] = await pool.execute(
+        `SELECT id, name from users WHERE id =?`,
+        [userId]
+      )
+      const pageUserData = pageUser[0]
+      const [users] = await pool.execute(
+        `
+      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
+      FROM users u
+      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
+      WHERE u.id IN 
+      (SELECT following_id FROM followships WHERE follower_id=? AND is_active=1)
+      ORDER BY u.name ASC`,
+        [currentUserID, userId]
+      )
+      res.render('userfollowings', { users, pageUserData })
+    } catch (error) {
+      next(error)
+    }
+  },
+  getUserFollowingsAPI: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const userId = req.params.id
+      const [users] = await pool.execute(
+        `
+      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
+      FROM users u
+      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
+      WHERE u.id IN 
+      (SELECT following_id FROM followships WHERE follower_id=? AND is_active=1)
+      ORDER BY u.name ASC`,
+        [currentUserID, userId]
+      )
+      return res.json(users)
+    } catch (error) {
+      next(error)
+    }
+  },
+  getUserFollowers: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const userId = req.params.id
+      const [pageUser] = await pool.execute(
+        `SELECT id, name from users WHERE id =?`,
+        [userId]
+      )
+      const pageUserData = pageUser[0]
+      const [users] = await pool.execute(
+        `
+      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
+      FROM users u
+      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
+      WHERE u.id IN 
+      (SELECT follower_id FROM followships WHERE following_id=? AND is_active=1)
+      ORDER BY u.name ASC`,
+        [currentUserID, userId]
+      )
+      res.render('userfollowers', { users, pageUserData })
+    } catch (error) {
+      next(error)
+    }
+  },
 }
 
 export default userController

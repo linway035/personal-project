@@ -1,290 +1,84 @@
 <script>
-  let socket = io()
-  const chatRooms = []
-  const senderId = localStorage.getItem('userId')
-  const userName = localStorage.getItem('name')
-  const userAvatar = localStorage.getItem('avatar')
-  const chatHeader = document.getElementById('chatHeader')
-  const chatHeaderImg = document.getElementById('chatHeaderImg')
-  const chatMessagesContainer = document.querySelector('.chat-messages')
-  const sendMessageButton = document.querySelector('.btn-primary')
-  const messageInput = document.getElementById('sendMes')
-  const messageForm = document.getElementById('messageForm')
-  const listContainer = document.getElementById('chat-list')
-  let activeChatRoomID = null
-  let receiverID = null
-
-  socket.emit('join', { senderId: senderId.toString(), userName })
-
-  // 使用fetch函式從API獲取聊天室列表
-  fetch('http://localhost:3000/chats/rooms')
+  // 使用 fetch 取得資料
+  fetch(`/users/${userId}/followings/api`)
     .then(response => response.json())
     .then(data => {
-      data.forEach(room => {
-        const listItem = document.createElement('div')
-        listItem.style = 'cursor: pointer'
-
-        listItem.className = 'list-group-item list-group-item-action border-0'
-        listItem.addEventListener('click', () => {
-          getChatMessages(room.room_id)
-        })
-
-        chatRooms[room.room_id] = {
-          receiver_id: room.receiver_id,
-          receiver_name: room.receiver_name,
-          receiver_avatar: room.receiver_avatar,
-        }
-
-        const dFlexDiv = document.createElement('div')
-        dFlexDiv.className = 'd-flex align-items-start'
-
-        const image = document.createElement('img')
-        image.src = room.receiver_avatar
-        image.className = 'rounded-circle mr-1'
-        image.alt = room.receiver_name
-        image.width = 40
-        image.height = 40
-
-        const contentDiv = document.createElement('div')
-        contentDiv.className = 'flex-grow-1 ml-3'
-
-        const receiverName = document.createElement('strong')
-        receiverName.textContent = room.receiver_name
-
-        const smallDiv = document.createElement('div')
-        smallDiv.className = 'small'
-
-        const onlineText = document.createElement('em')
-        onlineText.textContent = room.message
-
-        // 將生成的元素組合起來
-        smallDiv.appendChild(onlineText)
-
-        contentDiv.appendChild(receiverName)
-        contentDiv.appendChild(smallDiv)
-
-        dFlexDiv.appendChild(image)
-        dFlexDiv.appendChild(contentDiv)
-        listItem.appendChild(dFlexDiv)
-
-        // 將生成的列表項目加入到列表容器中
-        listContainer.appendChild(listItem)
+      // 將資料渲染到網頁上
+      const followingsContainer = document.getElementById(
+        'followings-container'
+      )
+      data.forEach(user => {
+        const userElement = createUserElement(user)
+        followingsContainer.appendChild(userElement)
       })
     })
     .catch(error => {
       console.error('Error:', error)
     })
 
-  // 取得聊天訊息的函式
-  function getChatMessages(roomId) {
-    const chatRoom = chatRooms[roomId]
-    const { receiver_name, receiver_avatar } = chatRoom
-    chatHeader.innerHTML = '<strong>' + receiver_name + '</strong>'
-    chatHeaderImg.innerHTML = `
-    <img
-      src="${receiver_avatar}"
-      class="rounded-circle mr-1"
-      width="40"
-      height="40"
-    />
-    `
-    activeChatRoomID = roomId
-    receiverID = chatRooms[roomId].receiver_id.toString()
-    console.log('activeChatRoomID', activeChatRoomID)
-    console.log('receiverID', receiverID)
+  // 建立使用者元素
+  function createUserElement(user) {
+    const userElement = document.createElement('div')
+    userElement.className = 'd-flex each-tweet'
 
-    // 使用fetch函式從API獲取聊天訊息
-    fetch(`./chats/messages/${roomId}`)
-      .then(response => response.json())
-      .then(data => {
-        chatMessagesContainer.innerHTML = ''
+    const tweetIcon = document.createElement('div')
+    tweetIcon.id = 'tweet-icon'
+    const tweetIconLink = document.createElement('a')
+    tweetIconLink.href = `/users/${user.id}/tweets`
+    const tweetIconImg = document.createElement('img')
+    tweetIconImg.src = user.avatar
+    tweetIconImg.alt = ''
+    tweetIconImg.width = 50
+    tweetIconImg.height = 50
+    tweetIconImg.className = 'rounded-circle'
+    tweetIconLink.appendChild(tweetIconImg)
+    tweetIcon.appendChild(tweetIconLink)
+    userElement.appendChild(tweetIcon)
 
-        data.forEach(message => {
-          const chatMessageDiv = document.createElement('div')
-          chatMessageDiv.className =
-            message.user_id === Number(senderId)
-              ? 'chat-message-right pb-4'
-              : 'chat-message-left pb-4'
+    const tweetRight = document.createElement('div')
+    tweetRight.id = 'tweet-right'
+    tweetRight.style.width = '528px'
+    const header = document.createElement('div')
+    header.className = 'header d-flex justify-content-between'
+    const nameSpan = document.createElement('span')
+    nameSpan.style.fontSize = '16px'
+    nameSpan.style.lineHeight = '26px'
+    nameSpan.style.fontWeight = '700'
+    nameSpan.style.color = '#171725'
+    nameSpan.textContent = user.name
+    header.appendChild(nameSpan)
 
-          const avatarDiv = document.createElement('div')
+    const form = document.createElement('form')
+    form.action = user.is_following
+      ? `/followships/${user.id}?_method=DELETE`
+      : '/followships'
+    form.method = 'POST'
+    form.style.display = 'contents'
 
-          const avatarImage = document.createElement('img')
-          avatarImage.src =
-            message.user_id === Number(senderId) ? userAvatar : receiver_avatar
-          avatarImage.className = 'rounded-circle mr-1'
-          avatarImage.width = 40
-          avatarImage.height = 40
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.name = 'id'
+    input.value = user.id
+    input.style.display = 'none'
 
-          const timestampDiv = document.createElement('div')
-          timestampDiv.className = 'text-muted small text-nowrap mt-2'
-          timestampDiv.textContent = new Date(
-            message.created_at
-          ).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const button = document.createElement('button')
+    button.type = 'submit'
+    button.className = user.is_following ? 'following-btn' : 'follow-btn'
+    button.textContent = user.is_following ? '正在跟隨' : '跟隨'
 
-          avatarDiv.appendChild(avatarImage)
-          avatarDiv.appendChild(timestampDiv)
+    form.appendChild(input)
+    form.appendChild(button)
+    header.appendChild(form)
+    tweetRight.appendChild(header)
 
-          const messageDiv = document.createElement('div')
-          messageDiv.className =
-            message.user_id === Number(senderId)
-              ? 'flex-shrink-1 bg-light rounded py-2 px-3 mr-3'
-              : 'flex-shrink-1 bg-light rounded py-2 px-3 ml-3'
+    const contentWord = document.createElement('div')
+    contentWord.className = 'content-word'
+    contentWord.style.margin = '0'
+    contentWord.textContent = user.bio
 
-          const senderDiv = document.createElement('div')
-          senderDiv.className = 'font-weight-bold mb-1'
-          senderDiv.textContent =
-            message.user_id === Number(senderId) ? 'You' : receiver_name
+    tweetRight.appendChild(contentWord)
+    userElement.appendChild(tweetRight)
 
-          const messageContentDiv = document.createTextNode(message.message)
-
-          messageDiv.appendChild(senderDiv)
-          messageDiv.appendChild(messageContentDiv)
-
-          chatMessageDiv.appendChild(avatarDiv)
-          chatMessageDiv.appendChild(messageDiv)
-
-          chatMessagesContainer.appendChild(chatMessageDiv)
-          chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight
-        })
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-  }
-
-  socket.on('message', ({ sender, roomID, message, receiverID }) => {
-    console.log('mess', sender, roomID, message)
-    fetch('http://localhost:3000/chats/rooms')
-      .then(response => response.json())
-      .then(data => {
-        listContainer.innerHTML = ''
-        data.forEach(room => {
-          const listItem = document.createElement('div')
-          listItem.style = 'cursor: pointer'
-
-          listItem.className = 'list-group-item list-group-item-action border-0'
-          listItem.addEventListener('click', () => {
-            getChatMessages(room.room_id)
-          })
-
-          chatRooms[room.room_id] = {
-            receiver_id: room.receiver_id,
-            receiver_name: room.receiver_name,
-            receiver_avatar: room.receiver_avatar,
-          }
-
-          const dFlexDiv = document.createElement('div')
-          dFlexDiv.className = 'd-flex align-items-start'
-
-          const image = document.createElement('img')
-          image.src = room.receiver_avatar
-          image.className = 'rounded-circle mr-1'
-          image.alt = room.receiver_name
-          image.width = 40
-          image.height = 40
-
-          const contentDiv = document.createElement('div')
-          contentDiv.className = 'flex-grow-1 ml-3'
-
-          const receiverName = document.createElement('strong')
-          receiverName.textContent = room.receiver_name
-
-          const smallDiv = document.createElement('div')
-          smallDiv.className = 'small'
-
-          const onlineText = document.createElement('em')
-          onlineText.textContent = room.message
-
-          // 將生成的元素組合起來
-          smallDiv.appendChild(onlineText)
-
-          contentDiv.appendChild(receiverName)
-          contentDiv.appendChild(smallDiv)
-
-          dFlexDiv.appendChild(image)
-          dFlexDiv.appendChild(contentDiv)
-          listItem.appendChild(dFlexDiv)
-
-          // 將生成的列表項目加入到列表容器中
-          listContainer.appendChild(listItem)
-        })
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-
-    if (activeChatRoomID === Number(roomID)) {
-      console.log('equal')
-      const chatMessageDiv = document.createElement('div')
-      chatMessageDiv.className =
-        sender === senderId
-          ? 'chat-message-right pb-4'
-          : 'chat-message-left pb-4'
-      const avatarDiv = document.createElement('div')
-
-      const avatarImage = document.createElement('img')
-      avatarImage.src =
-        sender === senderId ? userAvatar : chatRooms[room].receiver_avatar
-      avatarImage.className = 'rounded-circle mr-1'
-      avatarImage.width = 40
-      avatarImage.height = 40
-
-      const timestampDiv = document.createElement('div')
-      timestampDiv.className = 'text-muted small text-nowrap mt-2'
-      timestampDiv.textContent = new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-
-      avatarDiv.appendChild(avatarImage)
-      avatarDiv.appendChild(timestampDiv)
-
-      const messageDiv = document.createElement('div')
-      messageDiv.className =
-        sender === senderId
-          ? 'flex-shrink-1 bg-light rounded py-2 px-3 mr-3'
-          : 'flex-shrink-1 bg-light rounded py-2 px-3 ml-3'
-
-      const senderDiv = document.createElement('div')
-      senderDiv.className = 'font-weight-bold mb-1'
-      senderDiv.textContent =
-        sender === senderId ? 'You' : chatRooms[room].receiver_name
-
-      const messageContentDiv = document.createTextNode(message)
-
-      messageDiv.appendChild(senderDiv)
-      messageDiv.appendChild(messageContentDiv)
-
-      chatMessageDiv.appendChild(avatarDiv)
-      chatMessageDiv.appendChild(messageDiv)
-
-      chatMessagesContainer.appendChild(chatMessageDiv)
-    }
-  })
-  sendMessageButton.addEventListener('click', function (e) {
-    e.preventDefault()
-    const message = messageInput.value.trim()
-    if (message !== '') {
-      sendMessage(message, receiverID)
-    }
-  })
-
-  messageForm.addEventListener('submit', function (e) {
-    e.preventDefault()
-    const message = messageInput.value.trim()
-    if (message !== '') {
-      sendMessage(message, receiverID)
-    }
-  })
-
-  function sendMessage(message, receiverID) {
-    console.log('send', senderId, activeChatRoomID, receiverID)
-    socket.emit('message', {
-      sender: senderId,
-      roomID: activeChatRoomID,
-      message: message,
-      receiverID: receiverID,
-    })
-    messageInput.value = ''
+    return userElement
   }
 </script>
