@@ -119,7 +119,10 @@
   const messageInput = document.getElementById('sendMes')
   const messageForm = document.getElementById('messageForm')
   const listContainer = document.getElementById('chat-list')
-  let activeChatRoom = null
+  let activeChatRoomID = null
+  let receiverID = null
+
+  socket.emit('join', { senderId: senderId.toString(), userName })
 
   // 使用fetch函式從API獲取聊天室列表
   fetch('http://localhost:3000/chats/rooms')
@@ -182,7 +185,6 @@
 
   // 取得聊天訊息的函式
   function getChatMessages(roomId) {
-    socket.emit('join', { roomId: roomId.toString(), userName })
     const chatRoom = chatRooms[roomId]
     const { receiver_name, receiver_avatar } = chatRoom
     chatHeader.innerHTML = '<strong>' + receiver_name + '</strong>'
@@ -194,8 +196,10 @@
       height="40"
     />
     `
-    activeChatRoom = roomId
-    console.log('activeChatRoom', activeChatRoom)
+    activeChatRoomID = roomId
+    receiverID = chatRooms[roomId].receiver_id.toString()
+    console.log('activeChatRoomID', activeChatRoomID)
+    console.log('receiverID', receiverID)
 
     // 使用fetch函式從API獲取聊天訊息
     fetch(`./chats/messages/${roomId}`)
@@ -256,55 +260,13 @@
       })
   }
 
-  socket.on('message', ({ sender, room, message }) => {
-    console.log('hyr')
-    const chatMessageDiv = document.createElement('div')
-    chatMessageDiv.className =
-      sender === senderId ? 'chat-message-right pb-4' : 'chat-message-left pb-4'
-    const avatarDiv = document.createElement('div')
-
-    const avatarImage = document.createElement('img')
-    avatarImage.src =
-      sender === senderId ? userAvatar : chatRooms[room].receiver_avatar
-    avatarImage.className = 'rounded-circle mr-1'
-    avatarImage.width = 40
-    avatarImage.height = 40
-
-    const timestampDiv = document.createElement('div')
-    timestampDiv.className = 'text-muted small text-nowrap mt-2'
-    timestampDiv.textContent = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-
-    avatarDiv.appendChild(avatarImage)
-    avatarDiv.appendChild(timestampDiv)
-
-    const messageDiv = document.createElement('div')
-    messageDiv.className =
-      sender === senderId
-        ? 'flex-shrink-1 bg-light rounded py-2 px-3 mr-3'
-        : 'flex-shrink-1 bg-light rounded py-2 px-3 ml-3'
-
-    const senderDiv = document.createElement('div')
-    senderDiv.className = 'font-weight-bold mb-1'
-    senderDiv.textContent =
-      sender === senderId ? 'You' : chatRooms[room].receiver_name
-
-    const messageContentDiv = document.createTextNode(message)
-
-    messageDiv.appendChild(senderDiv)
-    messageDiv.appendChild(messageContentDiv)
-
-    chatMessageDiv.appendChild(avatarDiv)
-    chatMessageDiv.appendChild(messageDiv)
-
-    chatMessagesContainer.appendChild(chatMessageDiv)
+  socket.on('message', ({ sender, roomID, message, receiverID }) => {
+    console.log('mess', sender, roomID, message)
     fetch('http://localhost:3000/chats/rooms')
       .then(response => response.json())
       .then(data => {
         listContainer.innerHTML = ''
-        data.forEach(room => {          
+        data.forEach(room => {
           const listItem = document.createElement('div')
           listItem.style = 'cursor: pointer'
 
@@ -358,13 +320,60 @@
       .catch(error => {
         console.error('Error:', error)
       })
-  })
 
+    if (activeChatRoomID === Number(roomID)) {
+      console.log('equal')
+      const chatMessageDiv = document.createElement('div')
+      chatMessageDiv.className =
+        sender === senderId
+          ? 'chat-message-right pb-4'
+          : 'chat-message-left pb-4'
+      const avatarDiv = document.createElement('div')
+
+      const avatarImage = document.createElement('img')
+      avatarImage.src =
+        sender === senderId ? userAvatar : chatRooms[room].receiver_avatar
+      avatarImage.className = 'rounded-circle mr-1'
+      avatarImage.width = 40
+      avatarImage.height = 40
+
+      const timestampDiv = document.createElement('div')
+      timestampDiv.className = 'text-muted small text-nowrap mt-2'
+      timestampDiv.textContent = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+
+      avatarDiv.appendChild(avatarImage)
+      avatarDiv.appendChild(timestampDiv)
+
+      const messageDiv = document.createElement('div')
+      messageDiv.className =
+        sender === senderId
+          ? 'flex-shrink-1 bg-light rounded py-2 px-3 mr-3'
+          : 'flex-shrink-1 bg-light rounded py-2 px-3 ml-3'
+
+      const senderDiv = document.createElement('div')
+      senderDiv.className = 'font-weight-bold mb-1'
+      senderDiv.textContent =
+        sender === senderId ? 'You' : chatRooms[room].receiver_name
+
+      const messageContentDiv = document.createTextNode(message)
+
+      messageDiv.appendChild(senderDiv)
+      messageDiv.appendChild(messageContentDiv)
+
+      chatMessageDiv.appendChild(avatarDiv)
+      chatMessageDiv.appendChild(messageDiv)
+
+      chatMessagesContainer.appendChild(chatMessageDiv)
+    }
+  })
   sendMessageButton.addEventListener('click', function (e) {
     e.preventDefault()
     const message = messageInput.value.trim()
     if (message !== '') {
-      sendMessage(message)
+      sendMessage(message, receiverID)
     }
   })
 
@@ -372,54 +381,21 @@
     e.preventDefault()
     const message = messageInput.value.trim()
     if (message !== '') {
-      sendMessage(message)
+      sendMessage(message, receiverID)
     }
   })
 
-  function sendMessage(message) {
-    const chatMessageDiv = document.createElement('div')
-    chatMessageDiv.className = 'chat-message-right pb-4'
-
-    const avatarDiv = document.createElement('div')
-
-    const avatarImage = document.createElement('img')
-    avatarImage.src = userAvatar
-    avatarImage.className = 'rounded-circle mr-1'
-    avatarImage.width = 40
-    avatarImage.height = 40
-
-    const timestampDiv = document.createElement('div')
-    timestampDiv.className = 'text-muted small text-nowrap mt-2'
-    timestampDiv.textContent = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-
-    avatarDiv.appendChild(avatarImage)
-    avatarDiv.appendChild(timestampDiv)
-
-    const messageDiv = document.createElement('div')
-    messageDiv.className = 'flex-shrink-1 bg-light rounded py-2 px-3 mr-3'
-
-    const senderDiv = document.createElement('div')
-    senderDiv.className = 'font-weight-bold mb-1'
-    senderDiv.textContent = 'You'
-
-    const messageContentDiv = document.createTextNode(message)
-
-    messageDiv.appendChild(senderDiv)
-    messageDiv.appendChild(messageContentDiv)
-
-    chatMessageDiv.appendChild(avatarDiv)
-    chatMessageDiv.appendChild(messageDiv)
-
-    chatMessagesContainer.appendChild(chatMessageDiv)
+  function sendMessage(message, receiverID) {
+    console.log('send', senderId, activeChatRoomID, receiverID)
     socket.emit('message', {
       sender: senderId,
-      room: activeChatRoom,
+      roomID: activeChatRoomID,
       message: message,
+      receiverID: receiverID,
     })
     messageInput.value = ''
   }
 </script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>

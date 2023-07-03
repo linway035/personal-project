@@ -8,16 +8,24 @@ export function socketHandler(io) {
       console.log(`a user disconnected`)
     })
 
-    socket.on('join', ({ roomId, userName }) => {
-      socket.join(roomId)
-      console.log(`user ${userName} join roomId ${roomId}`)
+    socket.on('join', ({ senderId, userName }) => {
+      socket.join(senderId)
+      console.log(`user ${userName} join space ${senderId}`)
     })
 
-    socket.on('message', async ({ sender, room, message }) => {
-      console.log(`Received message from ${sender} to ${room}: ${message}`)
-      await chatHelpers.saveMessage(sender, room, message)
-      socket.to(room.toString()).emit('message', { sender, room, message })
-      console.log('emit')
+    socket.on('message', async ({ sender, roomID, message, receiverID }) => {
+      console.log(
+        `Received message from ${sender} to ${receiverID} room ${roomID}: ${message}`
+      )
+      await chatHelpers.saveMessage(sender, roomID, message)
+      // socket
+      //   .to([room.toString(), sender])
+      //   .emit('message', { sender, room, message })
+      io.to(receiverID).to(sender).emit('message', {
+        sender,
+        roomID,
+        message,
+      })
     })
   })
 }
