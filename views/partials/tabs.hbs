@@ -1,67 +1,79 @@
 <div id="tabs-section">
   <ul class="nav nav-tabs">
     <li class="nav-item">
-      <a class="nav-link {{#ifCond route 'tweets'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/tweets">推文</a>
+      <a class="nav-link {{#ifCond route 'tweets'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/tweets">Posts</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link {{#ifCond route 'replies'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/replies">回覆</a>
+      <a class="nav-link {{#ifCond route 'replies'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/replies">Replies</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link {{#ifCond route 'likes'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/likes">喜歡的內容</a>
+      <a class="nav-link {{#ifCond route 'likes'}}active{{/ifCond}}" href="/users/{{userProfile.id}}/likes">Likes</a>
     </li>
   </ul>
 
   <div class="d-flex flex-column tabs-content">
     <!-- if = 推文 -->
     {{#ifCond route "tweets"}}
-    {{#each userProfile.Tweets}}
+    {{#each tweets}}
     {{!-- 這是modal-reply --}}
-    {{>reply-modal tweet=this user=../userProfile User=../currentUser}}
-    <div class="d-flex each-tweet">
+    {{>reply-modal tweet=this user=../userProfile}}
+    <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
       <div id="tweet-icon">
-        <a href="/users/{{this.UserId}}/tweets">
-          <img src="{{.. /userProfile.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
+        <a href="/users/{{this.user_id}}/tweets">
+          <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
         </a>
       </div>
-      <div id="tweet-right" style="width: 528px">
+      <div id="tweet-right" style="width: 528px;">
         <div class="header" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
-          <a href="/users/{{this.UserId}}/tweets">
-            <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{..
-              /userProfile.name}}</span>
-            <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D; margin-left:8px;"
-              class="text-muted">@{{.. /userProfile.account}}</span>
+          <a href="/users/{{this.user_id}}/tweets">
+            <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
           </a>
           <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
-            class="text-muted">．{{relativeTimeFromNow this.createdAt}}</span>
+            class="text-muted">．{{relativeTimeFromNow this.updated_at}}
+          </span>
         </div>
-        <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');"
-          style="cursor: pointer;">
-          {{this.description}}
+        <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
+          {{this.content}}
+          <div class="image-container">
+            {{#each this.images}}
+            <img src="{{this}}" alt="Image" class="image-item">
+            {{/each}}
+          </div>
         </div>
         <div class="actions d-flex justify-content-between">
           <div class="d-flex reply">
             <button data-bs-toggle="modal" data-bs-target="#reply-modal-{{this.id}}">
               <img src="/images/icons/outlined-reply.png" alt="replies" style="width:16px; height: 16px">
             </button>
-            <span
-              style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.Replies.length}}</span>
+            <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.reply_count}}</span>
           </div>
           <div class="d-flex like">
-            {{#if this.isLiked}}
-            <form action="/tweets/{{this.id}}/unlike" method="post">
-              <button type="submit">
-                <img src=" /images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
-              </button>
-            </form>
+            {{#if this.is_liked}}
+            <button data-tweet-id="{{this.id}}" onclick="unlikeTweet(event,'{{this.id}}')">
+              <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+            </button>
             {{else}}
-            <form action="/tweets/{{this.id}}/like" method="post">
-              <button type="submit">
-                <img src=" /images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+            <button data-tweet-id="{{this.id}}" onclick="likeTweet(event,'{{this.id}}')">
+              <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+            </button>
+            {{/if}}
+            <span data-tweet-id="{{this.id}}"
+              style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
+    
+          </div>
+          <div class="d-flex hidden">
+            <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
+              <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
+                <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
               </button>
             </form>
-            {{/if}}
-            <span
-              style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.Likes.length}}</span>
+          </div>
+          <div class="d-flex rating" id="rating-{{this.id}}">
+            <span class="star" data-rating="1">&#9734;</span>
+            <span class="star" data-rating="2">&#9734;</span>
+            <span class="star" data-rating="3">&#9734;</span>
+            <span class="star" data-rating="4">&#9734;</span>
+            <span class="star" data-rating="5">&#9734;</span>
           </div>
         </div>
       </div>

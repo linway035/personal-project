@@ -10,12 +10,15 @@ router.get('/signin', userController.getSignInPage)
 router.post('/signin', userController.signIn)
 router.get('/logout', authenticate, userController.logout)
 router.get('/:id/followings', authenticate, userController.getUserFollowings)
+router.get('/:id/followers', authenticate, userController.getUserFollowers)
 router.get(
   '/:id/followings/api',
   authenticate,
   userController.getUserFollowingsAPI
 )
-router.get('/:id/followers', authenticate, userController.getUserFollowers)
+router.get('/:id/tweets', authenticate, userController.getUserTweetsAPI)
+// router.get('/:id/replies', authenticate, userController.getUserReplies)
+router.get('/:id/profile', authenticate, userController.getProfilePage)
 router.get('/edit/:id', authenticate, userController.getUserInfo)
 router.post(
   '/edit/:id',
@@ -26,8 +29,4 @@ router.post(
   authenticate,
   userController.postUserInfo
 )
-router.get('/:id/profile', authenticate, userController.getProfilePage)
-// router.get('/:id/followings', userController.getUserFollowings)
-// router.get('/:id/followers', userController.getUserFollowers)
-
 export default router

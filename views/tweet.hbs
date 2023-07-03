@@ -18,3 +18,63 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
   integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+<script>
+  function likeTweet(event, tweetId) {
+    event.preventDefault()
+    fetch(`/tweets/${tweetId}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tweetId: tweetId }),
+    })
+      .then(response => {
+        if (response.ok) {
+          const likeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
+          likeButton.innerHTML = `
+          <img src="/images/icons/filled-like.png" alt="like" style="width:30px; height: 30px">
+        `;
+          likeButton.onclick = event => unlikeTweet(event, tweetId)
+          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
+          const count = parseInt(countElement.textContent)
+          countElement.textContent = count + 1
+          console.log('Tweet liked successfully')
+        } else {
+          throw new Error('Failed to like tweet')
+        }
+      })
+      .catch(error => {
+        console.error('Error liking tweet:', error.message)
+      })
+  }
+
+  function unlikeTweet(event, tweetId) {
+    event.preventDefault()
+    fetch(`/tweets/${tweetId}/unlike`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ tweetId: tweetId }),
+    })
+      .then(response => {
+        if (response.ok) {
+          const unlikeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
+          unlikeButton.innerHTML = `
+          <img src="/images/icons/outlined-like.png" alt="like" style="width:30px; height: 30px">
+        `;
+          unlikeButton.onclick = event => likeTweet(event, tweetId)
+          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
+          const count = parseInt(countElement.textContent)
+          countElement.textContent = count - 1
+          console.log('Tweet unliked successfully')
+        } else {
+          throw new Error('Failed to unlike tweet')
+        }
+      })
+      .catch(error => {
+        console.error('Error unliking tweet:', error.message)
+      })
+  }
+</script>
