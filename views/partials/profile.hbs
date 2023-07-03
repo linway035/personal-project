@@ -1,7 +1,7 @@
 {{!-- Header --}}
 <div class="d-flex" style="margin:16px 0;">
   <a href="javascript:history.back()">
-    <img src="/images/icons/outlined-back.png" style="height:24px; margin-top:10px; margin-left:28px">
+    <img src="/images/icons/outlined-back.png" style="height:24px; margin-left:28px">
   </a>
   <div class="d-flex flex-column" style="margin-left:19px">
     <span style="line-height: 26px; font-weight:700; font-size:18px; color:#171725">{{userProfile.name}}</span>
@@ -18,7 +18,7 @@
     <button type="button" class="btn btn-outline-warning float-end" id="edit-button"
       style="border-radius:50px;line-height: 24px; height:40px; width:128px; border-color:#43BFFD;font-size:16px; font-weight:400;margin-top:216px;margin-right:16px; color:#43BFFD"
       data-id="{{userProfile.id}}" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-      編輯個人資料
+      Edit Profile
     </button>
     {{else if userProfile.is_following }}
     <form action="/followships/{{userProfile.id}}" method="POST" style="display: contents;">
@@ -73,7 +73,7 @@
           <div>
             <button type="submit" class="modal-post-btn my-1 mx-1"
               style="font-weight: 400;font-size: 16px;line-height: 24px;border: none;color: #FFFFFF;"
-              id="submit-btn">儲存</button>
+              id="submit-btn">Save</button>
           </div>
         </div>
 
@@ -119,9 +119,9 @@
           <div class="modal-intro-input-section">
             <label class="modal-intro-label" for="intro"
               style="font-family: 'Noto Sans TC';font-style: normal;font-weight: 400;font-size: 14px;line-height: 22px;color: #696974;">自我介紹</label>
-            <textarea class="modal-intro-input border-0" name="introduction"
+            <textarea class="modal-intro-input border-0" name="bio"
               style="font-size: 16px;outline: none;resize:none;height:120px;font-weight: 400;line-height: 26px;color: #171725;"
-              id="introduction" cols="65" rows="5" maxlength="160" required></textarea>
+              id="bio" cols="65" rows="5" maxlength="160" required></textarea>
           </div>
           <div
             style="inline-block;max-width: 600px;margin-left: 15px;font-weight: 500;font-size: 12px;line-height: 20px;color: #FC5A5A;">

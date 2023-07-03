@@ -17,6 +17,7 @@ export function socketHandler(io) {
       console.log(`Received message from ${sender} to ${room}: ${message}`)
       await chatHelpers.saveMessage(sender, room, message)
       socket.to(room.toString()).emit('message', { sender, room, message })
+      console.log('emit')
     })
   })
 }

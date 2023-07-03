@@ -129,6 +129,36 @@ const userController = {
       follows,
     })
   },
+  getUserInfo: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `SELECT * FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
+      const UserId = req.params.id
+      if (currentUserID !== Number(UserId)) {
+        console.log('edit error')
+        return res.json({
+          status: 'error',
+          messages: '無法編輯其他使用者資料！',
+        })
+      }
+      res.json(currentUserData)
+    } catch (err) {
+      next(err)
+    }
+  },
+  postUserInfo: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const UserId = req.params.id
+      console.log(req.body)
+    } catch (err) {
+      next(err)
+    }
+  },
 }
 
 export default userController

@@ -49,15 +49,17 @@
         </div>
         <div class="d-flex like">
           {{#if this.is_liked}}
-          <button onclick="unlikeTweet(event,'{{this.id}}')">
-            <img src=" /images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+          <button data-tweet-id="{{this.id}}" onclick="unlikeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{else}}
-          <button onclick="likeTweet(event,'{{this.id}}')">
-            <img src=" /images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+          <button data-tweet-id="{{this.id}}" onclick="likeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{/if}}
-          <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
+          <span data-tweet-id="{{this.id}}"
+            style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
+
         </div>
         <div class="d-flex hidden">
           <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
@@ -95,6 +97,14 @@
     })
       .then(response => {
         if (response.ok) {
+          const likeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
+          likeButton.innerHTML = `
+          <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+        `;
+          likeButton.onclick = event => unlikeTweet(event, tweetId)
+          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
+          const count = parseInt(countElement.textContent)
+          countElement.textContent = count + 1
           console.log('Tweet liked successfully')
         } else {
           throw new Error('Failed to like tweet')
@@ -116,6 +126,14 @@
     })
       .then(response => {
         if (response.ok) {
+          const unlikeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
+          unlikeButton.innerHTML = `
+          <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+        `;
+          unlikeButton.onclick = event => likeTweet(event, tweetId)
+          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
+          const count = parseInt(countElement.textContent)
+          countElement.textContent = count - 1
           console.log('Tweet unliked successfully')
         } else {
           throw new Error('Failed to unlike tweet')

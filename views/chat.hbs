@@ -257,7 +257,7 @@
   }
 
   socket.on('message', ({ sender, room, message }) => {
-    console.log('mess', sender, room, message)
+    console.log('hyr')
     const chatMessageDiv = document.createElement('div')
     chatMessageDiv.className =
       sender === senderId ? 'chat-message-right pb-4' : 'chat-message-left pb-4'
@@ -303,7 +303,8 @@
     fetch('http://localhost:3000/chats/rooms')
       .then(response => response.json())
       .then(data => {
-        data.forEach(room => {
+        listContainer.innerHTML = ''
+        data.forEach(room => {          
           const listItem = document.createElement('div')
           listItem.style = 'cursor: pointer'
 
