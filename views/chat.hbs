@@ -125,7 +125,7 @@
   socket.emit('join', { senderId: senderId.toString(), userName })
 
   // 使用fetch函式從API獲取聊天室列表
-  fetch('http://localhost:3000/chats/rooms')
+  fetch('/chats/rooms')
     .then(response => response.json())
     .then(data => {
       data.forEach(room => {
@@ -262,7 +262,7 @@
 
   socket.on('message', ({ sender, roomID, message, receiverID }) => {
     console.log('mess', sender, roomID, message)
-    fetch('http://localhost:3000/chats/rooms')
+    fetch('/chats/rooms')
       .then(response => response.json())
       .then(data => {
         listContainer.innerHTML = ''
