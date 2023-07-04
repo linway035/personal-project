@@ -135,11 +135,13 @@ const userController = {
           SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
         ) AS tl ON tweets.id = tl.tweet_id
         LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-        WHERE tweets.is_active = 1 AND tweets.user_id = ?
+        WHERE tweets.is_active = 1 AND tweets.user_id = ? AND tweets.id NOT IN (
+          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
+        )
         GROUP BY tweets.id
         ORDER BY tweets.updated_at DESC
       `,
-      [currentUserID, userId]
+      [currentUserID, userId, currentUserID]
     )
 
     const tweetsWithImages = tweets.map(tweet => {
@@ -410,11 +412,13 @@ const userController = {
         ) AS tll ON tweets.id = tll.tweet_id
         WHERE tweets.is_active = 1 AND tweets.id IN(
           SELECT tweet_id FROM tweet_likes where user_id =? and is_active=1
+        ) AND tweets.id NOT IN (
+          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
         )
         GROUP BY tweets.id, tll.updated_at
         ORDER BY like_date DESC
       `,
-        [currentUserID, userId, userId]
+        [currentUserID, userId, userId, currentUserID]
       )
       const tweetsWithImages = tweets.map(tweet => {
         if (tweet.images) {
