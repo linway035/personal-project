@@ -10,6 +10,8 @@
         <div class="d-flex justify-content-center" style="margin-top: 20px;">
           <img src="/images/icons/下載 (6).png" alt="">
         </div>
+        <div id="error-alert" class="alert alert-danger d-none alert-dismissible" role="alert">
+        </div>
         <div class="col-12 col-md-9 col-lg-7 col-xl-6">
           <div class="card" style="border-radius: 15px">
             <div class="card-body p-5">
@@ -18,22 +20,22 @@
               <form id="signup-form">
                 <div class="form-outline mb-4">
                   <input type="text" class="form-control form-control-lg" id="name" name="name"
-                    placeholder="Your Name" />
+                    placeholder="Your Name" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                   <input type="email" class="form-control form-control-lg" id="email" name="email"
-                    placeholder="Your Email" />
+                    placeholder="Your Email" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                   <input type="password" class="form-control form-control-lg" id="password" name="password"
-                    placeholder="Password" />
+                    placeholder="Password" required/>
                 </div>
 
                 <div class="form-outline mb-4">
                   <input type="password" class="form-control form-control-lg" id="checkPassword" name="checkPassword"
-                    placeholder="Repeat your password" />
+                    placeholder="Repeat your password" required/>
                 </div>
 
                 <div class="d-flex justify-content-center">
@@ -89,40 +91,4 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
   integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
-<script>
-  const signupForm = document.getElementById('signup-form')
-
-  signupForm.addEventListener('submit', function (e) {
-    e.preventDefault()
-
-    const name = document.getElementById('name').value
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
-    const checkPassword = document.getElementById('checkPassword').value
-
-    if (name && email && password && checkPassword) {
-      if (password !== checkPassword) {
-        alert('密碼和確認密碼不一致!')
-        return
-      }
-
-      fetch('/users/signup', {
-        method: 'POST',
-        body: JSON.stringify({ name, email, password, checkPassword }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => response.json())
-        .then(data => {
-          localStorage.setItem('userId', data.userId)
-          localStorage.setItem('name', data.name)
-          localStorage.setItem('avatar', data.avatar)
-          window.location.href = '/'
-        })
-        .catch(error => {
-          console.error(error)
-        })
-    }
-  })
-</script>
+<script src="/javascripts/signup.js"></script>
