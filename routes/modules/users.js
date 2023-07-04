@@ -15,9 +15,10 @@ router.get(
   '/:id/followings/api',
   authenticate,
   userController.getUserFollowingsAPI
-)
-router.get('/:id/tweets', authenticate, userController.getUserTweetsAPI)
-// router.get('/:id/replies', authenticate, userController.getUserReplies)
+) //未
+router.get('/:id/tweets', authenticate, userController.getUserTweetsAPI) //未
+router.get('/:id/replies', authenticate, userController.getUserReplies)
+router.get('/:id/likes', authenticate, userController.getUserLikes)
 router.get('/:id/profile', authenticate, userController.getProfilePage)
 router.get('/edit/:id', authenticate, userController.getUserInfo)
 router.post(

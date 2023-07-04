@@ -19,13 +19,13 @@
   {{>reply-modal user=../user tweet=this}}
   <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
     <div id="tweet-icon">
-      <a href="/users/{{this.user_id}}/tweets">
+      <a href="/users/{{this.user_id}}/profile">
         <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
       </a>
     </div>
     <div id="tweet-right" style="width: 528px;">
       <div class="header" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
-        <a href="/users/{{this.user_id}}/tweets">
+        <a href="/users/{{this.user_id}}/profile">
           <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
         </a>
         <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
