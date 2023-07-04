@@ -146,7 +146,13 @@ const userController = {
 
     const tweetsWithImages = tweets.map(tweet => {
       if (tweet.images) {
-        tweet.images = tweet.images.split(',')
+        tweet.images = tweet.images.split(',').map(image => {
+          if (image.startsWith('https://')) {
+            return image
+          } else {
+            return `\\${image}`
+          }
+        })
       } else {
         tweet.images = []
       }
@@ -294,7 +300,13 @@ const userController = {
       )
       const tweetsWithImages = tweets.map(tweet => {
         if (tweet.images) {
-          tweet.images = tweet.images.split(',')
+          tweet.images = tweet.images.split(',').map(image => {
+            if (image.startsWith('https://')) {
+              return image
+            } else {
+              return `\\${image}`
+            }
+          })
         } else {
           tweet.images = []
         }
@@ -422,7 +434,13 @@ const userController = {
       )
       const tweetsWithImages = tweets.map(tweet => {
         if (tweet.images) {
-          tweet.images = tweet.images.split(',')
+          tweet.images = tweet.images.split(',').map(image => {
+            if (image.startsWith('https://')) {
+              return image
+            } else {
+              return `\\${image}`
+            }
+          })
         } else {
           tweet.images = []
         }

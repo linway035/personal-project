@@ -167,7 +167,13 @@ const tweetController = {
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {
-        tweet.images = tweet.images.split(',')
+        tweet.images = tweet.images.split(',').map(image => {
+          if (image.startsWith('https://')) {
+            return image
+          } else {
+            return `\\${image}`
+          }
+        })
       } else {
         tweet.images = []
       }
@@ -224,7 +230,13 @@ const tweetController = {
 
       const tweetsWithImages = data.map(tweet => {
         if (tweet.images) {
-          tweet.images = tweet.images.split(',')
+          tweet.images = tweet.images.split(',').map(image => {
+            if (image.startsWith('https://')) {
+              return image
+            } else {
+              return `\\${image}`
+            }
+          })
         } else {
           tweet.images = []
         }
@@ -600,8 +612,15 @@ const tweetController = {
     )
     const currentUserData = currentUser[0]
 
+    res.render('searchUser', {
+      user: currentUserData,
+    })
+  },
+  getSearchUserAPI: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+
     const q = req.query.q?.trim().toLowerCase()
-    const [userSearchResult, fields] = await pool.execute(
+    const [userSearchResults, fields] = await pool.execute(
       `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
       CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
       FROM users
@@ -613,12 +632,8 @@ const tweetController = {
       WHERE name LIKE ?`,
       [currentUserID, currentUserID, `%${q}%`]
     )
-    // console.log(userSearchResult)
-    res.render('searchUser', {
-      userSearchResult,
-      q,
-      user: currentUserData,
-    })
+    // console.log(userSearchResults)
+    res.json({ userSearchResults, q })
   },
   getSearchTweet: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -628,6 +643,13 @@ const tweetController = {
       [currentUserID]
     )
     const currentUserData = currentUser[0]
+
+    res.render('search', {
+      user: currentUserData,
+    })
+  },
+  getSearchTweetAPI: async (req, res, next) => {
+    const currentUserID = res.locals.userId
 
     const q = req.query.q?.trim().toLowerCase()
     // 取推文
@@ -689,12 +711,7 @@ const tweetController = {
       return tweet
     })
     // console.log(tweetsWithImages)
-
-    res.render('search', {
-      tweets: tweetsWithImages,
-      q,
-      user: currentUserData,
-    })
+    res.json({ tweets: tweetsWithImages, q })
   },
   getRecommendUsersAPI: async (req, res, next) => {
     const currentUserID = res.locals.userId

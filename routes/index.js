@@ -19,7 +19,9 @@ router.post(
   followshipController.unFollowships
 )
 router.post('/followships', authenticate, followshipController.postFollowships)
+router.get('/search/people/api', authenticate, tweetController.getSearchUserAPI)
 router.get('/search/people', authenticate, tweetController.getSearchUser)
+router.get('/search/api', authenticate, tweetController.getSearchTweetAPI)
 router.get('/search', authenticate, tweetController.getSearchTweet)
 router.get('/home', authenticate, tweetController.getHome) //, authenticate
 router.get('/', (req, res) => {

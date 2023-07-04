@@ -38,7 +38,7 @@ signupForm.addEventListener('submit', function (e) {
         localStorage.setItem('userId', data.userId)
         localStorage.setItem('name', data.name)
         localStorage.setItem('avatar', data.avatar)
-        window.location.href = '/'
+        window.location.href = '/tweets/foryou'
       })
       .catch(error => {
         console.error(error)
