@@ -21,7 +21,7 @@ const userController = {
         throw new Error('密碼和確認密碼不一致!')
       }
       const [users, fields] = await pool.execute(
-        'SELECT * FROM Users WHERE email = ?',
+        'SELECT * FROM users WHERE email = ?',
         [email]
       )
       if (users.length !== 0) {
@@ -64,7 +64,7 @@ const userController = {
       if (!email || !password)
         throw new Error('Email and Password are required')
       const [user, fields] = await pool.execute(
-        'SELECT * FROM Users WHERE email = ?',
+        'SELECT * FROM users WHERE email = ?',
         [email]
       )
       if (!user.length) throw new Error('User not exist')
