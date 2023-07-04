@@ -1,6 +1,8 @@
-<div style="height: 1200px;width:332px">
+<div style="height: 1200px;width:332px; background:white">
   <div id="left-section">
-    <a href="/home"><img id="logo" src="/images/icons/logo.png"></a>
+    <a href="/home">
+      <img id="logo" src="/images/icons/logo.png" style="height: 70px;width:70px; margin-left:30px">
+    </a>
     <ul id="left-navs" class="nav flex-column">
       <li class="nav-item">
         <a href="/home" class="nav-item-content">
@@ -68,10 +70,11 @@
       <li class="nav-item d-flex justify-content-center" style="height: 46px;">
         <button type="button" class="btn btn-primary"
           style="border-radius:50px; width:100%; background:#43BFFD; border-color:#43BFFD;font-size:20px;font-weight:400"
-          data-bs-toggle="modal" data-bs-target="#post-modal">Tweet</button>
+          data-bs-toggle="modal" data-bs-target="#post-modal">Post</button>
       </li>
       <li id="logout">
-        <a href="/users/logout" style="margin-top:1.585vh; text-decoration: none; align-items: center; display:flex" onclick="logout()">
+        <a href="/users/logout" style="margin-top:1.585vh; text-decoration: none; align-items: center; display:flex"
+          onclick="logout()">
           <img src="/images/icons/outlined-logout.png" style="height:24px; margin-left:16px;">
           <span style="margin-left:16px; font-weight:700; font-size:18px; color:#44444F">Logout</span>
         </a>

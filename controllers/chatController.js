@@ -2,7 +2,19 @@ import pool from '../middleware/databasePool.js'
 
 const chatController = {
   getChatroom: async (req, res, next) => {
-    res.render('chat')
+    const currentUserID = res.locals.userId
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
+    const currentUserData = currentUser[0]
+    res.render('chat', {
+      user: currentUserData,
+    })
+  },
+  getChatroomqq: async (req, res, next) => {
+    res.render('chatqq')
   },
   getRoomList: async (req, res, next) => {
     const currentUserID = res.locals.userId

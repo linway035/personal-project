@@ -1,62 +1,107 @@
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="/stylesheets/message.css">
 </head>
 
-<div class="d-flex" style="height: 1200px;width:1400px;margin: 0 auto;">
-  {{>sidebar2 route='messages'}}
-  <div class="flex-grow-1">
-    <main class="content">
-      <div class="container p-0" style="margin-left: 0;">
-        <h1 class="h3 mb-3">Messages</h1>
-
-        <div class="card">
-          <div class="row g-0">
-            <div class="col-12 col-lg-5 col-xl-3 border-right">
-              <div class="px-4 d-none d-md-block">
-                <div class="d-flex align-items-center">
-                  <div class="flex-grow-1">
-                    <input type="text" class="form-control my-3" placeholder="Search..." />
-                  </div>
-                </div>
-              </div>
-
-              <div id="chat-list" class="list-group">
-                <!-- 這裡將動態生成的列表項目插入 -->
-              </div>
-
-              <hr class="d-block d-lg-none mt-1 mb-0" />
-            </div>
-            <div class="col-12 col-lg-7 col-xl-9">
-              <div class="py-2 px-4 border-bottom d-none d-lg-block">
-                <div class="d-flex align-items-center py-1">
-                  <div class="position-relative" id="chatHeaderImg">
-                    <img src="https://fakeimg.pl/50x50/ffffff/ffffff" class="rounded-circle mr-1" width="40" height="40" />
-                  </div>
-                  <div class="flex-grow-1 pl-3" id="chatHeader"></div>
-                </div>
-              </div>
-
-              <div class="position-relative">
-                <div class="chat-messages p-4"></div>
-              </div>
-
-              <div class="flex-grow-0 py-3 px-4 border-top">
-                <form id="messageForm">
-                  <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Type your message" id="sendMes" />
-                    <button type="submit" class="btn btn-primary">Send</button>
-                  </div>
-                </form>
+<main class="content">
+  <div class="container p-0">
+    <div class="card">
+      <div class="row g-0">
+        <div class="col-12 col-lg-5 col-xl-3 border-right">
+          <div class="px-4 d-none d-md-block">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <input type="text" class="form-control my-3" placeholder="Search..." />
               </div>
             </div>
           </div>
+
+          <div id="chat-list" class="list-group">
+            <!-- 這裡將動態生成的列表項目插入 -->
+          </div>
+
+          <hr class="d-block d-lg-none mt-1 mb-0" />
+        </div>
+        <div class="col-12 col-lg-7 col-xl-9">
+          <div class="py-2 px-4 border-bottom d-none d-lg-block">
+            <div class="d-flex align-items-center py-1">
+              <div class="position-relative" id="chatHeaderImg">
+                <img src="https://fakeimg.pl/50x50/ffffff/ffffff" class="rounded-circle mr-1" width="40" height="40" />
+              </div>
+              <div class="flex-grow-1 pl-3" id="chatHeader"></div>
+            </div>
+          </div>
+
+          <div class="position-relative">
+            <div class="chat-messages p-4"></div>
+          </div>
+
+          <div class="flex-grow-0 py-3 px-4 border-top">
+            <form id="messageForm">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Type your message" id="sendMes" />
+                <button type="submit" class="btn btn-primary">Send</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   </div>
-</div>
+</main>
 
+<style>
+  body {
+    margin-top: 20px;
+  }
+
+  .chat-online {
+    color: #34ce57;
+  }
+
+  .chat-offline {
+    color: #e4606d;
+  }
+
+  .chat-messages {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 70vh;
+  }
+
+  .chat-message-left,
+  .chat-message-right {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .chat-message-left {
+    margin-right: auto;
+  }
+
+  .chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto;
+  }
+
+  .py-3 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .px-4 {
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
+  }
+
+  .flex-grow-0 {
+    flex-grow: 0 !important;
+  }
+
+  .border-top {
+    border-top: 1px solid #dee2e6 !important;
+  }
+</style>
 
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
