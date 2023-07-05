@@ -1170,7 +1170,7 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 
 .image-item {
   flex-grow: 1;
-  max-width: calc(520px / 3);
+  max-width: calc(520px / 2);
   margin-right: 5px;
 }
 
