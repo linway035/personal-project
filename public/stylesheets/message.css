@@ -125,3 +125,31 @@ a {
   order: 1;
   flex-grow: 0;
 }
+
+#sidebar2-self {
+  position: fixed;
+  width: 178px;
+  height: 58px;
+  bottom: 70px;
+}
+
+#sidebar2-self img {
+  margin-right: 20px;
+}
+
+.sidebar-uppername {
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 700;
+  color: #171725;
+}
+.sidebar-lowername {
+  font-family: 'Noto Sans TC';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}

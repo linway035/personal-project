@@ -1,9 +1,10 @@
 <div style="height: 1200px;width:332px; background:white">
   <div id="left-section">
     <a href="/home">
-      <img id="logo" src="/images/icons/logo.png" style="margin-left:30px">
+      <img id="logo" src="/images/icons/logo.png" >
     </a>
     <ul id="left-navs" class="nav flex-column">
+      {{!-- home --}}
       <li class="nav-item">
         <a href="/home" class="nav-item-content">
           {{#ifNotCond route "home"}}
@@ -42,6 +43,7 @@
           {{/ifCond}}
         </a>
       </li>
+      {{!-- profile --}}
       <li class="nav-item">
         <a href="/users/{{user.id}}/profile" class="nav-item-content">
           {{#ifNotCond route "userProfile"}}
@@ -71,6 +73,15 @@
         <button type="button" class="btn btn-primary"
           style="border-radius:50px; width:100%; background:#43BFFD; border-color:#43BFFD;font-size:20px;font-weight:400"
           data-bs-toggle="modal" data-bs-target="#post-modal">Post</button>
+      </li>
+      <li class="nav-item" style="height: 46px;" id="sidebar2-self">
+        <a href="/users/{{user.id}}/profile" class="d-flex">
+          <img src="{{user.avatar}}" width="45" height="45" class="rounded-circle">
+          <div>
+            <div class="sidebar-uppername" >{{user.name}}</div>
+            <div class="sidebar-lowername">@{{user.name}}</div>
+          </div>          
+        </a>
       </li>
       <li id="logout">
         <a href="/users/logout" style="margin-top:1.585vh; text-decoration: none; align-items: center; display:flex"
