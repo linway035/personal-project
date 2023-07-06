@@ -13,6 +13,11 @@ export function socketHandler(io) {
       console.log(`user ${userName} join space ${senderId}`)
     })
 
+    socket.on('check', async ({ senderId, receiverId }) => {
+      await chatHelpers.checkRoom(senderId, receiverId)
+      console.log('checkroom')
+    })
+
     socket.on('message', async ({ sender, roomID, message, receiverID }) => {
       console.log(
         `Received message from ${sender} to ${receiverID} room ${roomID}: ${message}`

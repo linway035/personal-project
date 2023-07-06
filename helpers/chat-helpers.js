@@ -10,21 +10,23 @@ export async function saveMessage(senderId, roomId, message) {
   )
 }
 
-export async function checkRoom(senderId, receiverId, roomName) {
-  const [result] = await pool.execute(
-    `
-      SELECT name FROM rooms WHERE name=?
-    `,
-    [roomName]
-  )
-
+export async function checkRoom(senderId, receiverId) {
   // id較小者當user1
   const [smallerID, biggerID] = [
     Math.min(senderId, receiverId),
     Math.max(senderId, receiverId),
   ]
+  const roomName = `${smallerID}-${biggerID}`
+  const [result] = await pool.execute(
+    `
+      SELECT COUNT(*) as count FROM rooms WHERE name=?
+    `,
+    [roomName]
+  )
+  const isRoomExist = result[0].count > 0
+  console.log('isRoomExist', isRoomExist)
 
-  if (!result || (Array.isArray(result) && result.length === 0)) {
+  if (!isRoomExist) {
     try {
       // create room
       const createRoomQuery =

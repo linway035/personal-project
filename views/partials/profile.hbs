@@ -24,20 +24,17 @@
     <form action="/followships/{{userProfile.id}}" method="POST" style="display: contents;">
       <button type="submit" class="following-btn float-end" style="margin-top: 216px; margin-right: 16px;">Following</button>
     </form>
-    <button type="button" class="btn btn-outline-info float-end"
-      style="border-radius:50px;line-height: 24px; height:40px; border-color:#43BFFD;font-size:16px; font-weight:400;margin-top:216px;margin-right:16px;">
-      <img src="/images/icons/outlined-message.png" style="height: 20px;">
-    </button>
     {{else}}
     <form action="/followships" method="POST" style="display: contents;">
       <input type="text" name="id" value="{{userProfile.id}}" style="display: none;">
       <button type="submit" class="follow-btn float-end" style="margin-top: 216px; margin-right: 16px;">Follow</button>
     </form>
-    <button type="button" class="btn btn-outline-info float-end"
-      style="border-radius:50px;line-height: 24px; height:40px; border-color:#43BFFD;font-size:16px; font-weight:400;margin-top:216px;margin-right:16px;">
+    {{/if}}
+    <button type="button" class="btn btn-outline-info float-end"data-receiverId="{{userProfile.id}}"
+      style="border-radius:50px;line-height: 24px; height:40px; border-color:#43BFFD;font-size:16px; font-weight:400;margin-top:216px;margin-right:16px;"
+      id="pro-mess">
       <img src="/images/icons/outlined-message.png" style="height: 20px;">
     </button>
-    {{/if}}
   </div>
 
   <div class="d-flex flex-column" style="height:114px; margin-left:16px">
@@ -142,7 +139,9 @@
   </div>
 </div>
 
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="/javascripts/editModal.js"></script>
+<script src="/javascripts/profile.js"></script>
 
 {{!-- 以下是圖片暫存在瀏覽器 --}}
 <script>
