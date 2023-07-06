@@ -65,7 +65,6 @@
   const senderId = localStorage.getItem('userId')
   const userName = localStorage.getItem('name')
   const userAvatar = localStorage.getItem('avatar')
-  const nowReceiverId = localStorage.getItem('nowReceiverId')
   const chatHeader = document.getElementById('chatHeader')
   const chatHeaderImg = document.getElementById('chatHeaderImg')
   const chatMessagesContainer = document.querySelector('.chat-messages')
@@ -74,9 +73,43 @@
   const messageForm = document.getElementById('messageForm')
   const listContainer = document.getElementById('chat-list')
   let activeChatRoomID = null
-  let receiverID = null
+  let receiverID = localStorage.getItem('receiverId') || senderId
 
   socket.emit('join', { senderId: senderId.toString(), userName })
+
+  fetch('/chats/receiver', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      senderId: senderId,
+      receiverID: receiverID
+    })
+  })
+    .then(response => response.json())
+    .then(data=>{
+      const newChatRoom = {
+        receiver_id: data.id,
+        receiver_name: data.name,
+        receiver_avatar: data.avatar
+      };
+      activeChatRoomID = data.roomId
+      chatRooms[activeChatRoomID] = newChatRoom;
+      chatHeader.innerHTML = '<strong>' + data.name + '</strong>'
+      chatHeaderImg.innerHTML = `
+      <img
+        src="${data.avatar}"
+        class="rounded-circle mr-1"
+        width="40"
+        height="40"
+      />
+      `
+      getChatMessages(activeChatRoomID)
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    })
 
   // 使用fetch函式從API獲取聊天室列表
   fetch('/chats/rooms')
@@ -324,6 +357,7 @@
     }
   })
 
+  //click和submit送訊息
   sendMessageButton.addEventListener('click', function (e) {
     e.preventDefault()
     const message = messageInput.value.trim()
@@ -340,6 +374,7 @@
     }
   })
 
+  //送訊息功能
   function sendMessage(message, receiverID) {
     console.log('send', senderId, activeChatRoomID, receiverID)
     socket.emit('message', {

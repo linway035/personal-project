@@ -9,6 +9,7 @@ const chatController = {
       [currentUserID]
     )
     const currentUserData = currentUser[0]
+
     res.render('chat', {
       user: currentUserData,
     })
@@ -79,6 +80,29 @@ const chatController = {
     // },...]
 
     res.json(roomMessage)
+  },
+  postReceiever: async (req, res, next) => {
+    const senderId = Number(req.body.senderId)
+    const receiverID = Number(req.body.receiverID)
+    const [nowReceiver] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [receiverID]
+    )
+    const [smallerID, biggerID] = [
+      Math.min(senderId, receiverID),
+      Math.max(senderId, receiverID),
+    ]
+    const roomName = `${smallerID}-${biggerID}`
+    const [roomId] = await pool.execute(
+      `
+      SELECT id FROM rooms WHERE name=?
+    `,
+      [roomName]
+    )
+    const result = nowReceiver[0]
+    result.roomId = roomId[0].id
+    res.status(200).json(result)
   },
 }
 
