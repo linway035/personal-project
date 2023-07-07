@@ -180,8 +180,44 @@ const tweetController = {
       return tweet
     })
 
+    const [replies, others] = await await pool.execute(`
+    SELECT
+    r.user_id AS reply_user_id,
+    u.name AS reply_user_name,
+    u.avatar AS reply_user_avatar,
+    r.content AS reply_content,
+    r.created_at AS reply_created_at,
+    t.id AS tweet_id,
+    t.user_id AS tweet_user_id,
+    tu.name AS tweet_user_name,
+    tu.avatar AS tweet_user_avatar
+    FROM
+        replies AS r
+        INNER JOIN tweets AS t ON r.tweet_id = t.id
+        INNER JOIN users AS u ON r.user_id = u.id
+        INNER JOIN users AS tu ON t.user_id = tu.id
+        INNER JOIN followships AS f ON t.user_id = f.following_id
+    WHERE
+        (f.follower_id = 17 OR t.user_id = 17) -- 替換 YOUR_USER_ID 為您的使用者 ID
+        AND r.is_active = 1
+        AND t.is_active = 1
+        AND f.is_active = 1
+    ORDER BY
+    r.created_at DESC;
+    `)
+
+    const combinedArray = [...tweetsWithImages, ...replies]
+
+    const sortedArray = combinedArray.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.reply_created_at)
+      const dateB = new Date(b.created_at || b.reply_created_at)
+      return dateB - dateA
+    })
+
+    console.log(sortedArray)
+
     res.render('tweets', {
-      tweets: tweetsWithImages,
+      tweets: sortedArray,
       user: currentUserData,
     })
   },

@@ -21,6 +21,7 @@
 <div class="index-tweets d-flex justify-content-center">
   {{#each tweets}}
   {{!-- 這是modal-reply --}}
+  {{#if this.id }}
   {{>reply-modal user=../user tweet=this}}
   <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
     <div id="tweet-icon">
@@ -81,6 +82,34 @@
       </div>
     </div>
   </div>
+  {{else}}
+  <div class="d-flex each-tweet">
+    <div id="tweet-icon">
+      <a href="/users/{{this.reply_user_id}}/profile">
+        <img src="{{this.reply_user_avatar}}"  width="50" height="50" class="rounded-circle" />
+      </a>
+    </div>
+    <div id="tweet-right" style="width: 528px">
+      <div class="header">
+        <a href="/users/{{this.reply_user_id}}/profile">
+          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{reply_user_name}}</span>
+        </a>
+        <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
+          class="text-muted">．{{relativeTimeFromNow this.reply_created_at}}</span>
+      </div>
+      <a href="/tweets/{{this.tweet_id}}/replies" style="text-decoration: none;color: #6c757d;">
+        <p class="reply-whom">
+          回覆 <span>@{{this.tweet_user_name}}</span>
+        </p>
+        <div class="content-word">
+          <p style="margin-bottom: 8px; color: #171725;">
+            {{this.reply_content}}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+  {{/if}}
   {{/each}}
 </div>
 

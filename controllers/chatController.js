@@ -1,4 +1,5 @@
 import pool from '../middleware/databasePool.js'
+import * as chatHelpers from '../helpers/chat-helpers.js'
 
 const chatController = {
   getChatroom: async (req, res, next) => {
@@ -84,6 +85,7 @@ const chatController = {
   postReceiever: async (req, res, next) => {
     const senderId = Number(req.body.senderId)
     const receiverID = Number(req.body.receiverID)
+    await chatHelpers.checkRoom(senderId, receiverID)
     const [nowReceiver] = await pool.execute(
       `
     SELECT id, name, avatar FROM users WHERE id =?`,

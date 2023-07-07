@@ -16,16 +16,17 @@
 <div class="index-tweets d-flex justify-content-center">
   {{#each tweets}}
   {{!-- 這是modal-reply --}}
+  {{#if this.id }}
   {{>reply-modal user=../user tweet=this}}
   <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
     <div id="tweet-icon">
-      <a href="/users/{{this.user_id}}/profile">
+      <a href="/users/{{this.user_id}}/tweets">
         <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
       </a>
     </div>
     <div id="tweet-right" style="width: 528px;">
       <div class="header" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
-        <a href="/users/{{this.user_id}}/profile">
+        <a href="/users/{{this.user_id}}/tweets">
           <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
         </a>
         <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
@@ -49,27 +50,24 @@
         </div>
         <div class="d-flex like">
           {{#if this.is_liked}}
-          <button data-tweet-id="{{this.id}}" onclick="unlikeTweet(event,'{{this.id}}')">
-            <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+          <button onclick="unlikeTweet(event,'{{this.id}}')">
+            <img src=" /images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{else}}
-          <button data-tweet-id="{{this.id}}" onclick="likeTweet(event,'{{this.id}}')">
-            <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+          <button onclick="likeTweet(event,'{{this.id}}')">
+            <img src=" /images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{/if}}
-          <span data-tweet-id="{{this.id}}"
-            style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
-
+          <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
         </div>
-        <div class="d-flex hidden hidden-tooltip">
-          <span class="tooltiptext">hidden</span>
+        <div class="d-flex hidden">
           <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
             <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
               <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
             </button>
           </form>
         </div>
-        <div class="d-flex rating" id="rating-{{this.id}}" style="color: #ffd700">
+        <div class="d-flex rating" id="rating-{{this.id}}">
           <span class="star" data-rating="1">&#9734;</span>
           <span class="star" data-rating="2">&#9734;</span>
           <span class="star" data-rating="3">&#9734;</span>
@@ -79,6 +77,34 @@
       </div>
     </div>
   </div>
+  {{else}}
+  <div class="d-flex each-tweet">
+    <div id="tweet-icon">
+      <a href="/users/{{this.reply_user_id}}/profile">
+        <img src="{{this.reply_user_avatar}}" width="50" height="50" class="rounded-circle" />
+      </a>
+    </div>
+    <div id="tweet-right" style="width: 528px">
+      <div class="header">
+        <a href="/users/{{this.reply_user_id}}/profile">
+          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{reply_user_name}}</span>
+        </a>
+        <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
+          class="text-muted">．{{relativeTimeFromNow this.reply_created_at}}</span>
+      </div>
+      <a href="/tweets/{{this.tweet_id}}/replies" style="text-decoration: none;color: #6c757d;">
+        <p class="reply-whom">
+          回覆 <span>@{{this.tweet_user_name}}</span>
+        </p>
+        <div class="content-word">
+          <p style="margin-bottom: 8px; color: #171725;">
+            {{this.reply_content}}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+  {{/if}}
   {{/each}}
 </div>
 
