@@ -50,24 +50,23 @@
         </div>
         <div class="d-flex like">
           {{#if this.is_liked}}
-          <button onclick="unlikeTweet(event,'{{this.id}}')">
-            <img src=" /images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+          <button data-tweet-id="{{this.id}}" onclick="unlikeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{else}}
-          <button onclick="likeTweet(event,'{{this.id}}')">
-            <img src=" /images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+          <button data-tweet-id="{{this.id}}" onclick="likeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
           </button>
           {{/if}}
-          <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>
+          <span data-tweet-id="{{this.id}}" style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>          
         </div>
-        <div class="d-flex hidden">
-          <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
-            <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
-              <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
-            </button>
-          </form>
+        <div class="d-flex hidden hidden-tooltip">
+          <span class="tooltiptext">hidden</span>
+          <button onclick="hideTweet(event, '{{this.id}}')">
+            <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
+          </button>
         </div>
-        <div class="d-flex rating" id="rating-{{this.id}}">
+        <div class="d-flex rating" id="rating-{{this.id}}" style="color: #ffd700">
           <span class="star" data-rating="1">&#9734;</span>
           <span class="star" data-rating="2">&#9734;</span>
           <span class="star" data-rating="3">&#9734;</span>
@@ -108,66 +107,4 @@
   {{/each}}
 </div>
 
-
-<script>
-  function changePageTitle(title) {
-      document.getElementById('pageTitle').textContent = title;
-    }
-  function likeTweet(event, tweetId) {
-    event.preventDefault()
-    fetch(`/tweets/${tweetId}/like`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tweetId: tweetId }),
-    })
-      .then(response => {
-        if (response.ok) {
-          const likeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
-          likeButton.innerHTML = `
-          <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
-        `;
-          likeButton.onclick = event => unlikeTweet(event, tweetId)
-          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
-          const count = parseInt(countElement.textContent)
-          countElement.textContent = count + 1
-          console.log('Tweet liked successfully')
-        } else {
-          throw new Error('Failed to like tweet')
-        }
-      })
-      .catch(error => {
-        console.error('Error liking tweet:', error.message)
-      })
-  }
-
-  function unlikeTweet(event, tweetId) {
-    event.preventDefault()
-    fetch(`/tweets/${tweetId}/unlike`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tweetId: tweetId }),
-    })
-      .then(response => {
-        if (response.ok) {
-          const unlikeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
-          unlikeButton.innerHTML = `
-          <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
-        `;
-          unlikeButton.onclick = event => likeTweet(event, tweetId)
-          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
-          const count = parseInt(countElement.textContent)
-          countElement.textContent = count - 1
-          console.log('Tweet unliked successfully')
-        } else {
-          throw new Error('Failed to unlike tweet')
-        }
-      })
-      .catch(error => {
-        console.error('Error unliking tweet:', error.message)
-      })
-  }
-</script>
+<script src="/javascripts/indexPart.js"></script>

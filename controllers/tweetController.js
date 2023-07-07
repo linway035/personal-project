@@ -214,8 +214,6 @@ const tweetController = {
       return dateB - dateA
     })
 
-    console.log(sortedArray)
-
     res.render('tweets', {
       tweets: sortedArray,
       user: currentUserData,
@@ -585,7 +583,8 @@ const tweetController = {
         `,
         [currentUserID, tweetId]
       )
-      res.redirect('back')
+      // res.redirect('back')
+      res.status(200).json({ message: '推文已隱藏' })
     } catch (error) {
       next(error)
     }
