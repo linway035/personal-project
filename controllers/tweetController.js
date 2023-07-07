@@ -451,7 +451,7 @@ const tweetController = {
   },
   postReply: async (req, res, next) => {
     try {
-      const tweetId = req.params.id
+      const tweetId = Number(req.params.id)
       const currentUserID = res.locals.userId
       const content = req.body.comment
       if (!content) {
@@ -464,7 +464,8 @@ const tweetController = {
       VALUES (?,?,?,?,?)`,
         [tweetId, currentUserID, content, null, tweetId]
       ) //parent_id,path,PENDING
-      res.redirect('back')
+      // res.redirect('back')
+      res.status(200).json({ message: '回覆成功' })
     } catch (error) {
       next(error)
     }
@@ -562,7 +563,7 @@ const tweetController = {
           await Promise.all(insertPromises)
         }
         await connection.commit()
-        res.redirect('back')
+        res.json({ message: '貼文成功' })
       } catch (error) {
         await connection.rollback()
         throw error

@@ -62,11 +62,26 @@
     }
 
   modalPostForm.addEventListener('submit', function onFormSubmit(event) {
+      event.preventDefault();
       if (!modalPostForm.checkValidity()) {
-        event.preventDefault()
-        event.stopPropagation()
+        event.stopPropagation();
         postErrText.innerHTML = '內容不可空白!'
         postErrSection.classList.remove("err-sec")
+      } else {
+        const formData = new FormData(modalPostForm);
+        fetch('/tweets', {
+          method: 'POST',
+          body: formData,
+        })
+          .then(response => response.json())
+          .then(data => {
+            const postModal = document.getElementById('post-modal')
+            const modal = bootstrap.Modal.getInstance(postModal)
+            modal.hide()
+          })
+          .catch(error => {
+            console.error(error)
+          })
       }
     })
 </script>
@@ -101,4 +116,13 @@
     }
 
   })
+</script>
+
+<script>
+  const postModal = document.getElementById('post-modal'); // modal 的 HTML 元素
+  const descriptionInput = document.getElementById('description'); // 輸入框的 HTML 元素
+
+  postModal.addEventListener('show.bs.modal', function () {
+    descriptionInput.value = ''; // 清空輸入框的值
+  });
 </script>
