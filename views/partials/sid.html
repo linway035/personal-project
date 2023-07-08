@@ -1,78 +1,219 @@
-<head>
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-    crossorigin="anonymous"
-  />
-  <link rel="stylesheet" href="/stylesheets/style.css" />
-</head>
-
-<header class="p-3 mb-3 border-bottom">
-  <div class="container">
+<div
+  class="modal fade"
+  id="reply-modal-23"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="replyModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" style="position: relative">
     <div
-      class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
+      class="modal-content"
+      style="
+        width: 634px;
+        border-radius: 14px;
+        position: absolute;
+        top: 30px;
+        left: -119px;
+      "
     >
-      <a
-        href="/"
-        class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
-      >
-        <svg
-          class="bi me-2"
-          width="40"
-          height="32"
-          role="img"
-          aria-label="Bootstrap"
-        >
-          <use xlink:href="#bootstrap"></use>
-        </svg>
-      </a>
-      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 ms-lg-auto">
-        <input
-          type="search"
-          class="form-control"
-          placeholder="Search..."
-          aria-label="Search"
-        />
-      </form>
-      <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="#" class="nav-link px-2 link-dark">Messages</a></li>
-        <li><a href="#" class="nav-link px-2 link-dark">Follows</a></li>
-      </ul>
-
-      <div class="dropdown text-end">
-        <a
-          href="#"
-          class="d-block link-dark text-decoration-none dropdown-toggle"
-          id="dropdownUser1"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
+      <div class="modal-header" style="width: 634px; height: 56px">
+        <a data-bs-dismiss="modal">
           <img
-            src="https://github.com/mdo.png"
-            alt="mdo"
-            width="32"
-            height="32"
-            class="rounded-circle"
+            src="/images/icons/icon-danger.png"
+            alt=""
+            style="width: 25px; height: 25px"
           />
         </a>
-        <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-          <li><a class="dropdown-item" href="#">New project...</a></li>
-          <li><a class="dropdown-item" href="#">Settings</a></li>
-          <li><a class="dropdown-item" href="#">Profile</a></li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-          <li><a class="dropdown-item" href="#">Sign out</a></li>
-        </ul>
       </div>
+      <div class="modal-reply-tweet-main d-flex m-3">
+        <div class="modal-reply-tweet-avatar">
+          <img
+            src="https://pbs.twimg.com/profile_images/1564101520043479043/eJpWqka2_400x400.jpg"
+            class="rounded-circle"
+            style="width: 50px; height: 50px"
+          />
+          <hr
+            style="
+              width: 2px;
+              height: 86px;
+              border-right: solid #b5b5be;
+              position: absolute;
+              left: 39px;
+              top: 116px;
+            "
+          />
+        </div>
+        <div
+          class="modal-reply-tweet-text"
+          style="max-width: 90%; margin-left: 13px"
+        >
+          <span
+            class="modal-reply-tweet-name"
+            style="
+              font-size: 16px;
+              font-weight: 700;
+              line-height: 26px;
+              margin-right: 8px;
+            "
+            >Taylor Swift</span
+          >
+          <span
+            style="
+              font-size: 14px;
+              font-weight: 400;
+              line-height: 22px;
+              color: #6c757d;
+            "
+          >
+            11 天前</span
+          >
+          <br />
+          <p
+            class="modal-reply-tweet-description"
+            style="
+              word-wrap: break-word;
+              word-break: normal;
+              margin-top: 10px;
+              font-size: 16px;
+              font-weight: 400;
+              color: #171725;
+            "
+          >
+            Ahhhhh Detroit that was so much fun!! First time I performed at Ford
+            Field was singing the anthem there in 2006 and I remember thinking
+            it felt impossible for a place to be that big, I was sooo insanely
+            nervous
+          </p>
+          <small
+            style="
+              font-weight: 400;
+              font-size: 14px;
+              line-height: 22px;
+              color: #6c757d;
+            "
+            >回覆給 <span style="color: #43bffd">@Taylor Swift</span></small
+          >
+        </div>
+      </div>
+      <form
+        class="modal-tweet-post"
+        action="/tweets/23/replies"
+        method="POST"
+        id="reply-user-modal"
+        novalidate=""
+      >
+        <div class="modal-body d-flex" id="post-modal-body">
+          <div class="modal-avatar">
+            <img
+              style="
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+                margin-top: -30px;
+              "
+              src="https://pbs.twimg.com/profile_images/1564101520043479043/eJpWqka2_400x400.jpg"
+              alt="modal-avatar"
+            />
+          </div>
+          <div class="modal-input">
+            <textarea
+              class="textarea border border-0 m-2"
+              id="reply-textarea"
+              name="comment"
+              style="
+                font-size: 16px;
+                resize: none;
+                height: 192px;
+                outline: none;
+                color: #6c757d;
+                line-height: 26px;
+                font-weight: 400;
+              "
+              type="text"
+              cols="65"
+              rows="5"
+              placeholder="Tweet your reply!"
+              maxlength="140"
+              onkeyup="wordsTotal()"
+              required=""
+            ></textarea>
+          </div>
+        </div>
+        <div class="d-flex" style="align-items: center; position: relative">
+          <div
+            id="reply-err-section"
+            class="err-sec"
+            style="
+              display: inline-block;
+              margin-left: 360px;
+              margin-right: 20px;
+              align-items: center;
+              position: absolute;
+              top: -8px;
+              left: 74px;
+            "
+          >
+            <span
+              class="invalid-feedback-modal"
+              id="reply-err-text"
+              style="
+                font-family: 'Noto Sans TC';
+                font-style: normal;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 15px;
+                color: #fc5a5a;
+              "
+            >
+              內容不可空白
+            </span>
+          </div>
+          <div>
+            <button
+              type="submit"
+              class="setting-btn my-2"
+              id="#submit-btn"
+              style="
+                display: inline-block;
+                font-weight: 400;
+                font-size: 16px;
+                line-height: 24px;
+                border: none;
+                width: 64px;
+                height: 40px;
+                background: #43bffd;
+                border-radius: 50px;
+                padding: 10px 15px;
+                margin-left: 16px;
+                margin-right: 16px;
+                position: relative;
+                left: 530px;
+              "
+            >
+              Reply
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
-</header>
+  <script>
+    const replyUserModal = document.getElementById('reply-user-modal')
+    const replyErrSection = document.getElementById('reply-err-section')
+    const replyTextarea = document.getElementById('reply-textarea')
 
-<script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-  crossorigin="anonymous"
-></script>
+    replyTextarea.addEventListener('keydown', function keydown(event) {
+      replyErrSection.classList.add('err-sec')
+    })
+
+    replyUserModal.addEventListener('submit', function onFormSubmit(event) {
+      const replyUserModal = document.getElementById('reply-user-modal')
+      if (!replyUserModal.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+        replyErrSection.classList.remove('err-sec')
+      }
+    })
+  </script>
+</div>
