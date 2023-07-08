@@ -180,7 +180,8 @@ const tweetController = {
       return tweet
     })
 
-    const [replies, others] = await await pool.execute(`
+    const [replies, others] = await pool.execute(
+      `
     SELECT
     r.user_id AS reply_user_id,
     u.name AS reply_user_name,
@@ -198,13 +199,15 @@ const tweetController = {
         INNER JOIN users AS tu ON t.user_id = tu.id
         INNER JOIN followships AS f ON t.user_id = f.following_id
     WHERE
-        (f.follower_id = 17 OR t.user_id = 17) -- 替換 YOUR_USER_ID 為您的使用者 ID
+        (f.follower_id = ? OR t.user_id = ?)
         AND r.is_active = 1
         AND t.is_active = 1
         AND f.is_active = 1
     ORDER BY
     r.created_at DESC;
-    `)
+    `,
+      [currentUserID, currentUserID]
+    )
 
     const combinedArray = [...tweetsWithImages, ...replies]
 
@@ -454,6 +457,7 @@ const tweetController = {
       const tweetId = Number(req.params.id)
       const currentUserID = res.locals.userId
       const content = req.body.comment
+      console.log(content)
       if (!content) {
         req.flash('error_messages', '內容不可空白')
         res.redirect('back')
@@ -464,8 +468,8 @@ const tweetController = {
       VALUES (?,?,?,?,?)`,
         [tweetId, currentUserID, content, null, tweetId]
       ) //parent_id,path,PENDING
-      // res.redirect('back')
-      res.status(200).json({ message: '回覆成功' })
+      res.redirect('back')
+      // res.status(200).json({ message: '回覆成功' })
     } catch (error) {
       next(error)
     }

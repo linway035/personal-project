@@ -12,7 +12,8 @@ const followshipController = {
         ON DUPLICATE KEY UPDATE is_active = 1, updated_at = NOW()`,
         [currentUserID, followingId]
       )
-      res.redirect('back')
+      // res.redirect('back')
+      res.json({ message: 'follow' })
     } catch (error) {
       next(error)
     }
@@ -35,7 +36,8 @@ const followshipController = {
         )`,
         [currentUserID, followingId]
       )
-      res.redirect('back')
+      // res.redirect('back')
+      res.json({ message: 'unfollow' })
     } catch (error) {
       next(error)
     }
