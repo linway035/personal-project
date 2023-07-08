@@ -459,8 +459,10 @@ const tweetController = {
       const content = req.body.comment
       console.log(content)
       if (!content) {
+        console.log('no content')
         req.flash('error_messages', '內容不可空白')
-        res.redirect('back')
+        return res.redirect('back')
+        // res.status(500).json({ message: '回覆失敗' })
       }
       await pool.execute(
         `
