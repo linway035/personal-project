@@ -50,36 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     .join('')}
                 </div>
               </div>
-              <div class="actions d-flex">
-                <div class="d-flex reply" style="margin-right: 10px;">
-                  <button data-bs-toggle="modal" data-bs-target="#reply-modal-${
-                    tweet.id
-                  }">
-                    <img src="/images/icons/outlined-reply.png" alt="replies" style="width:16px; height: 16px">
-                  </button>
-                  <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">${
-                    tweet.reply_count
-                  }</span>
-                </div>
-                <div class="d-flex like">
-                  ${
-                    tweet.is_liked
-                      ? `
-                    <button data-tweet-id="${tweet.id}" onclick="unlikeTweet(event,'${tweet.id}')">
-                      <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
-                    </button>
-                    `
-                      : `
-                    <button data-tweet-id="${tweet.id}" onclick="likeTweet(event,'${tweet.id}')">
-                      <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
-                    </button>
-                    `
-                  }
-                  <span data-tweet-id="${tweet.id}" 
-                  style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">
-                  ${tweet.like_count}</span>
-                </div>
-              </div>
             </div>
           </div>
         `
