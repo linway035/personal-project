@@ -1117,17 +1117,27 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 .image-container {
   display: flex;
   margin-top: 10px;
-  /* justify-content: space-between; */
+  flex-wrap: wrap;
 }
 
 .image-item {
   flex-grow: 1;
-  max-width: calc(520px / 2);
+  max-width: 520px; /* 1 張圖片時的寬度 */
   margin-right: 5px;
 }
 
 .image-item:last-child {
   margin-right: 0;
+}
+
+/* 2 張圖片時的樣式 */
+.image-container.images-2 .image-item {
+  max-width: 260px;
+}
+
+/* 3 張圖片時的樣式 */
+.image-container.images-3 .image-item {
+  max-width: 170px;
 }
 
 /* chatroom */
