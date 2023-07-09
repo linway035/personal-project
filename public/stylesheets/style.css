@@ -1,4 +1,5 @@
 @import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
+@import url('https://fonts.googleapis.com/css2?family=Courgette&family=Playball&display=swap');
 
 body {
   font-family: 'Noto Sans TC', sans-serif;
@@ -1183,23 +1184,27 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 .hidden-tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
 .hidden-tooltip .tooltiptext {
+  font-family: 'Courgette', cursive;
+  font-size: 0.5rem;
   visibility: hidden;
-  width: 60px;
-  background-color: black;
-  color: #fff;
+  white-space: nowrap; /* Prevent line breaks */
+  background-color: white;
+  color: black;
   text-align: center;
   border-radius: 6px;
   bottom: 100%;
-  left: 50%;
+  left: -300%;
 
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
+  /* Add box shadow for a border-like effect */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  padding: 4px;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
