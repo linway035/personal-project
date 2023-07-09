@@ -21,11 +21,11 @@
       Edit Profile
     </button>
     {{else if userProfile.is_following }}
-    <form action="/followships/{{userProfile.id}}" method="POST" style="display: contents;">
+    <form action="/followships/profile/{{userProfile.id}}" method="POST" style="display: contents;">
       <button type="submit" class="following-btn float-end" style="margin-top: 216px; margin-right: 16px;">Following</button>
     </form>
     {{else}}
-    <form action="/followships" method="POST" style="display: contents;">
+    <form action="/followships/profile" method="POST" style="display: contents;">
       <input type="text" name="id" value="{{userProfile.id}}" style="display: none;">
       <button type="submit" class="follow-btn float-end" style="margin-top: 216px; margin-right: 16px;">Follow</button>
     </form>
