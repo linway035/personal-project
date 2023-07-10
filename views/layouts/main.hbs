@@ -18,8 +18,7 @@
       method: 'GET',
     })
       .then(response => {
-        localStorage.removeItem('userId')
-        localStorage.removeItem('name')
+        localStorage.clear()
         window.location.href = '/users/signin'
       })
       .catch(error => {
