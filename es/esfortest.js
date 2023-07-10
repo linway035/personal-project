@@ -72,3 +72,27 @@ async function deleteIndex(indexName) {
 
 // const indexName = 'game-of-thrones'
 // deleteIndex(indexName).catch(console.log)
+
+// async function searchByElastic(keywords) {
+//   const matchData = keywords.map(ele => ({ match: { content: ele } }))
+//   const data = await client.search({
+//     index: 'search-wawa',
+//     // index: process.env.ELASTIC_SEARCH_INDEX || 'search-chichi',
+//     query: {
+//       bool: {
+//         must: matchData,
+//       },
+//     },
+//   })
+
+//   // console.log('1',data);
+//   // console.log('2',data.hits.hits)
+
+//   const checkData = elasticSearchDataSchema.parse(data)
+//   const hitsArray = checkData.hits.hits
+//   const articleId = hitsArray.map(item => {
+//     return parseInt(item._source.id.split('articles_')[1])
+//   })
+//   console.log('articleId->', articleId)
+//   return articleId
+// }

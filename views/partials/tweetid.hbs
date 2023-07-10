@@ -11,12 +11,12 @@
   <div class="MainReplyTweet" style="margin: 16px;">
     <div class="post-user d-flex" style="gap: 8px;">
       <div>
-        <a href="/users/{{tweet.user_id}}/tweets">
+        <a href="/users/{{tweet.user_id}}/profile">
           <img src="{{tweet.avatar}}" alt="" width="50px" height="50px" class="rounded-circle" />
         </a>
       </div>
       <div>
-        <a href="/users/{{tweet.user_id}}/tweets">
+        <a href="/users/{{tweet.user_id}}/profile">
           <div class="popular-name">{{tweet.name}}</div>
           <small class="small-account">@{{tweet.name}}</small>
         </a>
@@ -26,7 +26,7 @@
       <p id="single-tweets-content-word">
         {{tweet.content}}
       </p>
-      <div class="image-container">
+      <div class="image-container images-{{tweet.images.length}}">
         {{#each tweet.images}}
         <img src="{{this}}" alt="Image" class="image-item">
         {{/each}}

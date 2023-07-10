@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const tweetHTML = `
           <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
             <div id="tweet-icon">
-              <a href="/users/${tweet.user_id}/tweets">
+              <a href="/users/${tweet.user_id}/profile">
                 <img src="${
                   tweet.avatar
                 }" alt="" width="50" height="50" class="rounded-circle" />
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
               <div class="header" onclick="window.open('/tweets/${
                 tweet.id
               }/replies','_self');" style="cursor: pointer;">
-                <a href="/users/${tweet.user_id}/tweets">
+                <a href="/users/${tweet.user_id}/profile">
                   <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">${
                     tweet.name
                   }</span>
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tweet.id
               }/replies','_self');" style="cursor: pointer;">
                 ${tweet.content}
-                <div class="image-container">
+                <div class="image-container images-${tweet.images.length}">
                   ${tweet.images
                     .map(
                       image =>

@@ -1,5 +1,6 @@
 import pool from '../middleware/databasePool.js'
 import { localFileHandler } from '../helpers/file-helpers.js'
+import * as es from '../es/es.js'
 
 const getUser = async (req, res, next) => {
   const currentUserID = res.locals.userId
@@ -800,6 +801,55 @@ const tweetController = {
       [currentUserID, currentUserID]
     )
     res.status(200).json(follows)
+  },
+  getTweetsByElasticSearch: async (req, res, next) => {
+    const query = req.query.q
+    const searchkeywords = query.split(' ')
+    console.log('query', query)
+    console.log('searchkeywors', searchkeywords)
+    const tweetIds = await es.searchByElastic(searchkeywords)
+
+    //query 和 execute結果不同
+    const [data, fields] = await pool.query(
+      `
+    SELECT
+      tweets.*,
+      users.name,
+      users.avatar,
+      GROUP_CONCAT(tweet_images.image_path) AS images
+    FROM
+      tweets
+    LEFT JOIN
+      tweet_images ON tweets.id = tweet_images.tweet_id
+    JOIN
+      users ON tweets.user_id = users.id
+    WHERE
+      tweets.id IN (?) AND tweets.is_active = 1
+    GROUP BY
+      tweets.id, tweets.content, users.name, users.avatar
+    ORDER BY
+      FIELD(tweets.id, ?);
+    `,
+      [tweetIds, tweetIds]
+    )
+    console.log('data', data)
+
+    const tweetsWithImages = data.map(tweet => {
+      if (tweet.images) {
+        tweet.images = tweet.images.split(',').map(image => {
+          if (image.startsWith('https://')) {
+            return image
+          } else {
+            return `\\${image}`
+          }
+        })
+      } else {
+        tweet.images = []
+      }
+      return tweet
+    })
+    // console.log(tweetsWithImages)
+    res.json({ tweets: tweetsWithImages, q: query })
   },
 }
 export default tweetController
