@@ -851,5 +851,32 @@ const tweetController = {
     // console.log(tweetsWithImages)
     res.json({ tweets: tweetsWithImages, q: query })
   },
+  getUsersByElasticSearch: async (req, res, next) => {
+    const currentUserID = res.locals.userId
+    const query = req.query.q.trim()
+
+    let userSearchResults = []
+    if (query.length > 0) {
+      const userIds = await es.searchUserByElastic(query)
+      if (userIds.length > 0) {
+        const [results, fields] = await pool.query(
+          `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
+      CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
+      FROM users
+      LEFT JOIN (
+        SELECT follower_id, following_id, 1 AS is_following
+        FROM followships
+        WHERE follower_id = ? AND followships.is_active=1
+      ) AS followships ON followships.following_id = users.id
+      WHERE id in (?)
+      ORDER BY field(users.id,?);
+      `,
+          [currentUserID, currentUserID, userIds, userIds]
+        )
+        userSearchResults = results
+      }
+    }
+    res.json({ userSearchResults, q: query })
+  },
 }
 export default tweetController

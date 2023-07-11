@@ -5,7 +5,6 @@ import chats from './modules/chats.js'
 import followships from './modules/followships.js'
 
 import tweetController from '../controllers/tweetController.js'
-import esController from '../controllers/esController.js'
 import generalErrorHandler from '../middleware/error-handler.js'
 import authenticate from '../middleware/auth.js'
 const router = Router()
@@ -15,8 +14,12 @@ router.use('/tweets', tweets)
 router.use('/chats', chats)
 router.use('/followships', followships)
 
-router.get('/es', esController.api)
-router.get('/search/people/api', authenticate, tweetController.getSearchUserAPI)
+// router.get('/search/people/api', authenticate, tweetController.getSearchUserAPI)
+router.get(
+  '/search/people/api',
+  authenticate,
+  tweetController.getUsersByElasticSearch
+)
 router.get('/search/people', authenticate, tweetController.getSearchUser)
 // router.get('/search/api', authenticate, tweetController.getSearchTweetAPI)
 router.get(

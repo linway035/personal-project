@@ -1,0 +1,148 @@
+{
+  "mappings": {
+    "properties": {
+      "Table": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "_timestamp": {
+        "type": "date"
+      },
+      "avatar": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "bio": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "content": {
+        "type": "text",
+        "fields": {
+          "icu": {
+            "type": "text",
+            "analyzer": "icu_analyzer"
+          },
+          "standard": {
+            "type": "text",
+            "analyzer": "standard"
+          }
+        }
+      },
+      "cover": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "created_at": {
+        "type": "date"
+      },
+      "email": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "filename": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "follower_id": {
+        "type": "long"
+      },
+      "following_id": {
+        "type": "long"
+      },
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "image_path": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "is_active": {
+        "type": "long"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "password": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "provider": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "rating": {
+        "type": "long"
+      },
+      "size": {
+        "type": "long"
+      },
+      "tweet_id": {
+        "type": "long"
+      },
+      "updated_at": {
+        "type": "date"
+      },
+      "user_id": {
+        "type": "long"
+      }
+    }
+  }
+}

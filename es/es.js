@@ -21,23 +21,66 @@ const client = new Client({
 export async function searchByElastic(keywords) {
   const matchData = keywords.map(ele => ({ match: { content: ele } }))
   const results = await client.search({
-    size: 100, //預設是10
-    index: 'search-rdsproductiontest',
+    size: 50, //預設是10
+    index: 'search-rdsproductiontest_v2',
     body: {
       query: {
         bool: {
-          must: matchData,
+          should: matchData,
+          minimum_should_match: 1,
+          analyzer: 'icu_analyzer',
         },
       },
     },
   })
 
   const data = results.hits.hits
-  const tweetId = data.map(item => {
+  const tweetIds = data.map(item => {
     return parseInt(item._source.id.split('tweets_')[1])
   })
-  console.log('tweetId->', tweetId)
-  return tweetId
+  console.log('tweetIds->', tweetIds)
+  const filteredTweetIds = tweetIds.filter(id => !isNaN(id))
+  return filteredTweetIds
 }
 
-// read().catch(console.log) //錯誤時才會走到.catch(console.log)
+export async function searchUserByElastic(keyword) {
+  const results = await client.search({
+    size: 20, //預設是10
+    index: 'search-rdsproductiontest',
+    body: {
+      query: {
+        bool: {
+          should: [
+            {
+              fuzzy: {
+                name: {
+                  value: `${keyword}`,
+                  fuzziness: 2,
+                  max_expansions: 20,
+                  prefix_length: 0,
+                  transpositions: true,
+                },
+              },
+            },
+            {
+              wildcard: {
+                name: {
+                  value: `*${keyword}*`,
+                  case_insensitive: true,
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  })
+
+  const data = results.hits.hits
+  const userIds = data.map(item => {
+    return parseInt(item._source.id.split('users_')[1])
+  })
+  console.log('userIds->', userIds)
+  const filteredUserIds = userIds.filter(id => !isNaN(id))
+  return filteredUserIds
+}
