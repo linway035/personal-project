@@ -24,8 +24,22 @@ export async function searchByElastic(keywords) {
     index: 'search-rdsproductiontest',
     body: {
       query: {
-        match: {
-          'content.icu': `${keywords}`,
+        bool: {
+          should: [
+            {
+              match: {
+                'content.icu': `${keywords}`,
+              },
+            },
+            {
+              match: {
+                content: {
+                  query: `${keywords}`,
+                  analyzer: 'your_custom_analyzer',
+                },
+              },
+            },
+          ],
         },
       },
     },
