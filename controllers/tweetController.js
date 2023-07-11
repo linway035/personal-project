@@ -804,10 +804,16 @@ const tweetController = {
   },
   getTweetsByElasticSearch: async (req, res, next) => {
     const query = req.query.q
+    if (!query || query.trim() === '') {
+      return res.json({ tweets: [], q: query })
+    }
     const searchkeywords = query.split(' ')
     console.log('query', query)
     console.log('searchkeywors', searchkeywords)
     const tweetIds = await es.searchByElastic(searchkeywords)
+    if (tweetIds.length === 0) {
+      return res.json({ tweets: [], q: query })
+    }
 
     //query 和 execute結果不同
     const [data, fields] = await pool.query(
@@ -832,7 +838,7 @@ const tweetController = {
     `,
       [tweetIds, tweetIds]
     )
-    console.log('data', data)
+    // console.log('data', data)
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {

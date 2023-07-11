@@ -19,22 +19,20 @@ const client = new Client({
 
 // console.log('===============')
 export async function searchByElastic(keywords) {
-  const matchData = keywords.map(ele => ({ match: { content: ele } }))
   const results = await client.search({
     size: 50, //預設是10
-    index: 'search-rdsproductiontest_v2',
+    index: 'search-rdsproductiontest',
     body: {
       query: {
-        bool: {
-          should: matchData,
-          minimum_should_match: 1,
-          analyzer: 'icu_analyzer',
+        match: {
+          'content.icu': `${keywords}`,
         },
       },
     },
   })
 
   const data = results.hits.hits
+  console.log(data)
   const tweetIds = data.map(item => {
     return parseInt(item._source.id.split('tweets_')[1])
   })
@@ -77,6 +75,7 @@ export async function searchUserByElastic(keyword) {
   })
 
   const data = results.hits.hits
+  console.log(data)
   const userIds = data.map(item => {
     return parseInt(item._source.id.split('users_')[1])
   })
