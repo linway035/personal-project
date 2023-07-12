@@ -158,7 +158,7 @@ const tweetController = {
         SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
     )
     AND (tweets.user_id IN (
-      SELECT following_id FROM followships WHERE follower_id = ?
+      SELECT following_id FROM followships WHERE follower_id = ? AND followships.is_active=1
     ) OR tweets.user_id = ?)
     GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
     ORDER BY tweets.updated_at DESC
