@@ -7,7 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\" --fix",
-    "dev": "nodemon app.js",
+    "start": "nodemon app.js",
+    "dev": "export NODE_ENV=develop && nodemon app.js",
+    "production": "export NODE_ENV=production && nodemon app.js",
     "socket": "cd socket/ && nodemon appSocket.js",
     "model": "npx sequelize db:migrate",
     "seed": "npx sequelize db:seed:all",
