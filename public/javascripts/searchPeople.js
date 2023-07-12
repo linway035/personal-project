@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const userHTML = `
             <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
               <div id="tweet-icon">
-                <a href="/users/${user.id}/tweets">
+                <a href="/users/${user.id}/profile">
                   <img src="${
                     user.avatar
                   }" alt="" width="50" height="50" class="rounded-circle" />
