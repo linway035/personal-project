@@ -1,6 +1,16 @@
-function changePageTitle(title) {
-  document.getElementById('pageTitle').textContent = title
-}
+// 獲取當前路徑
+const currentPath = window.location.pathname
+
+// 獲取導航連結元素
+const navLinks = document.querySelectorAll('.nav-link')
+
+// 迭代導航連結元素，根據路徑設置 active class
+navLinks.forEach(function (link) {
+  if (link.getAttribute('href') === currentPath) {
+    link.classList.add('active')
+  }
+})
+
 function likeTweet(event, tweetId) {
   console.log(tweetId, typeof tweetId)
   event.preventDefault()

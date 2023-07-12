@@ -1,14 +1,15 @@
 <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-  <h1 id="pageTitle" class="fw-bold fs-4 text-dark ms-3">Home</h1>
-  <nav class="d-flex">
-    <div class="mx-2">
-      <a class="text-decoration-none" href="/tweets/foryou" style="color: #000080;"
-        onclick="changePageTitle('Recommend')">For You</a>
-    </div>
-    <div class="mx-2">
-      <a class="text-decoration-none" href="/home" style="color: #000080;"
-        onclick="changePageTitle('Latest')">Following</a>
-    </div>
+
+  <nav class="nav-links">
+    <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="ex3-tab-1" data-mdb-toggle="tab" href="/tweets/foryou" role="tab" aria-controls="ex3-tabs-1" aria-selected="true">For you</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="ex3-tab-3" data-mdb-toggle="tab" href="/home" role="tab"
+          aria-controls="ex3-tabs-3" aria-selected="false">Following</a>
+      </li>
+    </ul>
   </nav>
 </div>
 
