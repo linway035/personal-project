@@ -8,8 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\" --fix",
     "start": "nodemon app.js",
-    "dev": "export NODE_ENV=develop && nodemon app.js",
-    "production": "export NODE_ENV=production && nodemon app.js",
+    "dev": "cross-env NODE_ENV=develop nodemon app.js",
+    "production": "cross-env NODE_ENV=production nodemon app.js",
     "socket": "cd socket/ && nodemon appSocket.js",
     "model": "npx sequelize db:migrate",
     "seed": "npx sequelize db:seed:all",
@@ -35,6 +35,7 @@
     "socket.io": "^4.7.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
