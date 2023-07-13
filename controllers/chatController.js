@@ -15,9 +15,6 @@ const chatController = {
       user: currentUserData,
     })
   },
-  getChatroomqq: async (req, res, next) => {
-    res.render('chatqq')
-  }, //just for test
   getRoomList: async (req, res, next) => {
     const currentUserID = res.locals.userId
     const [chatUserLists] = await pool.execute(
