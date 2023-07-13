@@ -41,6 +41,11 @@ module.exports = {
         defaultValue: Sequelize.literal('NOW()'),
       },
     })
+    await queryInterface.addConstraint('tweet_likes', {
+      fields: ['user_id', 'tweet_id'],
+      type: 'unique',
+      name: 'unique_user_tweet',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('tweet_likes')

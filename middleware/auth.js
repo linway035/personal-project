@@ -1,5 +1,4 @@
-import pool from './databasePool.js'
-import { signJWT, verifyJWT } from './JWT.js'
+import { verifyJWT } from './JWT.js'
 
 async function authenticate(req, res, next) {
   try {

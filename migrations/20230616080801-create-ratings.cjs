@@ -50,6 +50,11 @@ module.exports = {
         },
       },
     })
+    await queryInterface.addConstraint('ratings', {
+      fields: ['user_id', 'tweet_id'],
+      type: 'unique',
+      name: 'unique_ratings',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('ratings')

@@ -41,6 +41,11 @@ module.exports = {
         defaultValue: Sequelize.literal('NOW()'),
       },
     })
+    await queryInterface.addConstraint('followships', {
+      fields: ['follower_id', 'following_id'],
+      type: 'unique',
+      name: 'unique_followships',
+    })
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('followships')
