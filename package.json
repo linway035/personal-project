@@ -7,19 +7,40 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint \"**/*.js\" --fix",
-    "dev": "nodemon app.js"
+    "start": "nodemon app.js",
+    "dev": "cross-env NODE_ENV=develop nodemon app.js",
+    "production": "cross-env NODE_ENV=production nodemon app.js",
+    "socket": "cd socket/ && nodemon appSocket.js",
+    "model": "npx sequelize db:migrate",
+    "seed": "npx sequelize db:seed:all",
+    "undo": "npx sequelize db:migrate:undo:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.8.1",
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.8",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "express-handlebars": "^5.3.5",
-    "mysql2": "^3.3.5"
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.3.5",
+    "socket.io": "^4.7.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.42.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.0",
+    "eslint-plugin-promise": "^6.1.1",
     "sequelize": "^6.32.0",
     "sequelize-cli": "^6.6.1"
   }

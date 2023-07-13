@@ -1,0 +1,81 @@
+<div style="height: 1200px;width:332px; background:white">
+  <div id="left-section">
+    <ul id="left-navs" class="nav flex-column">
+      <li class="nav-item">
+        <a href="/home" class="nav-item-content">
+          {{#ifNotCond route "home"}}
+          <img src="/images/icons/outlined-home.png" class="base-icon">
+          <span class="word">Home</span>
+          {{/ifNotCond}}
+          {{#ifCond route "home"}}
+          <img src="/images/icons/filled-home.png" class="base-icon">
+          <span class="word" style="color: #43BFFD;">Home</span>
+          {{/ifCond}}
+        </a>
+      </li>
+      {{!-- search --}}
+      <li class="nav-item">
+        <a href="/search" class="nav-item-content">
+          {{#ifNotCond route "search"}}
+          <img src="/images/icons/search.png" class="base-icon">
+          <span class="word">Search</span>
+          {{/ifNotCond}}
+          {{#ifCond route "search"}}
+          <img src="/images/icons/search-blue.png" class="base-icon">
+          <span class="word" style="color: #43BFFD;">Search</span>
+          {{/ifCond}}
+        </a>
+      </li>
+      {{!-- chat messages --}}
+      <li class="nav-item">
+        <a href="/chats" class="nav-item-content">
+          {{#ifNotCond route "messages"}}
+          <img src="/images/icons/outlined-message.png" class="base-icon">
+          <span class="word">Messages</span>
+          {{/ifNotCond}}
+          {{#ifCond route "messages"}}
+          <img src="/images/icons/filled-message.png" class="base-icon">
+          <span class="word" style="color: #43BFFD;">Messages</span>
+          {{/ifCond}}
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="/users/{{user.id}}/profile" class="nav-item-content">
+          {{#ifNotCond route "userProfile"}}
+          <img src="/images/icons/outlined-user.png" class="base-icon">
+          <span class="word">Profile</span>
+          {{/ifNotCond}}
+          {{#ifCond route "userProfile"}}
+          <img src="/images/icons/filled-user.png" class="base-icon">
+          <span class="word" style="color: #43BFFD;">Profile</span>
+          {{/ifCond}}
+        </a>
+      </li>
+      {{!-- dashboard --}}
+      {{!-- <li class="nav-item">
+        <a href="/dashboard" class="nav-item-content">
+          {{#ifNotCond route "dashboard"}}
+          <img src="/images/icons/dashboard.png" class="base-icon">
+          <span class="word">Dashboard</span>
+          {{/ifNotCond}}
+          {{#ifCond route "dashboard"}}
+          <img src="/images/icons/dashboard-blue.png" class="base-icon">
+          <span class="word" style="color: #43BFFD;">Dashboard</span>
+          {{/ifCond}}
+        </a>
+      </li> --}}
+      <li class="nav-item d-flex justify-content-center" style="height: 46px;">
+        <button type="button" class="btn btn-primary"
+          style="border-radius:50px; width:100%; background:#43BFFD; border-color:#43BFFD;font-size:20px;font-weight:400"
+          data-bs-toggle="modal" data-bs-target="#post-modal">Post</button>
+      </li>
+      <li id="logout">
+        <a href="/users/logout" style="margin-top:1.585vh; text-decoration: none; align-items: center; display:flex"
+          onclick="logout()">
+          <img src="/images/icons/outlined-logout.png" style="height:24px; margin-left:16px;">
+          <span style="margin-left:16px; font-weight:700; font-size:18px; color:#44444F">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>

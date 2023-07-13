@@ -1,0 +1,114 @@
+<div class="d-flex align-items-center justify-content-between py-3 border-bottom">
+
+  <nav class="nav-links">
+    <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="ex3-tab-1" data-mdb-toggle="tab" href="/tweets/foryou" role="tab" aria-controls="ex3-tabs-1" aria-selected="true">For you</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="ex3-tab-3" data-mdb-toggle="tab" href="/home" role="tab"
+          aria-controls="ex3-tabs-3" aria-selected="false">Following</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+
+<div class="index-tweets d-flex justify-content-center">
+  {{#each tweets}}
+  {{!-- 這是modal-reply --}}
+  {{#if this.id }}
+  {{>reply-modal user=../user tweet=this}}
+  <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
+    <div id="tweet-icon">
+      <a href="/users/{{this.user_id}}/profile">
+        <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
+      </a>
+    </div>
+    <div id="tweet-right" style="width: 528px;">
+      <div class="header" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
+        <a href="/users/{{this.user_id}}/profile">
+          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
+        </a>
+        <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
+          class="text-muted">．{{relativeTimeFromNow this.updated_at}}
+        </span>
+      </div>
+      <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
+        {{this.content}}
+        <div class="image-container images-{{this.images.length}}">
+          {{#each this.images}}
+          <img src="{{this}}" alt="Image" class="image-item">
+          {{/each}}
+        </div>
+      </div>
+      <div class="actions d-flex justify-content-between">
+        <div class="d-flex reply">
+          <button data-bs-toggle="modal" data-bs-target="#reply-modal-{{this.id}}">
+            <img src="/images/icons/outlined-reply.png" alt="replies" style="width:16px; height: 16px">
+          </button>
+          <span style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.reply_count}}</span>
+        </div>
+        <div class="d-flex like">
+          {{#if this.is_liked}}
+          <button data-tweet-id="{{this.id}}" onclick="unlikeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+          </button>
+          {{else}}
+          <button data-tweet-id="{{this.id}}" onclick="likeTweet(event,'{{this.id}}')">
+            <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+          </button>
+          {{/if}}
+          <span data-tweet-id="{{this.id}}" style="line-height: 14px; font-size:14px; font-weight:600; color: #6C757D;">{{this.like_count}}</span>          
+        </div>
+        <div class="d-flex hidden hidden-tooltip">
+          <span class="tooltiptext">Never show this tweet again</span>
+          <button onclick="hideTweet(event, '{{this.id}}')">
+            <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
+          </button>
+        </div>
+        <div class="d-flex rating hidden-tooltip" id="rating-{{this.id}}" style="color: #ffd700">
+          <span class="tooltiptext" style="white-space: wrap; width: 280px; left:-200%; font-size:0.1rem">
+            Rate and improve your recommended content! Clear with a right-click
+          </span>
+          <span class="star" data-rating="1">&#9734;</span>
+          <span class="star" data-rating="2">&#9734;</span>
+          <span class="star" data-rating="3">&#9734;</span>
+          <span class="star" data-rating="4">&#9734;</span>
+          <span class="star" data-rating="5">&#9734;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{else}}
+  <div class="d-flex each-tweet">
+    <div id="tweet-icon">
+      <a href="/users/{{this.reply_user_id}}/profile">
+        <img src="{{this.reply_user_avatar}}" width="50" height="50" class="rounded-circle" />
+      </a>
+    </div>
+    <div id="tweet-right" style="width: 528px">
+      <div class="header">
+        <a href="/users/{{this.reply_user_id}}/profile">
+          <span style="font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{reply_user_name}}</span>
+        </a>
+        <span style="font-size: 14px; line-height: 22px; font-weight: 400;color: #6C757D;"
+          class="text-muted">．{{relativeTimeFromNow this.reply_created_at}}</span>
+      </div>
+      <a href="/tweets/{{this.tweet_id}}/replies" style="text-decoration: none;color: #6c757d;">
+        <p class="reply-whom">
+          回覆 <span>@{{this.tweet_user_name}}</span>
+        </p>
+        <div class="content-word">
+          <p style="margin-bottom: 8px; color: #171725;">
+            {{this.reply_content}}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+  {{/if}}
+  {{/each}}
+</div>
+
+<script src="/javascripts/indexPart.js"></script>

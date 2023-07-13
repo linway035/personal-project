@@ -1,0 +1,49 @@
+{{!-- header --}}
+<div class="d-flex" style="height:74px;border-bottom: 1px solid #e6ecf0;">
+  <a href="/users/{{pageUserData.id}}/profile">
+    <img src="/images/icons/outlined-back.png" style="height:24px; margin-top:24px; margin-left:28px">
+  </a>
+  <div class="d-flex flex-column" style="margin-left:19px;margin-top: 21px;margin-bottom: 16px;">
+    <span style="line-height: 26px; font-weight:700; font-size:18px; color:#171725">{{pageUserData.name}}</span>
+  </div>
+</div>
+{{!-- tab --}}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link {{#ifCond route 'followers'}}active{{/ifCond}}" href="/users/{{pageUserData.id}}/followers"
+      style="padding: 13px 0;top:0">Follower</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {{#ifCond route 'followings'}}active{{/ifCond}}" href="/users/{{pageUserData.id}}/followings"
+      style="padding: 13px 0;top:0">Following</a>
+  </li>
+</ul>
+{{!-- users --}}
+{{#each users}}
+<div class="d-flex each-tweet">
+  <div id="tweet-icon">
+    <a href="/users/{{this.id}}/profile">
+      <img src="{{this.avatar}}" alt="" width="50" height="50" class="rounded-circle" />
+    </a>
+  </div>
+  <div id="tweet-right" style="width: 528px">
+    <div class="header d-flex justify-content-between">
+      <span
+        style="margin: auto 0; font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
+      {{#if this.is_following }}
+      <form action="/followships/{{this.id}}" method="POST" style="display: contents;">
+        <button type="submit" class="following-btn">Following</button>
+      </form>
+      {{else}}
+      <form action="/followships" method="POST" style="display: contents;">
+        <input type="text" name="id" value="{{this.id}}" style="display: none;">
+        <button type="submit" class="follow-btn">Follow</button>
+      </form>
+      {{/if}}
+    </div>
+    <div class="content-word" style="margin:0">
+      {{this.bio}}
+    </div>
+  </div>
+</div>
+{{/each}}
