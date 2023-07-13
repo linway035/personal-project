@@ -184,7 +184,7 @@ module.exports = {
         provider: 'native',
         email: 'wa@seed.com',
         password: await bcrypt.hash('wa', saltRounds),
-        name: 'WaForTest',
+        name: 'Wayne',
         avatar:
           'https://fakeimg.pl/200x200/AAB8C2,128/000,255/?text=Wa&font=noto',
         cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
@@ -194,7 +194,7 @@ module.exports = {
         provider: 'native',
         email: 'nba@seed.com',
         password: await bcrypt.hash('nba', saltRounds),
-        name: 'nabForTest',
+        name: 'nba fan',
         avatar:
           'https://fakeimg.pl/200x200/AAB8C2,128/000,255/?text=nba&font=noto',
         cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
@@ -204,7 +204,7 @@ module.exports = {
         provider: 'native',
         email: 'music@seed.com',
         password: await bcrypt.hash('music', saltRounds),
-        name: 'musicForTest',
+        name: 'music zealot',
         avatar:
           'https://fakeimg.pl/200x200/AAB8C2,128/000,255/?text=music&font=noto',
         cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
@@ -214,7 +214,7 @@ module.exports = {
         provider: 'native',
         email: 'pol@seed.com',
         password: await bcrypt.hash('pol', saltRounds),
-        name: 'politicForTest',
+        name: 'politic expert',
         avatar:
           'https://fakeimg.pl/200x200/AAB8C2,128/000,255/?text=pol&font=noto',
         cover: 'https://fakeimg.pl/1500x600/6495ED/6495ED',
