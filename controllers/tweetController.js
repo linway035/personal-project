@@ -808,8 +808,6 @@ const tweetController = {
       return res.json({ tweets: [], q: query })
     }
     const searchkeywords = query.split(' ')
-    console.log('query', query)
-    console.log('searchkeywors', searchkeywords)
     const tweetIds = await es.searchByElastic(searchkeywords)
     if (tweetIds.length === 0) {
       return res.json({ tweets: [], q: query })

@@ -46,7 +46,7 @@ export async function searchByElastic(keywords) {
   })
 
   const data = results.hits.hits
-  console.log(data)
+  // console.log(data)
   const tweetIds = data.map(item => {
     return parseInt(item._source.id.split('tweets_')[1])
   })
@@ -89,7 +89,7 @@ export async function searchUserByElastic(keyword) {
   })
 
   const data = results.hits.hits
-  console.log(data)
+  // console.log(data)
   const userIds = data.map(item => {
     return parseInt(item._source.id.split('users_')[1])
   })

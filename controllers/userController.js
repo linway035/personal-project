@@ -169,6 +169,12 @@ const userController = {
   getUserFollowings: async (req, res, next) => {
     try {
       const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `
+        SELECT id, name, avatar FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
       const userId = req.params.id
       const [pageUser] = await pool.execute(
         `SELECT id, name from users WHERE id =?`,
@@ -185,7 +191,11 @@ const userController = {
       ORDER BY u.name ASC`,
         [currentUserID, userId]
       )
-      res.render('userfollowings', { users, pageUserData })
+      res.render('userfollowings', {
+        users,
+        pageUserData,
+        user: currentUserData,
+      })
     } catch (error) {
       next(error)
     }
@@ -212,6 +222,12 @@ const userController = {
   getUserFollowers: async (req, res, next) => {
     try {
       const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `
+        SELECT id, name, avatar FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
       const userId = req.params.id
       const [pageUser] = await pool.execute(
         `SELECT id, name from users WHERE id =?`,
@@ -228,7 +244,11 @@ const userController = {
       ORDER BY u.name ASC`,
         [currentUserID, userId]
       )
-      res.render('userfollowers', { users, pageUserData })
+      res.render('userfollowers', {
+        users,
+        pageUserData,
+        user: currentUserData,
+      })
     } catch (error) {
       next(error)
     }
