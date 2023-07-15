@@ -21,66 +21,6 @@
   integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
 <script>
-  function likeTweet(event, tweetId) {
-    event.preventDefault()
-    fetch(`/tweets/${tweetId}/like`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tweetId: tweetId }),
-    })
-      .then(response => {
-        if (response.ok) {
-          const likeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
-          likeButton.innerHTML = `
-          <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
-        `;
-          likeButton.onclick = event => unlikeTweet(event, tweetId)
-          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
-          const count = parseInt(countElement.textContent)
-          countElement.textContent = count + 1
-          console.log('Tweet liked successfully')
-        } else {
-          throw new Error('Failed to like tweet')
-        }
-      })
-      .catch(error => {
-        console.error('Error liking tweet:', error.message)
-      })
-  }
-
-  function unlikeTweet(event, tweetId) {
-    event.preventDefault()
-    fetch(`/tweets/${tweetId}/unlike`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tweetId: tweetId }),
-    })
-      .then(response => {
-        if (response.ok) {
-          const unlikeButton = document.querySelector(`button[data-tweet-id="${tweetId}"]`);
-          unlikeButton.innerHTML = `
-          <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
-        `;
-          unlikeButton.onclick = event => likeTweet(event, tweetId)
-          const countElement = document.querySelector(`span[data-tweet-id="${tweetId}"]`)
-          const count = parseInt(countElement.textContent)
-          countElement.textContent = count - 1
-          console.log('Tweet unliked successfully')
-        } else {
-          throw new Error('Failed to unlike tweet')
-        }
-      })
-      .catch(error => {
-        console.error('Error unliking tweet:', error.message)
-      })
-  }
-</script>
-
-<script>
   const stars = document.querySelectorAll('.star')
 
   stars.forEach(star => {
@@ -92,11 +32,11 @@
     })
 
     star.addEventListener('contextmenu', event => {
-      event.preventDefault(); // 阻止右鍵選單顯示
-      const ratingContainer = star.parentNode;
-      const tweetId = ratingContainer.id.split('-')[1];
-      clearRating(tweetId);
-    });
+      event.preventDefault()
+      const ratingContainer = star.parentNode
+      const tweetId = ratingContainer.id.split('-')[1]
+      clearRating(tweetId)
+    })
   })
 
   // 在頁面載入時獲取評分並顯示
@@ -147,15 +87,15 @@
       },
     })
       .then(response => {
-        getRatingsFromServer();
+        getRatingsFromServer()
       })
       .catch(error => {
         console.log('sendRatingToServer error')
-      });
+      })
   }
 
   function clearRating(tweetId) {
-    const url = `/tweets/${tweetId}/clearrating`;
+    const url = `/tweets/${tweetId}/clearrating`
     fetch(url, {
       method: 'DELETE',
       headers: {
@@ -163,10 +103,10 @@
       },
     })
       .then(response => {
-        getRatingsFromServer();
+        getRatingsFromServer()
       })
       .catch(error => {
-        console.log('clearRating error');
-      });
+        console.log('clearRating error')
+      })
   }
 </script>
