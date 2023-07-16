@@ -31,7 +31,8 @@
             </span>
           </div>
           <label class="btn btn-info" style="border-radius:50px; position: absolute;top: 13px;left: 488px;">
-            <input id="upload_img" style="display:none;" type="file" name="tweetImages" multiple>
+            <input id="upload_img" style="display:none;" type="file" name="tweetImages" 
+            accept="image/*">
             <i class="fa fa-photo"></i>
           </label>
           <button type="submit" class="setting-btn my-2" id="#post-submit-btn" style="display: inline-block;font-weight: 400;font-size: 16px;line-height: 24px;border: none;width: 64px;height: 40px;background: #43BFFD;border-radius: 50px;padding: 10px 15px;margin-left: 16px;margin-right: 16px;position: absolute;top: 3px;left: 538px;"> Post
@@ -119,10 +120,10 @@
 </script>
 
 <script>
-  const postModal = document.getElementById('post-modal'); // modal 的 HTML 元素
-  const descriptionInput = document.getElementById('description'); // 輸入框的 HTML 元素
+  const postModal = document.getElementById('post-modal')
+  const descriptionInput = document.getElementById('description')
 
   postModal.addEventListener('show.bs.modal', function () {
-    descriptionInput.value = ''; // 清空輸入框的值
+    descriptionInput.value = ''
   });
 </script>
