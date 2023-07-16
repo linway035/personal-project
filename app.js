@@ -41,5 +41,8 @@ app.use((req, res, next) => {
 })
 
 app.use(routes)
+app.all('*', (req, res) => {
+  res.status(404).render('404')
+})
 
 server.listen(port, () => console.log(`App is listening on port ${port}!`))

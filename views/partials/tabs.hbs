@@ -120,7 +120,7 @@
     {{#ifCond route "likes"}}
     {{#each tweets}}
     {{!-- 這是modal-reply --}}
-    {{>reply-modal tweet=this.Tweet User=../userProfile user=this.Tweet.User}}
+    {{>reply-modal tweet=this user=../userProfile}}
     <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
       <div id="tweet-icon">
         <a href="/users/{{this.user_id}}/profile">

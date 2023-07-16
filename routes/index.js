@@ -32,7 +32,6 @@ router.get('/home', authenticate, tweetController.getHome)
 router.get('/', (req, res) => {
   res.redirect('/home')
 })
-
 router.use('/', generalErrorHandler)
 
 export default router
