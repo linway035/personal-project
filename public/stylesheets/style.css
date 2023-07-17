@@ -1,5 +1,5 @@
 @import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
-@import url('https://fonts.googleapis.com/css2?family=Courgette&family=Playball&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cabin&family=Courgette&family=Playball&display=swap');
 
 body {
   font-family: 'Noto Sans TC', sans-serif;
@@ -1149,56 +1149,6 @@ form.was-validated .input:invalid ~ .invalid-feedback {
   max-width: 170px;
 }
 
-/* chatroom */
-.chatroom-container div {
-  display: block;
-}
-
-.chatroom-container .left-panel {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 260px;
-  overflow-x: hidden;
-  background-color: #3f0e40;
-  color: white;
-}
-
-.chatroom-container .chat-user {
-  padding: 10px;
-}
-.chatroom-container .description {
-  display: inline-block;
-}
-.chatroom-container .right-panel {
-  margin-left: 260px;
-}
-.chatroom-container .chat-header {
-  line-height: 40px;
-  padding: 10px 20px;
-  border-bottom: 1px solid #dddddd;
-}
-.chatroom-container .messages {
-  margin: 0;
-  padding: 20px;
-}
-.chatroom-container ul {
-  display: block;
-  list-style-type: disc;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  padding-inline-start: 40px;
-}
-.chatroom-container .message {
-  list-style: none;
-}
-.chatroom-container li {
-  display: list-item;
-  text-align: -webkit-match-parent;
-}
-
 /* Tooltip container */
 .hidden-tooltip {
   position: relative;
@@ -1207,7 +1157,7 @@ form.was-validated .input:invalid ~ .invalid-feedback {
 
 /* Tooltip text */
 .hidden-tooltip .tooltiptext {
-  font-family: 'Courgette', cursive;
+  font-family: 'Cabin', cursive;
   font-size: 0.5rem;
   visibility: hidden;
   white-space: nowrap; /* Prevent line breaks */

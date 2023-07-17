@@ -35,9 +35,9 @@ fetch('/tweets/follows')
         fetch(url, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(requestData),
+          body: JSON.stringify(requestData)
         })
           .then(response => response.json())
           .then(data => {

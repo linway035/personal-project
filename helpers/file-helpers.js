@@ -1,3 +1,4 @@
+// 改放s3，此檔案目前沒使用
 import fs from 'fs'
 import crypto from 'crypto'
 
@@ -7,11 +8,13 @@ const localFileHandler = file => {
     if (!file) return resolve(null)
     const fileName = randomImageName()
     // const AWS_CDN = process.env.AWS_CDN
+    // console.log(AWS_CDN)
     console.log('fileName', fileName)
     fs.promises
       .readFile(file.path)
       .then(data => fs.promises.writeFile(`uploads/${fileName}`, data))
       .then(() => resolve(`uploads/${fileName}`))
+      // .then(() => resolve(`${AWS_CDN}/${fileName}`))
       .catch(err => reject(err))
   })
 }

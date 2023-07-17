@@ -12,12 +12,9 @@ const chatController = {
     const currentUserData = currentUser[0]
 
     res.render('chat', {
-      user: currentUserData,
+      user: currentUserData
     })
   },
-  getChatroomqq: async (req, res, next) => {
-    res.render('chatqq')
-  }, //just for test
   getRoomList: async (req, res, next) => {
     const currentUserID = res.locals.userId
     const [chatUserLists] = await pool.execute(
@@ -93,7 +90,7 @@ const chatController = {
     )
     const [smallerID, biggerID] = [
       Math.min(senderId, receiverID),
-      Math.max(senderId, receiverID),
+      Math.max(senderId, receiverID)
     ]
     const roomName = `${smallerID}-${biggerID}`
     const [roomId] = await pool.execute(
@@ -105,7 +102,7 @@ const chatController = {
     const result = nowReceiver[0]
     result.roomId = roomId[0].id
     res.status(200).json(result)
-  },
+  }
 }
 
 export default chatController

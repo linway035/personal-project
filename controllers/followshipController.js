@@ -4,8 +4,7 @@ const followshipController = {
     try {
       const currentUserID = res.locals.userId
       const followingId = Number(req.body.id)
-      if (currentUserID === followingId)
-        throw new Error('Cannot follow yourself!')
+      if (currentUserID === followingId) { throw new Error('Cannot follow yourself!') }
       await pool.execute(
         `INSERT INTO followships (follower_id, following_id, is_active, updated_at)
         VALUES (?, ?, 1, NOW())
@@ -46,8 +45,7 @@ const followshipController = {
     try {
       const currentUserID = res.locals.userId
       const followingId = Number(req.body.id)
-      if (currentUserID === followingId)
-        throw new Error('Cannot follow yourself!')
+      if (currentUserID === followingId) { throw new Error('Cannot follow yourself!') }
       await pool.execute(
         `INSERT INTO followships (follower_id, following_id, is_active, updated_at)
         VALUES (?, ?, 1, NOW())
@@ -83,6 +81,6 @@ const followshipController = {
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 export default followshipController

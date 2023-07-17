@@ -57,7 +57,7 @@ module.exports = {
         avatar:
           'https://pbs.twimg.com/profile_images/1225597479711858688/-G9orx5h_400x400.jpg',
         cover:
-          'https://pbs.twimg.com/profile_banners/2842841126/1609304009/1080x360',
+          'https://pbs.twimg.com/profile_banners/2842841126/1688661515/1080x360',
         bio: 'Trae Young 3’s OTW 👀! 👟',
       },
       {
@@ -90,7 +90,7 @@ module.exports = {
         avatar:
           'https://pbs.twimg.com/profile_images/1564101520043479043/eJpWqka2_400x400.jpg',
         cover:
-          'https://pbs.twimg.com/profile_banners/17919972/1666325927/1080x360',
+          'https://pbs.twimg.com/profile_banners/17919972/1688655523/1500x500',
         bio: `I'm the problem, it's me`,
       },
       {
@@ -123,7 +123,7 @@ module.exports = {
         avatar:
           'https://pbs.twimg.com/profile_images/1380530524779859970/TfwVAbyX_400x400.jpg',
         cover:
-          'https://pbs.twimg.com/profile_banners/1349149096909668363/1686583051/1080x360',
+          'https://pbs.twimg.com/profile_banners/1349149096909668363/1688749098/1080x360',
         bio: `46th President of the United States, husband to @FLOTUS, proud dad & pop.`,
       },
       {

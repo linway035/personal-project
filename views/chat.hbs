@@ -15,8 +15,8 @@
             <div class="col-12 col-lg-5 col-xl-3 border-right">
               <div class="px-4 d-none d-md-block">
                 <div class="d-flex align-items-center">
-                  <div class="flex-grow-1">
-                    <input type="text" class="form-control my-3" placeholder="Search..." />
+                  <div class="flex-grow-1" style="font-weight: bold;">
+                    <div class="form-control my-3">Recent</div>
                   </div>
                 </div>
               </div>
@@ -239,7 +239,8 @@
           chatMessageDiv.appendChild(messageDiv)
 
           chatMessagesContainer.appendChild(chatMessageDiv)
-          chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight
+          chatMessagesContainer.scrollTop = 
+          chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight
         })
       })
       .catch(error => {
@@ -290,7 +291,6 @@
           const onlineText = document.createElement('em')
           onlineText.textContent = room.message
 
-          // 將生成的元素組合起來
           smallDiv.appendChild(onlineText)
 
           contentDiv.appendChild(receiverName)
@@ -300,7 +300,6 @@
           dFlexDiv.appendChild(contentDiv)
           listItem.appendChild(dFlexDiv)
 
-          // 將生成的列表項目加入到列表容器中
           listContainer.appendChild(listItem)
         })
       })
@@ -319,7 +318,7 @@
 
       const avatarImage = document.createElement('img')
       avatarImage.src =
-        sender === senderId ? userAvatar : chatRooms[room].receiver_avatar
+        sender === senderId ? userAvatar : chatRooms[roomID].receiver_avatar
       avatarImage.className = 'rounded-circle mr-1'
       avatarImage.width = 40
       avatarImage.height = 40
@@ -343,7 +342,7 @@
       const senderDiv = document.createElement('div')
       senderDiv.className = 'font-weight-bold mb-1'
       senderDiv.textContent =
-        sender === senderId ? 'You' : chatRooms[room].receiver_name
+        sender === senderId ? 'You' : chatRooms[roomID].receiver_name
 
       const messageContentDiv = document.createTextNode(message)
 
@@ -354,6 +353,8 @@
       chatMessageDiv.appendChild(messageDiv)
 
       chatMessagesContainer.appendChild(chatMessageDiv)
+      chatMessagesContainer.scrollTop =
+        chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight
     }
   })
 

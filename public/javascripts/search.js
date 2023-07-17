@@ -60,14 +60,14 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 })
 
-function likeTweet(event, tweetId) {
+function likeTweet (event, tweetId) {
   event.preventDefault()
   fetch(`/tweets/${tweetId}/like`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ tweetId: tweetId }),
+    body: JSON.stringify({ tweetId })
   })
     .then(response => {
       if (response.ok) {
@@ -93,14 +93,14 @@ function likeTweet(event, tweetId) {
     })
 }
 
-function unlikeTweet(event, tweetId) {
+function unlikeTweet (event, tweetId) {
   event.preventDefault()
   fetch(`/tweets/${tweetId}/unlike`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ tweetId: tweetId }),
+    body: JSON.stringify({ tweetId })
   })
     .then(response => {
       if (response.ok) {

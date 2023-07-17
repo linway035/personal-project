@@ -1,24 +1,64 @@
 import pool from '../middleware/databasePool.js'
-import { localFileHandler } from '../helpers/file-helpers.js'
 import * as es from '../es/es.js'
+import fs from 'fs'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
-const getUser = async (req, res, next) => {
-  const currentUserID = res.locals.userId
-  const [currentUser] = await pool.execute(`
-    SELECT id, name, avatar FROM users WHERE id =${currentUserID}`)
-  console.log(currentUser[0])
-  return currentUser[0]
+const bucketName = process.env.AWS_BUCKET_NAME
+const region = process.env.AWS_BUCKET_REGION
+const accessKeyId = process.env.AWS_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_KEY
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId,
+    secretAccessKey
+  },
+  region
+})
+
+async function uploadFileToS3 (file) {
+  // console.log(file)
+  //   {
+  //   fieldname: 'tweetImages',
+  //   originalname: 'Snipa.png',
+  //   encoding: '7bit',
+  //   mimetype: 'image/png',
+  //   destination: 'uploads/',
+  //   filename: '73c327099be6ffe1da5c1adc0b9f4234',
+  //   path: 'uploads\\73c327099be6ffe1da5c1adc0b9f4234',
+  //   size: 2455
+  // }
+  const fileStream = fs.createReadStream(file.path)
+
+  const uploadParams = {
+    Bucket: bucketName,
+    Body: fileStream,
+    Key: file.filename,
+    ContentType: file.mimetype
+  }
+
+  const command = new PutObjectCommand(uploadParams)
+
+  try {
+    await s3.send(command)
+    fs.unlink(file.path, error => {
+      if (error) {
+        console.error(`無法刪除檔案：${file.path}`, error)
+      }
+    })
+  } catch (error) {
+    throw new Error(`Failed to upload file to S3: ${error.message}`)
+  }
 }
 
-async function transformData() {
+async function transformData () {
   const [data] = await pool.query(
-    `SELECT tweet_id, user_id, rating FROM ratings`
+    'SELECT tweet_id, user_id, rating FROM ratings'
   )
   const [usersCount] = await pool.query(
-    `SELECT MAX(id) AS usersCount FROM users`
+    'SELECT MAX(id) AS usersCount FROM users'
   )
   const [tweetsCount] = await pool.query(
-    `SELECT MAX(id) AS tweetsCount FROM tweets`
+    'SELECT MAX(id) AS tweetsCount FROM tweets'
   )
   const usersLength = usersCount[0].usersCount
   const tweetsLength = tweetsCount[0].tweetsCount
@@ -27,7 +67,7 @@ async function transformData() {
 
   // Initialize the transformed data object with empty arrays for each user
   for (let user_id = 1; user_id <= usersLength; user_id++) {
-    transformedData[user_id] = Array(tweetsLength).fill(null) //調參
+    transformedData[user_id] = Array(tweetsLength).fill(null) // 調參
   }
 
   // Populate the transformed data with ratings
@@ -37,9 +77,6 @@ async function transformData() {
 
   return transformedData
 }
-
-// const matrix = await transformData()
-// console.log(matrix)
 
 const calculateSimilarity = (user1, user2, ratings) => {
   const commonIndices = Object.keys(ratings[user1]).filter(
@@ -70,26 +107,6 @@ const calculateSimilarity = (user1, user2, ratings) => {
   return numerator / (denominatorUser1 * denominatorUser2)
 }
 
-const calculateSimilaritySocial = (user1, user2, ratings, socialMatrix) => {
-  const commonIndices = Object.keys(ratings[user1]).filter(
-    index => ratings[user1][index] !== null && ratings[user2][index] !== null
-  )
-  // console.log('commonIndices', commonIndices)
-  if (commonIndices.length === 0) {
-    return 0
-  }
-  const socialSimilarity =
-    socialMatrix[user1][user2] + socialMatrix[user2][user1]
-  const similarity =
-    socialSimilarity *
-    commonIndices.reduce(
-      (sum, index) => sum + ratings[user1][index] * ratings[user2][index],
-      0
-    )
-
-  return similarity
-}
-
 const predictRatings = (user, otherUsers, ratings) => {
   const k =
     1 /
@@ -100,7 +117,7 @@ const predictRatings = (user, otherUsers, ratings) => {
 
   const predictedRatings = []
   for (let i = 0; i < ratings[user].length; i++) {
-    //若填補值為null則null，0則
+    // 若填補值為null則null，0則
     if (ratings[user][i] === null) {
       let similarityWeightedSum = 0
       for (let j = 0; j < otherUsers.length; j++) {
@@ -127,7 +144,7 @@ const tweetController = {
     )
     const currentUserData = currentUser[0]
 
-    // 取推文
+    // 取推文 自己和追蹤的
     const [data, fields] = await pool.execute(
       `
     SELECT tweets.*, users.name, users.avatar, 
@@ -164,7 +181,7 @@ const tweetController = {
     ORDER BY tweets.updated_at DESC
     `,
       [currentUserID, currentUserID, currentUserID, currentUserID]
-    ) //ORDER LIMIT pending
+    )
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {
@@ -181,9 +198,10 @@ const tweetController = {
       return tweet
     })
 
+    // 取回覆 自己 和 我追的人 的回覆
     const [replies, others] = await pool.execute(
       `
-    SELECT
+    SELECT 
     r.user_id AS reply_user_id,
     u.name AS reply_user_name,
     u.avatar AS reply_user_avatar,
@@ -193,19 +211,15 @@ const tweetController = {
     t.user_id AS tweet_user_id,
     tu.name AS tweet_user_name,
     tu.avatar AS tweet_user_avatar
-    FROM
-        replies AS r
-        INNER JOIN tweets AS t ON r.tweet_id = t.id
-        INNER JOIN users AS u ON r.user_id = u.id
-        INNER JOIN users AS tu ON t.user_id = tu.id
-        INNER JOIN followships AS f ON t.user_id = f.following_id
+    FROM replies as r
+    LEFT JOIN tweets AS t ON r.tweet_id = t.id
+    LEFT JOIN users AS u ON r.user_id = u.id
+    LEFT JOIN users AS tu ON t.user_id = tu.id
     WHERE
-        (f.follower_id = ? OR t.user_id = ?)
-        AND r.is_active = 1
-        AND t.is_active = 1
-        AND f.is_active = 1
-    ORDER BY
-    r.created_at DESC;
+    (r.user_id IN (SELECT following_id FROM followships WHERE follower_id = ? AND is_active = 1) OR r.user_id = ?) AND
+    t.is_active=1 AND
+    r.is_active=1
+    ORDER BY r.created_at DESC;
     `,
       [currentUserID, currentUserID]
     )
@@ -220,74 +234,8 @@ const tweetController = {
 
     res.render('tweets', {
       tweets: sortedArray,
-      user: currentUserData,
+      user: currentUserData
     })
-  },
-  getHomeAPI: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-
-      // 取推文
-      const [data, fields] = await pool.execute(
-        `
-    SELECT tweets.*, users.name, users.avatar, 
-    IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-    IF(tl.user_id IS NULL, 0, 1) AS is_liked,
-    GROUP_CONCAT(tweet_images.image_path) AS images
-    FROM tweets
-    JOIN users ON tweets.user_id = users.id
-    LEFT JOIN (
-      SELECT tweet_id, COUNT(*) AS count
-      FROM tweet_likes
-      WHERE is_active = 1
-      GROUP BY tweet_id
-    ) AS like_counts ON tweets.id = like_counts.tweet_id
-    LEFT JOIN (
-      SELECT t.id AS tweet_id, COUNT(r.id) AS count
-      FROM tweets AS t
-      LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
-      WHERE r.is_active = 1
-      GROUP BY t.id
-    ) AS reply_counts ON tweets.id = reply_counts.tweet_id
-    LEFT JOIN (
-      SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
-    ) AS tl ON tweets.id = tl.tweet_id
-    LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-    WHERE tweets.is_active = 1
-      AND tweets.id NOT IN (
-        SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
-    )
-    AND (tweets.user_id IN (
-      SELECT following_id FROM followships WHERE follower_id = ?
-    ) OR tweets.user_id = ?)
-    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
-    ORDER BY tweets.updated_at DESC
-    `,
-        [currentUserID, currentUserID, currentUserID, currentUserID]
-      ) //ORDER LIMIT pending
-
-      const tweetsWithImages = data.map(tweet => {
-        if (tweet.images) {
-          tweet.images = tweet.images.split(',').map(image => {
-            if (image.startsWith('https://')) {
-              return image
-            } else {
-              return `\\${image}`
-            }
-          })
-        } else {
-          tweet.images = []
-        }
-        return tweet
-      })
-
-      const tweets = tweetsWithImages
-
-      res.status(200).json(tweets)
-    } catch (error) {
-      console.error('Error retrieving home data:', error)
-      res.status(500).json({ message: 'Failed to retrieve home data' })
-    }
   },
   getForYouPage: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -299,12 +247,12 @@ const tweetController = {
     const currentUserData = currentUser[0]
 
     // 取推薦人
-    const matrix = await transformData() //若放在最外層則不會更新
+    const matrix = await transformData() // 若放在最外層則不會更新
     // console.log(matrix)
     const userId = res.locals.userId
 
     const similarityResults = {}
-    for (let user in matrix) {
+    for (const user in matrix) {
       if (user !== userId.toString()) {
         similarityResults[user] = calculateSimilarity(
           userId.toString(),
@@ -313,45 +261,24 @@ const tweetController = {
         )
       }
     }
+    // console.log(similarityResults) 得知相似度
 
-    // console.log(userIdsStr)
-
-    //關係矩陣
-    const [followMatrix] = await pool.execute(`
-      SELECT follower_id, following_id
-      FROM followships
-      WHERE is_active = 1
-    `)
-    const [usersLength] = await pool.execute(`SELECT COUNT(*) FROM users`)
-    const count = usersLength[0]['COUNT(*)']
-    // console.log(followMatrix)
-    // 先初始化社交關係矩陣
-    const socialMatrix = Array(count)
-      .fill(null)
-      .map(() => Array(count).fill(0))
-
-    // 遍歷追蹤關係資料，填充社交關係矩陣
-    followMatrix.forEach(({ follower_id, following_id }) => {
-      socialMatrix[follower_id - 1][following_id - 1] = 1
-    })
-    // console.log(socialMatrix)
-
-    //推薦文
+    // 推薦文
     const otherUsers = Object.keys(matrix).filter(
       user => parseInt(user) !== userId
     )
-    // console.log(otherUsers)
+    // console.log(otherUsers) 將所有其他使用者id變成一個array
     const predictedRatings = predictRatings(
       userId.toString(),
       otherUsers,
       matrix
     )
-    // console.log('hi', predictedRatings)
+    // console.log('predict', predictedRatings) 全部推文評分，array
     const indexedScores = predictedRatings.map((score, index) => ({
       index,
-      score,
-    }))
-    indexedScores.sort((a, b) => b.score - a.score)
+      score
+    })) // array of object [{ index: 61, score: 0 },...]
+    indexedScores.sort((a, b) => b.score - a.score) // sort會更改原array
     const sortedIndices = indexedScores.map(item => item.index + 1)
     const tweetIDsSorted = sortedIndices.join(',')
     // console.log(tweetIDsSorted)
@@ -390,8 +317,7 @@ const tweetController = {
     ORDER BY FIELD(tweets.id, ${tweetIDsSorted})
     `,
       [currentUserID, currentUserID]
-    ) //ORDER LIMIT pending
-    // console.log(currentUserID, data[0])
+    )
 
     const tweetsWithImages = data.map(tweet => {
       if (tweet.images) {
@@ -410,14 +336,14 @@ const tweetController = {
 
     res.render('tweets', {
       tweets: tweetsWithImages,
-      user: currentUserData,
+      user: currentUserData
     })
   },
   postLike: async (req, res, next) => {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
-      //若違反唯一性約束條件，則觸發重複鍵更新的邏輯
+      // 若違反唯一性約束條件，則觸發重複鍵更新的邏輯
       await pool.execute(
         `INSERT INTO tweet_likes (user_id, tweet_id, is_active, updated_at)
         VALUES (?, ?, 1, NOW())
@@ -433,7 +359,7 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
-      //MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
+      // MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
       await pool.execute(
         `UPDATE tweet_likes
         SET is_active = 0, updated_at = NOW()
@@ -458,7 +384,7 @@ const tweetController = {
       const tweetId = Number(req.params.id)
       const currentUserID = res.locals.userId
       const content = req.body.comment
-      console.log(content)
+      // console.log(content)
       if (!content) {
         console.log('no content')
         req.flash('error_messages', '內容不可空白')
@@ -470,7 +396,7 @@ const tweetController = {
       INSERT INTO replies (tweet_id, user_id, content, parent_id, path)
       VALUES (?,?,?,?,?)`,
         [tweetId, currentUserID, content, null, tweetId]
-      ) //parent_id,path,PENDING
+      )
       res.redirect('back')
       // res.status(200).json({ message: '回覆成功' })
     } catch (error) {
@@ -478,8 +404,16 @@ const tweetController = {
     }
   },
   getTweetPage: async (req, res, next) => {
-    const tweetId = req.params.id
     const currentUserID = res.locals.userId
+    const [currentUser] = await pool.execute(
+      `
+    SELECT id, name, avatar FROM users WHERE id =?`,
+      [currentUserID]
+    )
+    const currentUserData = currentUser[0]
+    // console.log(currentUserData)
+
+    const tweetId = req.params.id
     const [data, fields] = await pool.execute(
       `SELECT tweets.*, users.name, users.avatar, IFNULL(like_counts.count, 0) AS like_count, 
       IFNULL(reply_counts.count, 0) AS reply_count, IF(tl.user_id IS NULL, 0, 1) AS is_liked,
@@ -526,6 +460,7 @@ const tweetController = {
       throw new Error('找不到該推文')
     }
     const tweet = data[0]
+    tweet.currentUser = currentUserData
     // console.log(tweet)
 
     const [replies] = await pool.execute(
@@ -538,15 +473,17 @@ const tweetController = {
       [tweetId]
     )
     // console.log(replies) //array of objects
-    res.render('tweet', { tweet, replies })
+    res.render('tweet', { tweet, replies, user: currentUserData })
   },
   postTweet: async (req, res, next) => {
     try {
+      const AWS_CDN = process.env.AWS_CDN
       const { description } = req.body
       const currentUserID = res.locals.userId
       const files = req.files
-      // console.log(req.files)
-      const images = await Promise.all(files['tweetImages'] || [])
+      const images = await Promise.all(files.tweetImages || [])
+      const uploadPromises = images.map(image => uploadFileToS3(image))
+      await Promise.all(uploadPromises)
       if (description.length > 140) {
         throw new Error('請以 140 字以內為限')
       } else if (description.trim() === '') {
@@ -556,7 +493,7 @@ const tweetController = {
       await connection.beginTransaction()
       try {
         const [rows] = await pool.execute(
-          `INSERT INTO tweets (user_id, content) VALUES (?, ?)`,
+          'INSERT INTO tweets (user_id, content) VALUES (?, ?)',
           [currentUserID, description]
         )
         const tweetId = rows.insertId
@@ -564,7 +501,12 @@ const tweetController = {
           const insertPromises = images.map(image =>
             connection.execute(
               'INSERT INTO tweet_images (tweet_id, fileName, image_path, size) VALUES (?, ?, ?, ?)',
-              [tweetId, image.filename, image.path, image.size]
+              [
+                tweetId,
+                image.filename,
+                `${AWS_CDN}/${image.filename}`,
+                image.size
+              ]
             )
           )
           await Promise.all(insertPromises)
@@ -624,7 +566,7 @@ const tweetController = {
         `,
         [tweetId, currentUserID]
       )
-      const rating = rows[0]?.rating || null //給前端判斷null情況
+      const rating = rows[0]?.rating || null // 給前端判斷null情況
       // res.redirect('back')
       res.status(200).json({ rating })
     } catch (error) {
@@ -656,27 +598,8 @@ const tweetController = {
     const currentUserData = currentUser[0]
 
     res.render('searchUser', {
-      user: currentUserData,
+      user: currentUserData
     })
-  },
-  getSearchUserAPI: async (req, res, next) => {
-    const currentUserID = res.locals.userId
-
-    const q = req.query.q?.trim().toLowerCase()
-    const [userSearchResults, fields] = await pool.execute(
-      `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
-      CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
-      FROM users
-      LEFT JOIN (
-        SELECT follower_id, following_id, 1 AS is_following
-        FROM followships
-        WHERE follower_id = ? AND followships.is_active=1
-      ) AS followships ON followships.following_id = users.id
-      WHERE name LIKE ?`,
-      [currentUserID, currentUserID, `%${q}%`]
-    )
-    // console.log(userSearchResults)
-    res.json({ userSearchResults, q })
   },
   getSearchTweet: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -688,73 +611,8 @@ const tweetController = {
     const currentUserData = currentUser[0]
 
     res.render('search', {
-      user: currentUserData,
+      user: currentUserData
     })
-  },
-  getSearchTweetAPI: async (req, res, next) => {
-    const currentUserID = res.locals.userId
-
-    const q = req.query.q?.trim().toLowerCase()
-    // 取推文
-    let query = `
-      SELECT tweets.*, users.name, users.avatar, 
-      IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-      IF(tl.user_id IS NULL, 0, 1) AS is_liked,
-      GROUP_CONCAT(tweet_images.image_path) AS images
-      FROM tweets
-      JOIN users ON tweets.user_id = users.id
-      LEFT JOIN (
-        SELECT tweet_id, COUNT(*) AS count
-        FROM tweet_likes
-        WHERE is_active = 1
-        GROUP BY tweet_id
-      ) AS like_counts ON tweets.id = like_counts.tweet_id
-      LEFT JOIN (
-        SELECT t.id AS tweet_id, COUNT(r.id) AS count
-        FROM tweets AS t
-        LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
-        WHERE r.is_active = 1
-        GROUP BY t.id
-      ) AS reply_counts ON tweets.id = reply_counts.tweet_id
-      LEFT JOIN (
-        SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
-      ) AS tl ON tweets.id = tl.tweet_id
-      LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-      WHERE tweets.is_active = 1
-        AND tweets.id NOT IN (
-          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
-      )
-      `
-    const params = [currentUserID, currentUserID]
-    if (q) {
-      query += ' AND tweets.content LIKE ?'
-      params.push(`%${q}%`)
-    } else {
-      query += ' AND tweets.id =999999999'
-    } //若無q則無搜尋結果
-    query += `
-      GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
-      ORDER BY like_count DESC
-    `
-    // console.log(query)
-    const [data, fields] = await pool.execute(query, params)
-
-    const tweetsWithImages = data.map(tweet => {
-      if (tweet.images) {
-        tweet.images = tweet.images.split(',').map(image => {
-          if (image.startsWith('https://')) {
-            return image
-          } else {
-            return `\\${image}`
-          }
-        })
-      } else {
-        tweet.images = []
-      }
-      return tweet
-    })
-    // console.log(tweetsWithImages)
-    res.json({ tweets: tweetsWithImages, q })
   },
   getRecommendUsersAPI: async (req, res, next) => {
     const currentUserID = res.locals.userId
@@ -762,7 +620,7 @@ const tweetController = {
     const matrix = await transformData()
     const userId = res.locals.userId
     const similarityResults = {}
-    for (let user in matrix) {
+    for (const user in matrix) {
       if (user !== userId.toString()) {
         similarityResults[user] = calculateSimilarity(
           userId.toString(),
@@ -784,6 +642,8 @@ const tweetController = {
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
+      // 默認返回值
+      return 0
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
@@ -808,14 +668,12 @@ const tweetController = {
       return res.json({ tweets: [], q: query })
     }
     const searchkeywords = query.split(' ')
-    console.log('query', query)
-    console.log('searchkeywors', searchkeywords)
     const tweetIds = await es.searchByElastic(searchkeywords)
     if (tweetIds.length === 0) {
       return res.json({ tweets: [], q: query })
     }
 
-    //query 和 execute結果不同
+    // query 和 execute結果不同
     const [data, fields] = await pool.query(
       `
     SELECT
@@ -883,6 +741,6 @@ const tweetController = {
       }
     }
     res.json({ userSearchResults, q: query })
-  },
+  }
 }
 export default tweetController

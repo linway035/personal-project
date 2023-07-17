@@ -1,13 +1,4 @@
-const currentPath = window.location.pathname
-const navLinks = document.querySelectorAll('.nav-link')
-navLinks.forEach(function (link) {
-  if (link.getAttribute('href') === currentPath) {
-    link.classList.add('active')
-  }
-})
-
 function likeTweet (event, tweetId) {
-  console.log(tweetId, typeof tweetId)
   event.preventDefault()
   fetch(`/tweets/${tweetId}/like`, {
     method: 'POST',
@@ -22,8 +13,8 @@ function likeTweet (event, tweetId) {
           `button[data-tweet-id="${tweetId}"]`
         )
         likeButton.innerHTML = `
-      <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
-    `
+          <img src="/images/icons/filled-like.png" alt="like" style="width:16px; height: 16px">
+        `
         likeButton.onclick = event => unlikeTweet(event, tweetId)
         const countElement = document.querySelector(
           `span[data-tweet-id="${tweetId}"]`
@@ -54,8 +45,8 @@ function unlikeTweet (event, tweetId) {
           `button[data-tweet-id="${tweetId}"]`
         )
         unlikeButton.innerHTML = `
-      <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
-    `
+          <img src="/images/icons/outlined-like.png" alt="like" style="width:16px; height: 16px">
+        `
         unlikeButton.onclick = event => likeTweet(event, tweetId)
         const countElement = document.querySelector(
           `span[data-tweet-id="${tweetId}"]`

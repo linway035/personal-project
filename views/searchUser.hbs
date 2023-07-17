@@ -10,12 +10,12 @@
   <div class="tweets-mid"
     style="width:641px;height: 1200px;border-left: 1px solid #e6ecf0; border-right: 1px solid #e6ecf0;">
     <div class="row">
-      <div class="mt-2 mx-auto">
+      <div class="mt-2 px-3 mx-auto">
         <form id="search-form" action="/search/people">
           <div class="input-group">
             <input class="form-control border-end-0 border rounded-pill" type="search" value="{{q}}"
               id="example-search-input" name="q" placeholder="Search">
-            <span class="input-group-append">
+            <span class="mx-1 input-group-append">
               <button class="btn btn-outline-secondary bg-white border-bottom-0 border rounded-pill ms-n5"
                 type="submit">
                 <i class="fa fa-search"></i>
@@ -28,7 +28,7 @@
     <nav class="nav-links">
       <ul class="nav nav-tabs nav-justified mb-3" id="ex1" role="tablist">
         <li class="nav-item" role="presentation">
-          <a class="nav-link" href="/search" role="tab">Top</a>
+          <a class="nav-link" href="/search" role="tab">Top Tweets</a>
         </li>
         <li class="nav-item" role="presentation">
           <a class="nav-link active" href="/search/people" role="tab">People</a>
@@ -48,3 +48,4 @@
   integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 
 <script src="/javascripts/searchPeople.js"></script>
+<script src="/javascripts/follow.js"></script>
