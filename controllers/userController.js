@@ -1,6 +1,6 @@
 import pool from '../middleware/databasePool.js'
 import bcrypt from 'bcryptjs'
-import { signJWT, verifyJWT } from '../middleware/JWT.js'
+import { signJWT } from '../middleware/JWT.js'
 const saltRounds = 10
 
 const userController = {
@@ -64,7 +64,9 @@ const userController = {
     try {
       const email = req.body.email.trim()
       const password = req.body.password
-      if (!email || !password) { throw new Error('Email and Password are required') }
+      if (!email || !password) {
+        throw new Error('Email and Password are required')
+      }
       const [user, fields] = await pool.execute(
         'SELECT * FROM users WHERE email = ?',
         [email]
@@ -76,7 +78,7 @@ const userController = {
       res.cookie('jwtToken', token).json({
         userId: user[0].id,
         name: user[0].name,
-        avatar: user[0].avatar
+        avatar: user[0].avatar,
       })
     } catch (error) {
       next(error)
@@ -172,7 +174,7 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        tweets: tweetsWithImages
+        tweets: tweetsWithImages,
       })
     } catch (error) {
       next(error)
@@ -210,7 +212,7 @@ const userController = {
       res.render('userfollowings', {
         users,
         pageUserData,
-        user: currentUserData
+        user: currentUserData,
       })
     } catch (error) {
       next(error)
@@ -249,7 +251,7 @@ const userController = {
       res.render('userfollowers', {
         users,
         pageUserData,
-        user: currentUserData
+        user: currentUserData,
       })
     } catch (error) {
       next(error)
@@ -300,7 +302,7 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        replies
+        replies,
       })
     } catch (error) {
       next(error)
@@ -395,12 +397,12 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        tweets: tweetsWithImages
+        tweets: tweetsWithImages,
       })
     } catch (error) {
       next(error)
     }
-  }
+  },
 }
 
 export default userController

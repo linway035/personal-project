@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import userController from '../../controllers/userController.js'
 import authenticate from '../../middleware/auth.js'
-import upload from '../../middleware/multer.js'
 const router = Router()
 
 router.get('/signup', userController.getSignUpPage)

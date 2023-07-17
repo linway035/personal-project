@@ -1,5 +1,4 @@
 import pool from '../middleware/databasePool.js'
-import { localFileHandler } from '../helpers/file-helpers.js'
 import * as es from '../es/es.js'
 import fs from 'fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
@@ -253,7 +252,7 @@ const tweetController = {
     const userId = res.locals.userId
 
     const similarityResults = {}
-    for (let user in matrix) {
+    for (const user in matrix) {
       if (user !== userId.toString()) {
         similarityResults[user] = calculateSimilarity(
           userId.toString(),
@@ -621,7 +620,7 @@ const tweetController = {
     const matrix = await transformData()
     const userId = res.locals.userId
     const similarityResults = {}
-    for (let user in matrix) {
+    for (const user in matrix) {
       if (user !== userId.toString()) {
         similarityResults[user] = calculateSimilarity(
           userId.toString(),
@@ -643,6 +642,8 @@ const tweetController = {
       if (isNaN(b[1]) || isNaN(a[1])) {
         return isNaN(b[1]) ? -1 : 1
       }
+      // 默認返回值
+      return 0
     })
     const sortedUserIds = sortedResults.map(([userId]) => parseInt(userId))
     const userIdsStr = sortedUserIds.join(',')
