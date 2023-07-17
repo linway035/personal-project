@@ -1,4 +1,4 @@
-let socket = io()
+const socket = io()
 const senderId = localStorage.getItem('userId')
 const button = document.querySelector('#pro-mess')
 let receiverId = null

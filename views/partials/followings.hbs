@@ -30,14 +30,10 @@
     <div class="header d-flex justify-content-between">
       <span style="margin: auto 0; font-size: 16px; line-height: 26px; font-weight: 700;color: #171725;">{{this.name}}</span>
       {{#if this.is_following }}
-      <form action="/followships/{{this.id}}" method="POST" style="display: contents;">
-        <button type="submit" class="following-btn">Following</button>
-      </form>
+      <button class="following-btn" data-user-id="{{this.id}}" onclick="unfollowUser({{this.id}})">Following</button>
       {{else}}
-      <form action="/followships" method="POST" style="display: contents;">
-        <input type="text" name="id" value="{{this.id}}" style="display: none;">
-        <button type="submit" class="follow-btn">Follow</button>
-      </form>
+      <button class="follow-btn" data-user-id="{{this.id}}" onclick="followUser({{this.id}})">Follow
+      </button>
       {{/if}}
     </div>
     <div class="content-word" style="margin:0">

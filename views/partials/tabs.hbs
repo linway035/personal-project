@@ -34,7 +34,7 @@
         </div>
         <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
           {{this.content}}
-          <div class="image-container">
+          <div class="image-container images-{{this.images.length}}">
             {{#each this.images}}
             <img src="{{this}}" alt="Image" class="image-item">
             {{/each}}
@@ -63,14 +63,12 @@
           </div>
           <div class="d-flex hidden hidden-tooltip">
             <span class="tooltiptext">Never show this tweet again</span>
-            <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
-              <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
-                <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
-              </button>
-            </form>
+            <button onclick="hideTweet(event, '{{this.id}}')">
+              <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
+            </button>
           </div>
           <div class="d-flex rating hidden-tooltip" id="rating-{{this.id}}" style="color: #ffd700">
-            <span class="tooltiptext" style="white-space: wrap; width: 280px; left:-200%; font-size:0.1rem">
+            <span class="tooltiptext" style="white-space: wrap; left:-200%; font-size:0.1rem">
               Rate and improve your recommended content! Clear with a right-click
             </span>
             <span class="star" data-rating="1">&#9734;</span>
@@ -122,7 +120,7 @@
     {{#ifCond route "likes"}}
     {{#each tweets}}
     {{!-- 這是modal-reply --}}
-    {{>reply-modal tweet=this.Tweet User=../userProfile user=this.Tweet.User}}
+    {{>reply-modal tweet=this user=../userProfile}}
     <div class="d-flex each-tweet" style="padding: 16px 0;width: 639px;">
       <div id="tweet-icon">
         <a href="/users/{{this.user_id}}/profile">
@@ -140,7 +138,7 @@
         </div>
         <div class="content-word" onclick="window.open('/tweets/{{this.id}}/replies','_self');" style="cursor: pointer;">
           {{this.content}}
-          <div class="image-container">
+          <div class="image-container images-{{this.images.length}}">
             {{#each this.images}}
             <img src="{{this}}" alt="Image" class="image-item">
             {{/each}}
@@ -169,11 +167,9 @@
           </div>
           <div class="d-flex hidden hidden-tooltip">
             <span class="tooltiptext">Never show this tweet again</span>
-            <form action="/tweets/{{this.id}}/hidden" method="post" style="align-items: center; display: flex;">
-              <button type="submit" style="padding: 0; border: 0; background-color: #fff;">
-                <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
-              </button>
-            </form>
+            <button onclick="hideTweet(event, '{{this.id}}')">
+              <img src="/images/icons/hide.png" style="width:16px; height: 16px" />
+            </button>
           </div>
           <div class="d-flex rating" id="rating-{{this.id}}" style="color: #ffd700">
             <span class="star" data-rating="1">&#9734;</span>
@@ -189,3 +185,5 @@
     {{/ifCond}}
   </div>
 </div>
+
+<script src="/javascripts/tabs.js"></script>

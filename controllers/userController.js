@@ -1,6 +1,6 @@
 import pool from '../middleware/databasePool.js'
 import bcrypt from 'bcryptjs'
-import { signJWT, verifyJWT } from '../middleware/JWT.js'
+import { signJWT } from '../middleware/JWT.js'
 const saltRounds = 10
 
 const userController = {
@@ -16,6 +16,9 @@ const userController = {
       const checkPassword = req.body.checkPassword
       if (!name || !email || !password || !checkPassword) {
         throw new Error('All required')
+      }
+      if (name.length > 21) {
+        throw new Error('名字請不要超過20字')
       }
       if (password !== checkPassword) {
         throw new Error('密碼和確認密碼不一致!')
@@ -61,8 +64,9 @@ const userController = {
     try {
       const email = req.body.email.trim()
       const password = req.body.password
-      if (!email || !password)
+      if (!email || !password) {
         throw new Error('Email and Password are required')
+      }
       const [user, fields] = await pool.execute(
         'SELECT * FROM users WHERE email = ?',
         [email]
@@ -74,7 +78,7 @@ const userController = {
       res.cookie('jwtToken', token).json({
         userId: user[0].id,
         name: user[0].name,
-        avatar: user[0].avatar,
+        avatar: user[0].avatar
       })
     } catch (error) {
       next(error)
@@ -84,34 +88,41 @@ const userController = {
     res.clearCookie('jwtToken').redirect('/users/signin')
   },
   getProfilePage: async (req, res, next) => {
-    const currentUserID = res.locals.userId
-    const [currentUser] = await pool.execute(
-      `
-    SELECT id, name, avatar FROM users WHERE id =?`,
-      [currentUserID]
-    )
-    const currentUserData = currentUser[0]
+    try {
+      const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `
+        SELECT id, name, avatar FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
 
-    const userId = req.params.id
-    const [user] = await pool.execute(
-      `
-    SELECT u.*, IF(f.following_id IS NULL, 0, 1) AS is_following,
-    (SELECT COUNT(*) FROM followships WHERE following_id = u.id AND is_active = 1) AS followers_count,
-    (SELECT COUNT(*) FROM followships WHERE follower_id = u.id AND is_active = 1) AS following_count
-    FROM users AS u
-    LEFT JOIN (
-      SELECT following_id
-      FROM followships
-      WHERE follower_id = ? AND is_active = 1
-    ) AS f ON u.id = f.following_id
-    WHERE u.id =?`,
-      [currentUserID, userId]
-    )
-    const userProfile = user[0]
-    const isCurrentUser = userProfile.id === currentUserID
+      const userId = req.params.id
+      console.log(currentUserID, userId)
+      const [user] = await pool.execute(
+        `
+        SELECT u.*, IF(f.following_id IS NULL, 0, 1) AS is_following,
+        (SELECT COUNT(*) FROM followships WHERE following_id = u.id AND is_active = 1) AS followers_count,
+        (SELECT COUNT(*) FROM followships WHERE follower_id = u.id AND is_active = 1) AS following_count
+        FROM users AS u
+        LEFT JOIN (
+          SELECT following_id
+          FROM followships
+          WHERE follower_id = ? AND is_active = 1
+        ) AS f ON u.id = f.following_id
+        WHERE u.id =?`,
+        [currentUserID, userId]
+      )
+      if (user.length === 0) {
+        res.render('404', { message: 'This account doesn’t exist' })
+        return
+      }
+      const userProfile = user[0]
+      console.log('gg', userProfile)
+      const isCurrentUser = userProfile.id === currentUserID
 
-    const [tweets] = await pool.execute(
-      `
+      const [tweets] = await pool.execute(
+        `
         SELECT tweets.*, users.name, users.avatar, 
         IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
         IF(MAX(tl.user_id) IS NULL, 0, 1) AS is_liked,
@@ -141,163 +152,9 @@ const userController = {
         GROUP BY tweets.id
         ORDER BY tweets.updated_at DESC
       `,
-      [currentUserID, userId, currentUserID]
-    )
+        [currentUserID, userId, currentUserID]
+      )
 
-    const tweetsWithImages = tweets.map(tweet => {
-      if (tweet.images) {
-        tweet.images = tweet.images.split(',').map(image => {
-          if (image.startsWith('https://')) {
-            return image
-          } else {
-            return `\\${image}`
-          }
-        })
-      } else {
-        tweet.images = []
-      }
-      return tweet
-    })
-
-    res.render('userprofile', {
-      userProfile,
-      isCurrentUser,
-      user: currentUserData,
-      tweets: tweetsWithImages,
-    })
-  },
-  getUserInfo: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const [currentUser] = await pool.execute(
-        `SELECT * FROM users WHERE id =?`,
-        [currentUserID]
-      )
-      const currentUserData = currentUser[0]
-      const UserId = req.params.id
-      if (currentUserID !== Number(UserId)) {
-        console.log('edit error')
-        return res.json({
-          status: 'error',
-          messages: '無法編輯其他使用者資料！',
-        })
-      }
-      res.json(currentUserData)
-    } catch (err) {
-      next(err)
-    }
-  },
-  postUserInfo: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const UserId = req.params.id
-      console.log(req.body)
-    } catch (err) {
-      next(err)
-    }
-  },
-  getUserFollowings: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const userId = req.params.id
-      const [pageUser] = await pool.execute(
-        `SELECT id, name from users WHERE id =?`,
-        [userId]
-      )
-      const pageUserData = pageUser[0]
-      const [users] = await pool.execute(
-        `
-      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
-      FROM users u
-      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
-      WHERE u.id IN 
-      (SELECT following_id FROM followships WHERE follower_id=? AND is_active=1)
-      ORDER BY u.name ASC`,
-        [currentUserID, userId]
-      )
-      res.render('userfollowings', { users, pageUserData })
-    } catch (error) {
-      next(error)
-    }
-  },
-  getUserFollowingsAPI: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const userId = req.params.id
-      const [users] = await pool.execute(
-        `
-      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
-      FROM users u
-      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
-      WHERE u.id IN 
-      (SELECT following_id FROM followships WHERE follower_id=? AND is_active=1)
-      ORDER BY u.name ASC`,
-        [currentUserID, userId]
-      )
-      return res.json(users)
-    } catch (error) {
-      next(error)
-    }
-  },
-  getUserFollowers: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const userId = req.params.id
-      const [pageUser] = await pool.execute(
-        `SELECT id, name from users WHERE id =?`,
-        [userId]
-      )
-      const pageUserData = pageUser[0]
-      const [users] = await pool.execute(
-        `
-      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
-      FROM users u
-      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
-      WHERE u.id IN 
-      (SELECT follower_id FROM followships WHERE following_id=? AND is_active=1)
-      ORDER BY u.name ASC`,
-        [currentUserID, userId]
-      )
-      res.render('userfollowers', { users, pageUserData })
-    } catch (error) {
-      next(error)
-    }
-  },
-  getUserTweetsAPI: async (req, res, next) => {
-    try {
-      const currentUserID = res.locals.userId
-      const userId = req.params.id
-      const [tweets] = await pool.execute(
-        `
-        SELECT tweets.*, users.name, users.avatar, 
-        IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-        IF(MAX(tl.user_id) IS NULL, 0, 1) AS is_liked,
-        GROUP_CONCAT(tweet_images.image_path) AS images
-        FROM tweets
-        JOIN users ON tweets.user_id = users.id
-        LEFT JOIN (
-          SELECT tweet_id, COUNT(*) AS count
-          FROM tweet_likes
-          WHERE is_active = 1
-          GROUP BY tweet_id
-        ) AS like_counts ON tweets.id = like_counts.tweet_id
-        LEFT JOIN (
-          SELECT t.id AS tweet_id, COUNT(r.id) AS count
-          FROM tweets AS t
-          LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
-          WHERE r.is_active = 1
-          GROUP BY t.id
-        ) AS reply_counts ON tweets.id = reply_counts.tweet_id
-        LEFT JOIN (
-          SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
-        ) AS tl ON tweets.id = tl.tweet_id
-        LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-        WHERE tweets.is_active = 1 AND tweets.user_id = ?
-        GROUP BY tweets.id
-        ORDER BY tweets.updated_at DESC
-      `,
-        [currentUserID, userId]
-      )
       const tweetsWithImages = tweets.map(tweet => {
         if (tweet.images) {
           tweet.images = tweet.images.split(',').map(image => {
@@ -313,8 +170,89 @@ const userController = {
         return tweet
       })
 
-      console.log(tweetsWithImages)
-      res.json(tweetsWithImages)
+      res.render('userprofile', {
+        userProfile,
+        isCurrentUser,
+        user: currentUserData,
+        tweets: tweetsWithImages
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+  getUserFollowings: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `
+        SELECT id, name, avatar FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
+      const userId = req.params.id
+      const [pageUser] = await pool.execute(
+        'SELECT id, name from users WHERE id =?',
+        [userId]
+      )
+      if (pageUser.length === 0) {
+        res.render('404', { message: 'This account doesn’t exist' })
+        return
+      }
+      const pageUserData = pageUser[0]
+      const [users] = await pool.execute(
+        `
+      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
+      FROM users u
+      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
+      WHERE u.id IN 
+      (SELECT following_id FROM followships WHERE follower_id=? AND is_active=1)
+      ORDER BY u.name ASC`,
+        [currentUserID, userId]
+      )
+      res.render('userfollowings', {
+        users,
+        pageUserData,
+        user: currentUserData
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+  getUserFollowers: async (req, res, next) => {
+    try {
+      const currentUserID = res.locals.userId
+      const [currentUser] = await pool.execute(
+        `
+        SELECT id, name, avatar FROM users WHERE id =?`,
+        [currentUserID]
+      )
+      const currentUserData = currentUser[0]
+      const userId = req.params.id
+      const [pageUser] = await pool.execute(
+        'SELECT id, name from users WHERE id =?',
+        [userId]
+      )
+      if (pageUser.length === 0) {
+        res.render('404', { message: 'This account doesn’t exist' })
+        return
+      }
+      const pageUserData = pageUser[0]
+
+      const [users] = await pool.execute(
+        `
+      SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
+      FROM users u
+      LEFT JOIN followships f ON f.following_id = u.id AND f.follower_id = ? AND f.is_active = 1
+      WHERE u.id IN 
+      (SELECT follower_id FROM followships WHERE following_id=? AND is_active=1)
+      ORDER BY u.name ASC`,
+        [currentUserID, userId]
+      )
+      res.render('userfollowers', {
+        users,
+        pageUserData,
+        user: currentUserData
+      })
     } catch (error) {
       next(error)
     }
@@ -344,6 +282,10 @@ const userController = {
         WHERE u.id =?`,
         [currentUserID, userId]
       )
+      if (user.length === 0) {
+        res.render('404', { message: 'This account doesn’t exist' })
+        return
+      }
       const userProfile = user[0]
       const isCurrentUser = userProfile.id === currentUserID
       const [replies] = await pool.execute(
@@ -360,7 +302,7 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        replies,
+        replies
       })
     } catch (error) {
       next(error)
@@ -391,6 +333,10 @@ const userController = {
         WHERE u.id =?`,
         [currentUserID, userId]
       )
+      if (user.length === 0) {
+        res.render('404', { message: 'This account doesn’t exist' })
+        return
+      }
       const userProfile = user[0]
       const isCurrentUser = userProfile.id === currentUserID
       const [tweets] = await pool.execute(
@@ -451,12 +397,12 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        tweets: tweetsWithImages,
+        tweets: tweetsWithImages
       })
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 
 export default userController

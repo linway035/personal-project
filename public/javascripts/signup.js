@@ -16,6 +16,14 @@ signupForm.addEventListener('submit', function (e) {
     errorAlert.classList.remove('d-none')
     return
   }
+  if (name.length > 21) {
+    errorAlert.innerHTML = `
+          <strong>名字請不要超過20字</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `
+    errorAlert.classList.remove('d-none')
+    return
+  }
   if (name && email && password && checkPassword) {
     if (password !== checkPassword) {
       errorAlert.innerHTML = `
@@ -30,8 +38,8 @@ signupForm.addEventListener('submit', function (e) {
       method: 'POST',
       body: JSON.stringify({ name, email, password, checkPassword }),
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     })
       .then(response => response.json())
       .then(data => {

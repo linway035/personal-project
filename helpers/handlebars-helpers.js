@@ -12,8 +12,9 @@ const handlebarsHelpers = {
     return a === b ? options.inverse(this) : options.fn(this)
   },
   currentYear: () => dayjs().year(),
-  relativeTimeFromNow: a => dayjs(a).fromNow(),
-  tweetDateTime: a => dayjs(a).format('A h:mm・YYYY年M月D日'),
+  // relativeTimeFromNow: a => dayjs(a).fromNow(),
+  relativeTimeFromNow: a => dayjs(a).subtract(8, 'hour').fromNow(), // AWS版本
+  tweetDateTime: a => dayjs(a).format('A h:mm・YYYY年M月D日')
 }
 
 export default handlebarsHelpers
