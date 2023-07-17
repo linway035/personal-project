@@ -602,25 +602,6 @@ const tweetController = {
       user: currentUserData,
     })
   },
-  getSearchUserAPI: async (req, res, next) => {
-    const currentUserID = res.locals.userId
-
-    const q = req.query.q?.trim().toLowerCase()
-    const [userSearchResults, fields] = await pool.execute(
-      `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
-      CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
-      FROM users
-      LEFT JOIN (
-        SELECT follower_id, following_id, 1 AS is_following
-        FROM followships
-        WHERE follower_id = ? AND followships.is_active=1
-      ) AS followships ON followships.following_id = users.id
-      WHERE name LIKE ?`,
-      [currentUserID, currentUserID, `%${q}%`]
-    )
-    // console.log(userSearchResults)
-    res.json({ userSearchResults, q })
-  },
   getSearchTweet: async (req, res, next) => {
     const currentUserID = res.locals.userId
     const [currentUser] = await pool.execute(
@@ -633,71 +614,6 @@ const tweetController = {
     res.render('search', {
       user: currentUserData,
     })
-  },
-  getSearchTweetAPI: async (req, res, next) => {
-    const currentUserID = res.locals.userId
-
-    const q = req.query.q?.trim().toLowerCase()
-    // 取推文
-    let query = `
-      SELECT tweets.*, users.name, users.avatar, 
-      IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
-      IF(tl.user_id IS NULL, 0, 1) AS is_liked,
-      GROUP_CONCAT(tweet_images.image_path) AS images
-      FROM tweets
-      JOIN users ON tweets.user_id = users.id
-      LEFT JOIN (
-        SELECT tweet_id, COUNT(*) AS count
-        FROM tweet_likes
-        WHERE is_active = 1
-        GROUP BY tweet_id
-      ) AS like_counts ON tweets.id = like_counts.tweet_id
-      LEFT JOIN (
-        SELECT t.id AS tweet_id, COUNT(r.id) AS count
-        FROM tweets AS t
-        LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
-        WHERE r.is_active = 1
-        GROUP BY t.id
-      ) AS reply_counts ON tweets.id = reply_counts.tweet_id
-      LEFT JOIN (
-        SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
-      ) AS tl ON tweets.id = tl.tweet_id
-      LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
-      WHERE tweets.is_active = 1
-        AND tweets.id NOT IN (
-          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
-      )
-      `
-    const params = [currentUserID, currentUserID]
-    if (q) {
-      query += ' AND tweets.content LIKE ?'
-      params.push(`%${q}%`)
-    } else {
-      query += ' AND tweets.id =999999999'
-    } //若無q則無搜尋結果
-    query += `
-      GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
-      ORDER BY like_count DESC
-    `
-    // console.log(query)
-    const [data, fields] = await pool.execute(query, params)
-
-    const tweetsWithImages = data.map(tweet => {
-      if (tweet.images) {
-        tweet.images = tweet.images.split(',').map(image => {
-          if (image.startsWith('https://')) {
-            return image
-          } else {
-            return `\\${image}`
-          }
-        })
-      } else {
-        tweet.images = []
-      }
-      return tweet
-    })
-    // console.log(tweetsWithImages)
-    res.json({ tweets: tweetsWithImages, q })
   },
   getRecommendUsersAPI: async (req, res, next) => {
     const currentUserID = res.locals.userId
