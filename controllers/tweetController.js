@@ -1,6 +1,55 @@
 import pool from '../middleware/databasePool.js'
 import { localFileHandler } from '../helpers/file-helpers.js'
 import * as es from '../es/es.js'
+import fs from 'fs'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+
+const bucketName = process.env.AWS_BUCKET_NAME
+const region = process.env.AWS_BUCKET_REGION
+const accessKeyId = process.env.AWS_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_KEY
+const s3 = new S3Client({
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
+  region,
+})
+
+async function uploadFileToS3(file) {
+  // console.log(file)
+  //   {
+  //   fieldname: 'tweetImages',
+  //   originalname: 'Snipa.png',
+  //   encoding: '7bit',
+  //   mimetype: 'image/png',
+  //   destination: 'uploads/',
+  //   filename: '73c327099be6ffe1da5c1adc0b9f4234',
+  //   path: 'uploads\\73c327099be6ffe1da5c1adc0b9f4234',
+  //   size: 2455
+  // }
+  const fileStream = fs.createReadStream(file.path)
+
+  const uploadParams = {
+    Bucket: bucketName,
+    Body: fileStream,
+    Key: file.filename,
+    ContentType: file.mimetype,
+  }
+
+  const command = new PutObjectCommand(uploadParams)
+
+  try {
+    await s3.send(command)
+    fs.unlink(file.path, error => {
+      if (error) {
+        console.error(`無法刪除檔案：${file.path}`, error)
+      }
+    })
+  } catch (error) {
+    throw new Error(`Failed to upload file to S3: ${error.message}`)
+  }
+}
 
 async function transformData() {
   const [data] = await pool.query(
@@ -429,11 +478,13 @@ const tweetController = {
   },
   postTweet: async (req, res, next) => {
     try {
+      const AWS_CDN = process.env.AWS_CDN
       const { description } = req.body
       const currentUserID = res.locals.userId
       const files = req.files
-      // console.log(req.files)
       const images = await Promise.all(files['tweetImages'] || [])
+      const uploadPromises = images.map(image => uploadFileToS3(image))
+      await Promise.all(uploadPromises)
       if (description.length > 140) {
         throw new Error('請以 140 字以內為限')
       } else if (description.trim() === '') {
@@ -451,7 +502,12 @@ const tweetController = {
           const insertPromises = images.map(image =>
             connection.execute(
               'INSERT INTO tweet_images (tweet_id, fileName, image_path, size) VALUES (?, ?, ?, ?)',
-              [tweetId, image.filename, image.path, image.size]
+              [
+                tweetId,
+                image.filename,
+                `${AWS_CDN}/${image.filename}`,
+                image.size,
+              ]
             )
           )
           await Promise.all(insertPromises)
