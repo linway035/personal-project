@@ -1,6 +1,6 @@
 import pool from '../middleware/databasePool.js'
 
-export async function saveMessage(senderId, roomId, message) {
+export async function saveMessage (senderId, roomId, message) {
   await pool.execute(
     `
       INSERT INTO messages ( user_id , room_id , message )
@@ -10,11 +10,11 @@ export async function saveMessage(senderId, roomId, message) {
   )
 }
 
-export async function checkRoom(senderId, receiverId) {
+export async function checkRoom (senderId, receiverId) {
   // id較小者當user1
   const [smallerID, biggerID] = [
     Math.min(senderId, receiverId),
-    Math.max(senderId, receiverId),
+    Math.max(senderId, receiverId)
   ]
   const roomName = `${smallerID}-${biggerID}`
   const [result] = await pool.execute(
