@@ -10,7 +10,7 @@ const imageFilter = (req, file, cb) => {
 
 const upload = multer({
   dest: 'uploads/',
-  fileFilter: imageFilter,
+  fileFilter: imageFilter
 })
 
 export default upload

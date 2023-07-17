@@ -25,8 +25,8 @@ app.use(cors())
 app.engine('hbs', exphbs({ extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true })) //body-parser
-app.use(express.json()) //解析 application/json 格式資料，才可以用 raw json
+app.use(express.urlencoded({ extended: true })) // body-parser
+app.use(express.json()) // 解析 application/json 格式資料，才可以用 raw json
 app.use(cookieParser())
 app.use('/uploads', express.static('./uploads'))
 app.use(

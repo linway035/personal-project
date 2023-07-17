@@ -1,4 +1,4 @@
-//改放s3，此檔案目前沒使用
+// 改放s3，此檔案目前沒使用
 import fs from 'fs'
 import crypto from 'crypto'
 

@@ -1,15 +1,15 @@
 import * as dotenv from 'dotenv'
-dotenv.config()
 import { Client } from '@elastic/elasticsearch'
+dotenv.config()
 
 const client = new Client({
   cloud: {
-    id: process.env.cloudID, //兩個id都連得到
+    id: process.env.cloudID // 兩個id都連得到
   },
   auth: {
     username: process.env.ESusername,
-    password: process.env.ESpassword,
-  },
+    password: process.env.ESpassword
+  }
 })
 
 // client
@@ -18,9 +18,9 @@ const client = new Client({
 //   .catch(error => console.error(error))
 
 // console.log('===============')
-export async function searchByElastic(keywords) {
+export async function searchByElastic (keywords) {
   const results = await client.search({
-    size: 50, //預設是10
+    size: 50, // 預設是10
     index: 'search-rdsproductiontest',
     body: {
       query: {
@@ -28,21 +28,21 @@ export async function searchByElastic(keywords) {
           should: [
             {
               match: {
-                'content.icu': `${keywords}`,
-              },
+                'content.icu': `${keywords}`
+              }
             },
             {
               match: {
                 content: {
                   query: `${keywords}`,
-                  analyzer: 'your_custom_analyzer',
-                },
-              },
-            },
-          ],
-        },
-      },
-    },
+                  analyzer: 'your_custom_analyzer'
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
   })
 
   const data = results.hits.hits
@@ -55,9 +55,9 @@ export async function searchByElastic(keywords) {
   return filteredTweetIds
 }
 
-export async function searchUserByElastic(keyword) {
+export async function searchUserByElastic (keyword) {
   const results = await client.search({
-    size: 20, //預設是10
+    size: 20, // 預設是10
     index: 'search-rdsproductiontest',
     body: {
       query: {
@@ -70,22 +70,22 @@ export async function searchUserByElastic(keyword) {
                   fuzziness: 2,
                   max_expansions: 20,
                   prefix_length: 0,
-                  transpositions: true,
-                },
-              },
+                  transpositions: true
+                }
+              }
             },
             {
               wildcard: {
                 name: {
                   value: `*${keyword}*`,
-                  case_insensitive: true,
-                },
-              },
-            },
-          ],
-        },
-      },
-    },
+                  case_insensitive: true
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
   })
 
   const data = results.hits.hits

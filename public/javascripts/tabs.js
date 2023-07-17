@@ -1,11 +1,11 @@
-function likeTweet(event, tweetId) {
+function likeTweet (event, tweetId) {
   event.preventDefault()
   fetch(`/tweets/${tweetId}/like`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ tweetId: tweetId }),
+    body: JSON.stringify({ tweetId })
   })
     .then(response => {
       if (response.ok) {
@@ -30,14 +30,14 @@ function likeTweet(event, tweetId) {
       console.error('Error liking tweet:', error.message)
     })
 }
-function unlikeTweet(event, tweetId) {
+function unlikeTweet (event, tweetId) {
   event.preventDefault()
   fetch(`/tweets/${tweetId}/unlike`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ tweetId: tweetId }),
+    body: JSON.stringify({ tweetId })
   })
     .then(response => {
       if (response.ok) {
@@ -62,14 +62,14 @@ function unlikeTweet(event, tweetId) {
       console.error('Error unliking tweet:', error.message)
     })
 }
-function hideTweet(event, tweetId) {
+function hideTweet (event, tweetId) {
   event.preventDefault()
   fetch(`/tweets/${tweetId}/hidden`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify({}),
+    body: JSON.stringify({})
   })
     .then(response => {
       if (response.ok) {

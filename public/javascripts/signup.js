@@ -38,8 +38,8 @@ signupForm.addEventListener('submit', function (e) {
       method: 'POST',
       body: JSON.stringify({ name, email, password, checkPassword }),
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     })
       .then(response => response.json())
       .then(data => {

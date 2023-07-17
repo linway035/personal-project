@@ -1,13 +1,13 @@
-async function followUser(userId) {
+async function followUser (userId) {
   try {
     const response = await fetch('/followships', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        id: userId,
-      }),
+        id: userId
+      })
     })
     if (response.ok) {
       const data = await response.json()
@@ -28,13 +28,13 @@ async function followUser(userId) {
   }
 }
 
-async function unfollowUser(userId) {
+async function unfollowUser (userId) {
   try {
     const response = await fetch(`/followships/${userId}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     })
     if (response.ok) {
       const data = await response.json()

@@ -1,6 +1,6 @@
 import pool from '../middleware/databasePool.js'
 
-export async function saveMessage(senderId, roomId, message) {
+export async function saveMessage (senderId, roomId, message) {
   await pool.execute(
     `
       INSERT INTO messages ( user_id , room_id , message )
@@ -10,11 +10,11 @@ export async function saveMessage(senderId, roomId, message) {
   )
 }
 
-export async function checkRoom(senderId, receiverId) {
+export async function checkRoom (senderId, receiverId) {
   // id較小者當user1
   const [smallerID, biggerID] = [
     Math.min(senderId, receiverId),
-    Math.max(senderId, receiverId),
+    Math.max(senderId, receiverId)
   ]
   const roomName = `${smallerID}-${biggerID}`
   const [result] = await pool.execute(
@@ -38,7 +38,7 @@ export async function checkRoom(senderId, receiverId) {
   }
 }
 
-export async function getRoomIdByName(roomName) {
+export async function getRoomIdByName (roomName) {
   const [rows] = await pool.execute(
     `
     SELECT id FROM rooms
@@ -54,7 +54,7 @@ export async function getRoomIdByName(roomName) {
   return null
 }
 
-export async function getMessagesByRoom(roomName) {
+export async function getMessagesByRoom (roomName) {
   const roomId = getRoomIdByName(roomName)
   const [rows] = await pool.execute(
     `
@@ -68,8 +68,8 @@ export async function getMessagesByRoom(roomName) {
   return data
 }
 
-//pending
-export async function getChatListById(id) {
+// pending
+export async function getChatListById (id) {
   /*
      [
    {
@@ -111,8 +111,8 @@ export async function getChatListById(id) {
     const receiverData = receiverProfileData.filter(
       profileItem => profileItem.id === item.receiverId
     )
-    item['receiverName'] = receiverData[0].name
-    item['receiverPicture'] = receiverData[0].picture
+    item.receiverName = receiverData[0].name
+    item.receiverPicture = receiverData[0].picture
     return item
   })
 

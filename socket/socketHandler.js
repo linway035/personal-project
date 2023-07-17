@@ -1,11 +1,11 @@
 import * as chatHelpers from '../helpers/chat-helpers.js'
 
-export function socketHandler(io) {
+export function socketHandler (io) {
   io.on('connection', socket => {
-    console.log(`a user connected `)
+    console.log('a user connected ')
 
     socket.on('disconnect', () => {
-      console.log(`a user disconnected`)
+      console.log('a user disconnected')
     })
 
     socket.on('join', ({ senderId, userName }) => {
@@ -29,7 +29,7 @@ export function socketHandler(io) {
       io.to(receiverID).to(sender).emit('message', {
         sender,
         roomID,
-        message,
+        message
       })
     })
   })

@@ -53,13 +53,13 @@ async function uploadFileToS3(file) {
 
 async function transformData() {
   const [data] = await pool.query(
-    `SELECT tweet_id, user_id, rating FROM ratings`
+    'SELECT tweet_id, user_id, rating FROM ratings'
   )
   const [usersCount] = await pool.query(
-    `SELECT MAX(id) AS usersCount FROM users`
+    'SELECT MAX(id) AS usersCount FROM users'
   )
   const [tweetsCount] = await pool.query(
-    `SELECT MAX(id) AS tweetsCount FROM tweets`
+    'SELECT MAX(id) AS tweetsCount FROM tweets'
   )
   const usersLength = usersCount[0].usersCount
   const tweetsLength = tweetsCount[0].tweetsCount
@@ -68,7 +68,7 @@ async function transformData() {
 
   // Initialize the transformed data object with empty arrays for each user
   for (let user_id = 1; user_id <= usersLength; user_id++) {
-    transformedData[user_id] = Array(tweetsLength).fill(null) //調參
+    transformedData[user_id] = Array(tweetsLength).fill(null) // 調參
   }
 
   // Populate the transformed data with ratings
@@ -118,7 +118,7 @@ const predictRatings = (user, otherUsers, ratings) => {
 
   const predictedRatings = []
   for (let i = 0; i < ratings[user].length; i++) {
-    //若填補值為null則null，0則
+    // 若填補值為null則null，0則
     if (ratings[user][i] === null) {
       let similarityWeightedSum = 0
       for (let j = 0; j < otherUsers.length; j++) {
@@ -248,7 +248,7 @@ const tweetController = {
     const currentUserData = currentUser[0]
 
     // 取推薦人
-    const matrix = await transformData() //若放在最外層則不會更新
+    const matrix = await transformData() // 若放在最外層則不會更新
     // console.log(matrix)
     const userId = res.locals.userId
 
@@ -264,7 +264,7 @@ const tweetController = {
     }
     // console.log(similarityResults) 得知相似度
 
-    //推薦文
+    // 推薦文
     const otherUsers = Object.keys(matrix).filter(
       user => parseInt(user) !== userId
     )
@@ -279,7 +279,7 @@ const tweetController = {
       index,
       score,
     })) // array of object [{ index: 61, score: 0 },...]
-    indexedScores.sort((a, b) => b.score - a.score) //sort會更改原array
+    indexedScores.sort((a, b) => b.score - a.score) // sort會更改原array
     const sortedIndices = indexedScores.map(item => item.index + 1)
     const tweetIDsSorted = sortedIndices.join(',')
     // console.log(tweetIDsSorted)
@@ -344,7 +344,7 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
-      //若違反唯一性約束條件，則觸發重複鍵更新的邏輯
+      // 若違反唯一性約束條件，則觸發重複鍵更新的邏輯
       await pool.execute(
         `INSERT INTO tweet_likes (user_id, tweet_id, is_active, updated_at)
         VALUES (?, ?, 1, NOW())
@@ -360,7 +360,7 @@ const tweetController = {
     const tweetId = req.params.id
     const currentUserID = res.locals.userId
     try {
-      //MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
+      // MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
       await pool.execute(
         `UPDATE tweet_likes
         SET is_active = 0, updated_at = NOW()
@@ -482,7 +482,7 @@ const tweetController = {
       const { description } = req.body
       const currentUserID = res.locals.userId
       const files = req.files
-      const images = await Promise.all(files['tweetImages'] || [])
+      const images = await Promise.all(files.tweetImages || [])
       const uploadPromises = images.map(image => uploadFileToS3(image))
       await Promise.all(uploadPromises)
       if (description.length > 140) {
@@ -494,7 +494,7 @@ const tweetController = {
       await connection.beginTransaction()
       try {
         const [rows] = await pool.execute(
-          `INSERT INTO tweets (user_id, content) VALUES (?, ?)`,
+          'INSERT INTO tweets (user_id, content) VALUES (?, ?)',
           [currentUserID, description]
         )
         const tweetId = rows.insertId
@@ -567,7 +567,7 @@ const tweetController = {
         `,
         [tweetId, currentUserID]
       )
-      const rating = rows[0]?.rating || null //給前端判斷null情況
+      const rating = rows[0]?.rating || null // 給前端判斷null情況
       // res.redirect('back')
       res.status(200).json({ rating })
     } catch (error) {
@@ -672,7 +672,7 @@ const tweetController = {
       return res.json({ tweets: [], q: query })
     }
 
-    //query 和 execute結果不同
+    // query 和 execute結果不同
     const [data, fields] = await pool.query(
       `
     SELECT
