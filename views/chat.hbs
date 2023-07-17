@@ -239,7 +239,8 @@
           chatMessageDiv.appendChild(messageDiv)
 
           chatMessagesContainer.appendChild(chatMessageDiv)
-          chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight
+          chatMessagesContainer.scrollTop = 
+          chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight
         })
       })
       .catch(error => {
@@ -352,6 +353,8 @@
       chatMessageDiv.appendChild(messageDiv)
 
       chatMessagesContainer.appendChild(chatMessageDiv)
+      chatMessagesContainer.scrollTop =
+        chatMessagesContainer.scrollHeight - chatMessagesContainer.clientHeight
     }
   })
 
