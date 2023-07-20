@@ -1,6 +1,6 @@
-import * as chatHelpers from '../helpers/chat-helpers.js'
+import * as chatModel from '../models/chat.js'
 
-export function socketHandler (io) {
+export function socketHandler(io) {
   io.on('connection', socket => {
     console.log('a user connected ')
 
@@ -14,7 +14,7 @@ export function socketHandler (io) {
     })
 
     socket.on('check', async ({ senderId, receiverId }) => {
-      await chatHelpers.checkRoom(senderId, receiverId)
+      await chatModel.checkRoom(senderId, receiverId)
       console.log('checkroom')
     })
 
@@ -22,14 +22,14 @@ export function socketHandler (io) {
       console.log(
         `Received message from ${sender} to ${receiverID} room ${roomID}: ${message}`
       )
-      await chatHelpers.saveMessage(sender, roomID, message)
+      await chatModel.saveMessage(sender, roomID, message)
       // socket
       //   .to([room.toString(), sender])
       //   .emit('message', { sender, room, message })
       io.to(receiverID).to(sender).emit('message', {
         sender,
         roomID,
-        message
+        message,
       })
     })
   })
