@@ -223,3 +223,40 @@ export async function getUsersByElasticSearch(currentUserID, userIds) {
   )
   return results
 }
+
+export async function getTweetsOfOneUser(currentUserID, userId) {
+  const [tweets] = await pool.execute(
+    `
+        SELECT tweets.*, users.name, users.avatar, 
+        IFNULL(like_counts.count, 0) AS like_count, IFNULL(reply_counts.count, 0) AS reply_count,
+        IF(MAX(tl.user_id) IS NULL, 0, 1) AS is_liked,
+        GROUP_CONCAT(tweet_images.image_path) AS images
+        FROM tweets
+        JOIN users ON tweets.user_id = users.id
+        LEFT JOIN (
+          SELECT tweet_id, COUNT(*) AS count
+          FROM tweet_likes
+          WHERE is_active = 1
+          GROUP BY tweet_id
+        ) AS like_counts ON tweets.id = like_counts.tweet_id
+        LEFT JOIN (
+          SELECT t.id AS tweet_id, COUNT(r.id) AS count
+          FROM tweets AS t
+          LEFT JOIN replies AS r ON t.id = r.tweet_id AND r.parent_id IS NULL
+          WHERE r.is_active = 1
+          GROUP BY t.id
+        ) AS reply_counts ON tweets.id = reply_counts.tweet_id
+        LEFT JOIN (
+          SELECT * FROM tweet_likes WHERE user_id = ? AND is_active = 1
+        ) AS tl ON tweets.id = tl.tweet_id
+        LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
+        WHERE tweets.is_active = 1 AND tweets.user_id = ? AND tweets.id NOT IN (
+          SELECT tweet_id FROM hidden_tweets WHERE user_id = ?
+        )
+        GROUP BY tweets.id
+        ORDER BY tweets.updated_at DESC
+      `,
+    [currentUserID, userId, currentUserID]
+  )
+  return tweets
+}

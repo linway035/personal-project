@@ -2,6 +2,7 @@ import pool from '../middleware/databasePool.js'
 import * as userModel from '../models/user.js'
 import * as tweetModel from '../models/tweet.js'
 import * as es from '../es/es.js'
+import tweetHelpers from '../helpers/tweet-helpers.js'
 import fs from 'fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
@@ -122,30 +123,13 @@ const predictRatings = (user, otherUsers, ratings) => {
   return predictedRatings
 }
 
-async function joinTweetsWithImages(data) {
-  return data.map(tweet => {
-    if (tweet.images) {
-      tweet.images = tweet.images.split(',').map(image => {
-        if (image.startsWith('https://')) {
-          return image
-        } else {
-          return `\\${image}`
-        }
-      })
-    } else {
-      tweet.images = []
-    }
-    return tweet
-  })
-}
-
 const tweetController = {
   getHome: async (req, res, next) => {
     const currentUserID = res.locals.userId
     const currentUserData = await userModel.getCurrentUserData(currentUserID)
 
     const data = await tweetModel.getFollowingTweets(currentUserID)
-    const tweetsWithImages = await joinTweetsWithImages(data)
+    const tweetsWithImages = await tweetHelpers.joinTweetsWithImages(data)
 
     const replies = await tweetModel.getFollowingReplies(currentUserID)
 
@@ -236,7 +220,7 @@ const tweetController = {
       [currentUserID, currentUserID]
     )
 
-    const tweetsWithImages = await joinTweetsWithImages(data)
+    const tweetsWithImages = await tweetHelpers.joinTweetsWithImages(data)
 
     res.render('tweets', {
       tweets: tweetsWithImages,
@@ -293,7 +277,7 @@ const tweetController = {
       if (data.length === 0) {
         throw new Error('找不到該推文')
       }
-      await joinTweetsWithImages(data)
+      await tweetHelpers.joinTweetsWithImages(data)
       const tweet = data[0]
       tweet.currentUser = currentUserData
       const replies = await tweetModel.getRepliesOfTweet(tweetId)
@@ -464,7 +448,7 @@ const tweetController = {
     }
 
     const data = await tweetModel.getTweetsByElasticSearch(tweetIds)
-    const tweetsWithImages = await joinTweetsWithImages(data)
+    const tweetsWithImages = await tweetHelpers.joinTweetsWithImages(data)
     res.json({ tweets: tweetsWithImages, q: query })
   },
   getUsersByElasticSearch: async (req, res, next) => {
