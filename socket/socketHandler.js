@@ -1,6 +1,6 @@
 import * as chatModel from '../models/chat.js'
 
-export function socketHandler(io) {
+export function socketHandler (io) {
   io.on('connection', socket => {
     console.log('a user connected ')
 
@@ -29,7 +29,7 @@ export function socketHandler(io) {
       io.to(receiverID).to(sender).emit('message', {
         sender,
         roomID,
-        message,
+        message
       })
     })
   })

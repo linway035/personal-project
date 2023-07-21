@@ -72,7 +72,7 @@ const userController = {
       res.cookie('jwtToken', token).json({
         userId: user[0].id,
         name: user[0].name,
-        avatar: user[0].avatar,
+        avatar: user[0].avatar
       })
     } catch (error) {
       next(error)
@@ -102,7 +102,7 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        tweets: tweetsWithImages,
+        tweets: tweetsWithImages
       })
     } catch (error) {
       next(error)
@@ -123,7 +123,7 @@ const userController = {
       res.render('userfollowings', {
         users,
         pageUserData,
-        user: currentUserData,
+        user: currentUserData
       })
     } catch (error) {
       next(error)
@@ -145,7 +145,7 @@ const userController = {
       res.render('userfollowers', {
         users,
         pageUserData,
-        user: currentUserData,
+        user: currentUserData
       })
     } catch (error) {
       next(error)
@@ -169,7 +169,7 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        replies,
+        replies
       })
     } catch (error) {
       next(error)
@@ -195,12 +195,12 @@ const userController = {
         userProfile,
         isCurrentUser,
         user: currentUserData,
-        tweets: tweetsWithImages,
+        tweets: tweetsWithImages
       })
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 
 export default userController

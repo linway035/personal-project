@@ -14,6 +14,6 @@ const tweetHelpers = {
       }
       return tweet
     })
-  },
+  }
 }
 export default tweetHelpers

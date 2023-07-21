@@ -1,6 +1,6 @@
 import pool from './databasePool.js'
 
-export async function postFollow(currentUserID, followingId) {
+export async function postFollow (currentUserID, followingId) {
   await pool.execute(
     `INSERT INTO followships (follower_id, following_id, is_active, updated_at)
       VALUES (?, ?, 1, NOW())
@@ -9,7 +9,7 @@ export async function postFollow(currentUserID, followingId) {
   )
 }
 
-export async function postUnfollow(currentUserID, followingId) {
+export async function postUnfollow (currentUserID, followingId) {
   await pool.execute(
     `UPDATE followships
       SET is_active = 0, updated_at = NOW()

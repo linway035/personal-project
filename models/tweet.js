@@ -1,7 +1,7 @@
 import pool from './databasePool.js'
 
 // Tweets from myself and the people I'm following
-export async function getFollowingTweets(currentUserID) {
+export async function getFollowingTweets (currentUserID) {
   const [data, fields] = await pool.execute(
     `
     SELECT tweets.*, users.name, users.avatar, 
@@ -43,7 +43,7 @@ export async function getFollowingTweets(currentUserID) {
 }
 
 // Replies from myself and the people I'm following
-export async function getFollowingReplies(currentUserID) {
+export async function getFollowingReplies (currentUserID) {
   const [replies, others] = await pool.execute(
     `
     SELECT 
@@ -71,7 +71,7 @@ export async function getFollowingReplies(currentUserID) {
   return replies
 }
 
-export async function postLike(currentUserID, tweetId) {
+export async function postLike (currentUserID, tweetId) {
   // 若違反唯一性約束條件，則觸發重複鍵更新的邏輯
   await pool.execute(
     `INSERT INTO tweet_likes (user_id, tweet_id, is_active, updated_at)
@@ -81,7 +81,7 @@ export async function postLike(currentUserID, tweetId) {
   )
 }
 
-export async function postUnlike(currentUserID, tweetId) {
+export async function postUnlike (currentUserID, tweetId) {
   // MySQL不允許在 UPDATE查詢中直接使用來自相同表格的子查詢，故改間接
   await pool.execute(
     `UPDATE tweet_likes
@@ -99,7 +99,7 @@ export async function postUnlike(currentUserID, tweetId) {
   )
 }
 
-export async function getSpecifiedTweet(currentUserID, tweetId) {
+export async function getSpecifiedTweet (currentUserID, tweetId) {
   const [data, fields] = await pool.execute(
     `SELECT tweets.*, users.name, users.avatar, IFNULL(like_counts.count, 0) AS like_count, 
       IFNULL(reply_counts.count, 0) AS reply_count, IF(tl.user_id IS NULL, 0, 1) AS is_liked,
@@ -130,7 +130,7 @@ export async function getSpecifiedTweet(currentUserID, tweetId) {
   return data
 }
 
-export async function getRepliesOfTweet(tweetId) {
+export async function getRepliesOfTweet (tweetId) {
   const [replies] = await pool.execute(
     `
     SELECT replies.*, users.name, users.avatar 
@@ -143,7 +143,7 @@ export async function getRepliesOfTweet(tweetId) {
   return replies
 }
 
-export async function postHidden(currentUserID, tweetId) {
+export async function postHidden (currentUserID, tweetId) {
   await pool.execute(
     `INSERT INTO hidden_tweets (user_id, tweet_id)
         VALUES (?, ?)
@@ -152,7 +152,7 @@ export async function postHidden(currentUserID, tweetId) {
   )
 }
 
-export async function postRating(currentUserID, tweetId, rating) {
+export async function postRating (currentUserID, tweetId, rating) {
   await pool.execute(
     `INSERT INTO ratings (user_id, tweet_id, rating)
         VALUES (?, ?, ?)
@@ -162,7 +162,7 @@ export async function postRating(currentUserID, tweetId, rating) {
   )
 }
 
-export async function getRating(tweetId, currentUserID) {
+export async function getRating (tweetId, currentUserID) {
   const [rows, fields] = await pool.execute(
     `SELECT rating FROM ratings WHERE tweet_id=? AND user_id=?
         `,
@@ -172,14 +172,14 @@ export async function getRating(tweetId, currentUserID) {
   return rating
 }
 
-export async function deleteRating(tweetId, currentUserID) {
-  await pool.execute(`DELETE FROM ratings WHERE tweet_id=? and user_id=?;`, [
+export async function deleteRating (tweetId, currentUserID) {
+  await pool.execute('DELETE FROM ratings WHERE tweet_id=? and user_id=?;', [
     tweetId,
-    currentUserID,
+    currentUserID
   ])
 }
 
-export async function getTweetsByElasticSearch(tweetIds) {
+export async function getTweetsByElasticSearch (tweetIds) {
   // query 和 execute結果會不同
   const [data, fields] = await pool.query(
     `
@@ -206,7 +206,7 @@ export async function getTweetsByElasticSearch(tweetIds) {
   return data
 }
 
-export async function getUsersByElasticSearch(currentUserID, userIds) {
+export async function getUsersByElasticSearch (currentUserID, userIds) {
   const [results, fields] = await pool.query(
     `SELECT users.*, IFNULL(followships.is_following, 0) AS is_following,
       CASE WHEN users.id = ? THEN 1 ELSE 0 END AS is_current_user
@@ -224,7 +224,7 @@ export async function getUsersByElasticSearch(currentUserID, userIds) {
   return results
 }
 
-export async function getTweetsOfOneUser(currentUserID, userId) {
+export async function getTweetsOfOneUser (currentUserID, userId) {
   const [tweets] = await pool.execute(
     `
         SELECT tweets.*, users.name, users.avatar, 

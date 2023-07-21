@@ -1,6 +1,6 @@
 import pool from './databasePool.js'
 
-export async function saveMessage(senderId, roomId, message) {
+export async function saveMessage (senderId, roomId, message) {
   await pool.execute(
     `
       INSERT INTO messages ( user_id , room_id , message )
@@ -10,11 +10,11 @@ export async function saveMessage(senderId, roomId, message) {
   )
 }
 
-export async function checkRoom(senderId, receiverId) {
+export async function checkRoom (senderId, receiverId) {
   // id較小者當user1
   const [smallerID, biggerID] = [
     Math.min(senderId, receiverId),
-    Math.max(senderId, receiverId),
+    Math.max(senderId, receiverId)
   ]
   const roomName = `${smallerID}-${biggerID}`
   const [result] = await pool.execute(
@@ -36,7 +36,7 @@ export async function checkRoom(senderId, receiverId) {
   }
 }
 
-export async function getChatUserLists(currentUserID) {
+export async function getChatUserLists (currentUserID) {
   const [chatUserLists] = await pool.execute(
     `
       SELECT 
@@ -71,7 +71,7 @@ export async function getChatUserLists(currentUserID) {
   return chatUserLists
 }
 
-export async function getRoomMessages(roomId) {
+export async function getRoomMessages (roomId) {
   const [roomMessage] = await pool.execute(
     `
     SELECT * FROM messages WHERE room_id =? ORDER BY created_at ASC
@@ -81,7 +81,7 @@ export async function getRoomMessages(roomId) {
   return roomMessage
 }
 
-export async function getNowReceiverData(receiverID) {
+export async function getNowReceiverData (receiverID) {
   const [nowReceiver] = await pool.execute(
     `
     SELECT id, name, avatar FROM users WHERE id =?`,
@@ -90,7 +90,7 @@ export async function getNowReceiverData(receiverID) {
   return nowReceiver[0]
 }
 
-export async function getRoomIdByRoomName(roomName) {
+export async function getRoomIdByRoomName (roomName) {
   const [roomId] = await pool.execute(
     `
       SELECT id FROM rooms WHERE name=?

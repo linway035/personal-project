@@ -45,6 +45,6 @@ const followshipController = {
     } catch (error) {
       next(error)
     }
-  },
+  }
 }
 export default followshipController

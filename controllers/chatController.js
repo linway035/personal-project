@@ -6,7 +6,7 @@ const chatController = {
     const currentUserID = res.locals.userId
     const currentUserData = await userModel.getCurrentUserData(currentUserID)
     res.render('chat', {
-      user: currentUserData,
+      user: currentUserData
     })
   },
   getRoomList: async (req, res, next) => {
@@ -25,13 +25,13 @@ const chatController = {
     await chatModel.checkRoom(senderId, receiverID)
     const [smallerID, biggerID] = [
       Math.min(senderId, receiverID),
-      Math.max(senderId, receiverID),
+      Math.max(senderId, receiverID)
     ]
     const roomName = `${smallerID}-${biggerID}`
     const result = await chatModel.getNowReceiverData(receiverID)
     result.roomId = await chatModel.getRoomIdByRoomName(roomName)
     return res.status(200).json(result)
-  },
+  }
 }
 
 export default chatController

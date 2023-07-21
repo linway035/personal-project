@@ -1,6 +1,6 @@
 import pool from './databasePool.js'
 
-export async function getCurrentUserData(currentUserID) {
+export async function getCurrentUserData (currentUserID) {
   const [currentUser] = await pool.execute(
     `
     SELECT id, name, avatar FROM users WHERE id =?`,
@@ -10,7 +10,7 @@ export async function getCurrentUserData(currentUserID) {
   return currentUserData
 }
 
-export async function getPageUserData(userId) {
+export async function getPageUserData (userId) {
   const [pageUser] = await pool.execute(
     'SELECT id, name from users WHERE id =?',
     [userId]
@@ -18,7 +18,7 @@ export async function getPageUserData(userId) {
   return pageUser
 }
 
-export async function getProfilePageData(currentUserID, userId) {
+export async function getProfilePageData (currentUserID, userId) {
   const [user] = await pool.execute(
     `
         SELECT u.*, IF(f.following_id IS NULL, 0, 1) AS is_following,
@@ -36,7 +36,7 @@ export async function getProfilePageData(currentUserID, userId) {
   return user
 }
 
-export async function getUserFollowingsData(currentUserID, userId) {
+export async function getUserFollowingsData (currentUserID, userId) {
   const [users] = await pool.execute(
     `
       SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
@@ -50,7 +50,7 @@ export async function getUserFollowingsData(currentUserID, userId) {
   return users
 }
 
-export async function getUserFollowersData(currentUserID, userId) {
+export async function getUserFollowersData (currentUserID, userId) {
   const [users] = await pool.execute(
     `
       SELECT u.id, u.name, u.avatar, u.bio, IF(f.following_id IS NULL, 0, 1) AS is_following
@@ -64,7 +64,7 @@ export async function getUserFollowersData(currentUserID, userId) {
   return users
 }
 
-export async function getUserRepliesData(userId) {
+export async function getUserRepliesData (userId) {
   const [replies] = await pool.execute(
     `
         SELECT r.*, t.user_id as tweet_user_id, u.name as tweet_user_name FROM replies r
@@ -78,7 +78,7 @@ export async function getUserRepliesData(userId) {
   return replies
 }
 
-export async function getUserLikeTweets(currentUserID, userId) {
+export async function getUserLikeTweets (currentUserID, userId) {
   const [tweets] = await pool.execute(
     `
         SELECT tweets.*, users.name, users.avatar, 

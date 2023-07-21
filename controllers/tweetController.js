@@ -13,19 +13,19 @@ const secretAccessKey = process.env.AWS_SECRET_KEY
 const s3 = new S3Client({
   credentials: {
     accessKeyId,
-    secretAccessKey,
+    secretAccessKey
   },
-  region,
+  region
 })
 
-async function uploadFileToS3(file) {
+async function uploadFileToS3 (file) {
   const fileStream = fs.createReadStream(file.path)
 
   const uploadParams = {
     Bucket: bucketName,
     Body: fileStream,
     Key: file.filename,
-    ContentType: file.mimetype,
+    ContentType: file.mimetype
   }
 
   const command = new PutObjectCommand(uploadParams)
@@ -42,7 +42,7 @@ async function uploadFileToS3(file) {
   }
 }
 
-async function transformData() {
+async function transformData () {
   const [data] = await pool.query(
     'SELECT tweet_id, user_id, rating FROM ratings'
   )
@@ -143,7 +143,7 @@ const tweetController = {
 
     res.render('tweets', {
       tweets: sortedArray,
-      user: currentUserData,
+      user: currentUserData
     })
   },
   getForYouPage: async (req, res, next) => {
@@ -178,7 +178,7 @@ const tweetController = {
     // console.log('predict', predictedRatings) 全部推文評分，array
     const indexedScores = predictedRatings.map((score, index) => ({
       index,
-      score,
+      score
     })) // array of objects [{ index: 61, score: 0 },...]
     indexedScores.sort((a, b) => b.score - a.score)
     const sortedIndices = indexedScores.map(item => item.index + 1)
@@ -224,7 +224,7 @@ const tweetController = {
 
     res.render('tweets', {
       tweets: tweetsWithImages,
-      user: currentUserData,
+      user: currentUserData
     })
   },
   postLike: async (req, res, next) => {
@@ -316,7 +316,7 @@ const tweetController = {
                 tweetId,
                 image.filename,
                 `${AWS_CDN}/${image.filename}`,
-                image.size,
+                image.size
               ]
             )
           )
@@ -379,14 +379,14 @@ const tweetController = {
     const currentUserID = res.locals.userId
     const currentUserData = await userModel.getCurrentUserData(currentUserID)
     res.render('searchUser', {
-      user: currentUserData,
+      user: currentUserData
     })
   },
   getSearchTweet: async (req, res, next) => {
     const currentUserID = res.locals.userId
     const currentUserData = await userModel.getCurrentUserData(currentUserID)
     res.render('search', {
-      user: currentUserData,
+      user: currentUserData
     })
   },
   getRecommendUsersAPI: async (req, res, next) => {
@@ -467,6 +467,6 @@ const tweetController = {
       }
     }
     res.json({ userSearchResults, q: query })
-  },
+  }
 }
 export default tweetController
