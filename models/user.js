@@ -70,7 +70,7 @@ export async function getUserRepliesData (userId) {
         SELECT r.*, t.user_id as tweet_user_id, u.name as tweet_user_name FROM replies r
         LEFT JOIN tweets t on r.tweet_id=t.id
         LEFT JOIN users u on t.user_id=u.id
-        where r.user_id =? AND r.is_active=1 AND t.is_active=1
+        WHERE r.user_id =? AND r.is_active=1 AND t.is_active=1
         ORDER BY r.updated_at DESC;
       `,
     [userId]

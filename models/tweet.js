@@ -34,7 +34,7 @@ export async function getFollowingTweets (currentUserID) {
     AND (tweets.user_id IN (
       SELECT following_id FROM followships WHERE follower_id = ? AND followships.is_active=1
     ) OR tweets.user_id = ?)
-    GROUP BY tweets.id, tweets.user_id, tweets.content, tweets.is_active, tweets.created_at, tweets.updated_at, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id
+    GROUP BY tweets.id, tl.user_id
     ORDER BY tweets.updated_at DESC
     `,
     [currentUserID, currentUserID, currentUserID, currentUserID]
@@ -124,7 +124,8 @@ export async function getSpecifiedTweet (currentUserID, tweetId) {
       ) AS tl ON tweets.id = tl.tweet_id
       LEFT JOIN tweet_images ON tweets.id = tweet_images.tweet_id
       WHERE tweets.id = ?
-      GROUP BY tweets.id, users.name, users.avatar, like_counts.count, reply_counts.count, tl.user_id`,
+      GROUP BY tweets.id, tl.user_id
+      `,
     [currentUserID, tweetId]
   )
   return data
@@ -146,8 +147,8 @@ export async function getRepliesOfTweet (tweetId) {
 export async function postHidden (currentUserID, tweetId) {
   await pool.execute(
     `INSERT INTO hidden_tweets (user_id, tweet_id)
-        VALUES (?, ?)
-        `,
+      VALUES (?, ?)
+      `,
     [currentUserID, tweetId]
   )
 }
@@ -155,9 +156,9 @@ export async function postHidden (currentUserID, tweetId) {
 export async function postRating (currentUserID, tweetId, rating) {
   await pool.execute(
     `INSERT INTO ratings (user_id, tweet_id, rating)
-        VALUES (?, ?, ?)
-        ON DUPLICATE KEY UPDATE rating = ? , updated_at = NOW();
-        `,
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE rating = ? , updated_at = NOW();
+      `,
     [currentUserID, tweetId, rating, rating]
   )
 }
@@ -165,7 +166,7 @@ export async function postRating (currentUserID, tweetId, rating) {
 export async function getRating (tweetId, currentUserID) {
   const [rows, fields] = await pool.execute(
     `SELECT rating FROM ratings WHERE tweet_id=? AND user_id=?
-        `,
+    `,
     [tweetId, currentUserID]
   )
   const rating = rows[0]?.rating || null // 給前端判斷null情況
@@ -197,7 +198,7 @@ export async function getTweetsByElasticSearch (tweetIds) {
     WHERE
       tweets.id IN (?) AND tweets.is_active = 1
     GROUP BY
-      tweets.id, tweets.content, users.name, users.avatar
+      tweets.id
     ORDER BY
       FIELD(tweets.id, ?);
     `,

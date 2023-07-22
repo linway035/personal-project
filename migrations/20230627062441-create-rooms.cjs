@@ -35,8 +35,12 @@ module.exports = {
         defaultValue: Sequelize.literal('NOW()'),
       },
     })
+    await queryInterface.addIndex('rooms', ['name'], {
+      name: 'idx_name',
+    })
   },
   async down(queryInterface, Sequelize) {
+    await queryInterface.removeIndex('rooms', 'idx_name')
     await queryInterface.dropTable('rooms')
   },
 }
