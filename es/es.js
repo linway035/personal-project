@@ -42,6 +42,11 @@ export async function searchByElastic (keywords) {
           ]
         }
       }
+      // highlight: {
+      //   fields: {
+      //     content: {},
+      //   },
+      // },
     }
   })
 
