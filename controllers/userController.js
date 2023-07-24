@@ -1,4 +1,4 @@
-import pool from '../middleware/databasePool.js'
+import pool from '../models/databasePool.js'
 import * as userModel from '../models/user.js'
 import * as tweetModel from '../models/tweet.js'
 import tweetHelpers from '../helpers/tweet-helpers.js'

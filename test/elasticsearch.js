@@ -9,12 +9,12 @@ chai.use(chaiHttp)
 dotenv.config()
 const client = new Client({
   cloud: {
-    id: process.env.cloudID,
+    id: process.env.cloudID
   },
   auth: {
     username: process.env.ESusername,
-    password: process.env.ESpassword,
-  },
+    password: process.env.ESpassword
+  }
 })
 
 describe('Elasticsearch', () => {
