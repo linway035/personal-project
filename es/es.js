@@ -42,15 +42,18 @@ export async function searchByElastic (keywords) {
           ]
         }
       }
+      // highlight: {
+      //   fields: {
+      //     content: {},
+      //   },
+      // },
     }
   })
 
   const data = results.hits.hits
-  // console.log(data)
   const tweetIds = data.map(item => {
     return parseInt(item._source.id.split('tweets_')[1])
   })
-  console.log('tweetIds->', tweetIds)
   const filteredTweetIds = tweetIds.filter(id => !isNaN(id))
   return filteredTweetIds
 }
@@ -89,11 +92,9 @@ export async function searchUserByElastic (keyword) {
   })
 
   const data = results.hits.hits
-  // console.log(data)
   const userIds = data.map(item => {
     return parseInt(item._source.id.split('users_')[1])
   })
-  console.log('userIds->', userIds)
   const filteredUserIds = userIds.filter(id => !isNaN(id))
   return filteredUserIds
 }
