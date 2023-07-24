@@ -49,9 +49,8 @@ signupForm.addEventListener('submit', function (e) {
         window.location.href = '/tweets/foryou'
       })
       .catch(error => {
-        console.error(error)
         errorAlert.innerHTML = `
-          <strong>${error}</strong>
+          <strong>註冊失敗，請完整填寫欄位</strong>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           `
         errorAlert.classList.remove('d-none')

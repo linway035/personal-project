@@ -14,14 +14,12 @@ router.use('/tweets', tweets)
 router.use('/chats', chats)
 router.use('/followships', followships)
 
-// router.get('/search/people/api', authenticate, tweetController.getSearchUserAPI)
 router.get(
   '/search/people/api',
   authenticate,
   tweetController.getUsersByElasticSearch
 )
 router.get('/search/people', authenticate, tweetController.getSearchUser)
-// router.get('/search/api', authenticate, tweetController.getSearchTweetAPI)
 router.get(
   '/search/api',
   authenticate,
