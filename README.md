@@ -45,6 +45,10 @@ StellarTweets is a personal project that aims to create a simple social networki
 
 **Others:** Bootstrap, ORM (Sequelize) , express-handlebars
 
+## MySQL Database Schema
+
+![drawSQL-sns-export-2023-08-03](https://github.com/linway035/personal-project/assets/32064935/a7fcfa27-35d2-46fa-abd2-c165a7019b33)
+
 ## Server structure
 
 ![structure](https://github.com/linway035/personal-project/assets/32064935/612960f3-e59e-4d18-9304-d498e7cc0a77)

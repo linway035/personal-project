@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET
-const expireTime = 60 * 60 * 24 * 5
+const expireTime = 60 * 60 * 24 * 1
 
-export function signJWT (userId) {
+export function signJWT(userId) {
   return new Promise((resolve, reject) => {
     jwt.sign(
       { userId },
@@ -19,7 +19,7 @@ export function signJWT (userId) {
   })
 }
 
-export function verifyJWT (token) {
+export function verifyJWT(token) {
   return new Promise((resolve, reject) => {
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
       if (err) {
